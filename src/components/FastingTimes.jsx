@@ -13,7 +13,7 @@ export default function FastingTimes() {
   const fetchFastingTimes = async () => {
     try {
       const response = await fetch(
-        'https://api.aladhan.com/v1/timingsByCity?city=Mecca&country=Saudi%20Arabia&method=4'
+        'https://islamicapi.com/api/v1/fasting/?lat=7.517478&lon=4.522775&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs'
       )
       const data = await response.json()
 

@@ -1,39 +1,39 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
-import ProtectedRoute from './components/ProtectedRoute'
+// import { AuthProvider } from './context/AuthContext'
+// import ProtectedRoute from './components/ProtectedRoute'
 import Landing from './pages/Landing'
-import Login from './pages/Login'
-import Signup from './pages/Signup'
-import Dashboard from './pages/Dashboard'
-import GroupDetail from './pages/GroupDetail'
+// import Login from './pages/Login'
+// import Signup from './pages/Signup'
+// import Dashboard from './pages/Dashboard'
+// import GroupDetail from './pages/GroupDetail'
 
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
+      {/* <AuthProvider> */}
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
+          {/* <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/group/:groupId"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <GroupDetail />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/" />} /> */}
         </Routes>
-      </AuthProvider>
+      {/* </AuthProvider> */}
     </BrowserRouter>
   )
 }
