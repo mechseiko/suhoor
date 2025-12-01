@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.86.0",
     "firebase": "^12.6.0",
     "lucide-react": "^0.555.0",
     "prettier": "^3.7.2",
