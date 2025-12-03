@@ -1,0 +1,5 @@
+1. On the Dashboard
+
+
+User will be seeing incoming fasts
+user will see his own groups

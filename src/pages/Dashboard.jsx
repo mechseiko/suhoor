@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Moon, LogOut, Plus, Users } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { LogOut, Plus, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore'
@@ -8,8 +8,15 @@ import GroupList from '../components/GroupList'
 import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
 import FastingTimes from '../components/FastingTimes'
+import Logo from '../components/Logo'
+import Loader from '../components/Loader'
+
+console.info("imported from firebase/firestore", db, collection, getDoc, setDoc, query, where, getDocs)
 
 export default function Dashboard() {
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const linkGroupKey = queryParams.get("groupKey");
     const { currentUser, logout } = useAuth()
     const navigate = useNavigate()
     const [showCreateModal, setShowCreateModal] = useState(false)
@@ -17,10 +24,13 @@ export default function Dashboard() {
     const [groups, setGroups] = useState([])
     const [loading, setLoading] = useState(true)
 
+    console.log("!currentUser:", !currentUser)
+
     useEffect(() => {
         if (currentUser) {
             createOrUpdateProfile()
             fetchGroups()
+            // logout()
         }
     }, [currentUser])
 
@@ -58,7 +68,6 @@ export default function Dashboard() {
                 setLoading(false)
                 return
             }
-
             // Fetch actual group data
             // Note: Firestore 'in' query supports up to 10 items. For more, we'd need to batch or fetch individually.
             // For simplicity, we'll fetch individually here or use 'in' if we assume < 10 groups.
@@ -71,7 +80,6 @@ export default function Dashboard() {
                     groupsData.push({ id: groupSnap.id, ...groupSnap.data() })
                 }
             }
-
             setGroups(groupsData)
         } catch (err) {
             console.error('Error fetching groups:', err)
@@ -89,15 +97,14 @@ export default function Dashboard() {
         }
     }
 
+    if (linkGroupKey !== '') { setShowJoinModal(true); }
+
     return (
-        <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-sm border-b">
-                <div className="container mx-auto px-6 py-4">
+        <div className="min-h-screen">
+            <nav className="bg-white shadow-sm">
+                <div className="container mx-auto py-3">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <Moon className="h-8 w-8 text-blue-600" />
-                            <span className="text-2xl font-bold text-gray-900">Suhoor</span>
-                        </div>
+                        <Logo />
                         <div className="flex items-center space-x-4">
                             <span className="text-gray-600">{currentUser?.email}</span>
                             <button
@@ -135,23 +142,21 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {loading ? (
-                            <div className="text-center py-12">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                            </div>
-                        ) : groups.length === 0 ? (
-                            <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                                <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                    No groups yet
-                                </h3>
-                                <p className="text-gray-600 mb-6">
-                                    Create a new group or join an existing one to get started
-                                </p>
-                            </div>
-                        ) : (
-                            <GroupList groups={groups} onUpdate={fetchGroups} />
-                        )}
+                        {loading ?
+                            <Loader />
+                            : groups.length === 0 ?
+                                <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+                                    <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                        No groups yet
+                                    </h3>
+                                    <p className="text-gray-600 mb-6">
+                                        Create a new group or join an existing one to get started
+                                    </p>
+                                </div>
+                                : (
+                                    <GroupList groups={groups} onUpdate={fetchGroups} />
+                                )}
                     </div>
 
                     <div className="lg:col-span-1">
@@ -177,6 +182,7 @@ export default function Dashboard() {
                         setShowJoinModal(false)
                         fetchGroups()
                     }}
+                    linkGroupKey={linkGroupKey && linkGroupKey}
                 />
             )}
         </div>

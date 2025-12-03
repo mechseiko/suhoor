@@ -1,8 +1,24 @@
 @import 'tailwindcss';
 
+@theme {
+  --font-helvetica: "Helvetica", system-ui, sans-serif;
+
+  /* Heroship Color Palette */
+  --color-primary: #3D1F94;
+  /* Deep Indigo – bold and creative */
+  --color-secondary: #F9A826;
+  /* Warm Amber – energetic and inviting */
+  --color-accent: #00C2A8;
+  /* Aqua Mint – fresh and modern */
+  --color-muted: #E5E7EB;
+  /* Soft Gray – clean background */
+  --color-dark: #1F2937;
+  /* Charcoal – for text and contrast */
+}
+
 body {
   min-height: 100vh;
   background-color: white;
-  color: #111827;
-  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--color-dark);
+  font-family: var(--font-helvetica);
 }

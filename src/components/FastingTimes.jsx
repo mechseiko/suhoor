@@ -2,57 +2,92 @@ import { useState, useEffect } from 'react'
 import { Clock, Sun, Moon, Calendar } from 'lucide-react'
 
 export default function FastingTimes() {
+
+  // -----------------------------
+  // HOOKS MUST ALWAYS COME FIRST
+  // -----------------------------
+  const [location, setLocation] = useState({
+    loaded: false,
+    coordinates: { lat: null, lng: null },
+    error: null,
+  });
+
   const [fastingData, setFastingData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // --- Location Fetch ---
+  const onSuccess = (position) => {
+    setLocation({
+      loaded: true,
+      coordinates: {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      },
+      error: null,
+    });
+  };
+
+  const onError = (err) => {
+    setLocation({
+      loaded: true,
+      coordinates: { lat: null, lng: null },
+      error: err.message,
+    });
+  };
+
   useEffect(() => {
-    fetchFastingTimes()
-  }, [])
-
-  const fetchFastingTimes = async () => {
-    try {
-      const response = await fetch(
-        'https://islamicapi.com/api/v1/fasting/?lat=7.517478&lon=4.522775&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs'
-      )
-      const data = await response.json()
-
-      if (data.code === 200) {
-        const timings = data.data.timings
-        const date = data.data.date
-
-        setFastingData({
-          fasting: [
-            {
-              date: date.gregorian.date,
-              hijri: date.hijri.date,
-              hijri_readable: `${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year} AH`,
-              time: {
-                sahur: timings.Fajr,
-                iftar: timings.Maghrib,
-              },
-            },
-          ],
-        })
-      }
-    } catch (err) {
-      setError('Failed to load fasting times')
-      console.error('Error fetching fasting times:', err)
-    } finally {
-      setLoading(false)
+    if (!("geolocation" in navigator)) {
+      onError({ message: "Geolocation not supported" });
+      return;
     }
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+  }, []);
+
+  // --- Fetch Fasting Times ---
+  useEffect(() => {
+    if (!location.loaded) return;
+    if (!location.coordinates.lat || !location.coordinates.lng) return;
+
+    const fetchFastingTimes = async () => {
+      console.log(location.coordinates.lat, location.coordinates.lng)
+      try {
+        const response = await fetch(
+          `https://islamicapi.com/api/v1/fasting/?lat=${location.coordinates.lat}&lon=${location.coordinates.lng}&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs`
+        );
+        const data = await response.json();
+
+        if (data.code === 200 && data.data.fasting) {
+          setFastingData({ fasting: data.data.fasting });
+        }
+      } catch (err) {
+        setError("Failed to load fasting times");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFastingTimes();
+  }, [location.loaded, location.coordinates.lat, location.coordinates.lng]);
+
+  // -----------------------------
+  // CONDITIONAL UI RETURNS BELOW
+  // -----------------------------
+
+  if (!location.loaded) {
+    return <div><strong>Loading location...</strong></div>;
+  }
+
+  if (location.error) {
+    return <div><strong>Error:</strong> {location.error}</div>;
   }
 
   if (loading) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-          <div className="h-4 bg-gray-200 rounded"></div>
-          <div className="h-4 bg-gray-200 rounded"></div>
-        </div>
+        Loading fasting times...
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -60,23 +95,23 @@ export default function FastingTimes() {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <p className="text-red-600">{error}</p>
       </div>
-    )
+    );
   }
 
-  const todayData = fastingData?.fasting?.[0]
+  const todayData = fastingData?.fasting?.[0];
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 sticky top-8">
       <div className="flex items-center space-x-2 mb-6">
-        <Calendar className="h-6 w-6 text-blue-600" />
-        <h3 className="text-xl font-bold text-gray-900">Today's Times</h3>
+        <Calendar className="h-6 w-6 text-primary" />
+        <h3 className="text-xl font-bold text-dark">Today's Fasting Times</h3>
       </div>
 
       {todayData && (
         <div className="space-y-6">
           <div>
-            <div className="text-sm text-gray-500 mb-1">Gregorian Date</div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-sm text-dark/70 mb-1">Gregorian Date</div>
+            <div className="text-lg font-semibold text-dark">
               {new Date(todayData.date).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
@@ -87,39 +122,51 @@ export default function FastingTimes() {
           </div>
 
           <div>
-            <div className="text-sm text-gray-500 mb-1">Hijri Date</div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-sm text-dark/70 mb-1">Hijri Date</div>
+            <div className="text-lg font-semibold text-dark">
               {todayData.hijri_readable}
             </div>
           </div>
 
           <div className="border-t pt-6 space-y-4">
-            <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Moon className="h-5 w-5 text-blue-600" />
-                <span className="font-medium text-gray-900">Suhoor Ends</span>
+                <Moon className="h-5 w-5 text-primary" />
+                <span className="font-medium text-dark">Suhoor Ends</span>
               </div>
-              <span className="text-xl font-bold text-blue-600">
+              <span className="text-xl font-bold text-primary">
                 {todayData.time.sahur}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-secondary/10 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Sun className="h-5 w-5 text-orange-600" />
-                <span className="font-medium text-gray-900">Iftar Begins</span>
+                <Sun className="h-5 w-5 text-secondary" />
+                <span className="font-medium text-dark">Iftar Begins</span>
               </div>
-              <span className="text-xl font-bold text-orange-600">
+              <span className="text-xl font-bold text-secondary">
                 {todayData.time.iftar}
               </span>
             </div>
+
+            {todayData.time.duration && (
+              <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Clock className="h-5 w-5 text-accent" />
+                  <span className="font-medium text-dark">Fasting Duration</span>
+                </div>
+                <span className="text-lg font-bold text-accent">
+                  {todayData.time.duration}
+                </span>
+              </div>
+            )}
           </div>
 
-          <div className="text-xs text-gray-500 text-center pt-4 border-t">
+          <div className="text-xs text-dark/60 text-center pt-4 border-t border-muted">
             Times are approximate. Please verify with your local mosque.
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

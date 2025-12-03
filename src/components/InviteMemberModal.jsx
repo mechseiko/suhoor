@@ -48,10 +48,10 @@ export default function InviteMemberModal({ groupId, onClose }) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
             <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-bold text-gray-900">Invite Member</h3>
+                    <h3 className="text-2xl font-bold text-dark">Invite Member</h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-dark/40 hover:text-dark/60"
                     >
                         <X className="h-6 w-6" />
                     </button>
@@ -59,13 +59,13 @@ export default function InviteMemberModal({ groupId, onClose }) {
 
                 {success ? (
                     <div className="text-center py-8">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Mail className="h-8 w-8 text-green-600" />
+                        <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Mail className="h-8 w-8 text-accent" />
                         </div>
-                        <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                        <h4 className="text-xl font-semibold text-dark mb-2">
                             Invite Sent!
                         </h4>
-                        <p className="text-gray-600">
+                        <p className="text-dark/70">
                             An invitation has been recorded for {email}
                         </p>
                     </div>
@@ -79,7 +79,7 @@ export default function InviteMemberModal({ groupId, onClose }) {
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-dark/80 mb-2">
                                     Email Address
                                 </label>
                                 <input
@@ -87,10 +87,10 @@ export default function InviteMemberModal({ groupId, onClose }) {
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-4 py-3 border border-muted rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                                     placeholder="friend@example.com"
                                 />
-                                <p className="text-sm text-gray-500 mt-2">
+                                <p className="text-sm text-dark/70 mt-2">
                                     They'll need to sign up with this email to join
                                 </p>
                             </div>
@@ -99,14 +99,14 @@ export default function InviteMemberModal({ groupId, onClose }) {
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+                                    className="flex-1 px-4 py-3 border border-muted text-dark/80 rounded-lg hover:bg-muted/30 font-medium"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+                                    className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 font-medium disabled:opacity-50"
                                 >
                                     {loading ? 'Sending...' : 'Send Invite'}
                                 </button>

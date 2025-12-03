@@ -67,21 +67,21 @@ export default function WakeUpTracker({ groupId, members }) {
     return (
         <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-                    <Moon className="h-6 w-6 text-blue-600" />
+                <h3 className="text-xl font-bold text-dark flex items-center space-x-2">
+                    <Moon className="h-6 w-6 text-primary" />
                     <span>Today's Wake Up Tracker</span>
                 </h3>
                 {!hasWokenUp ? (
                     <button
                         onClick={handleWakeUp}
                         disabled={loading}
-                        className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+                        className="flex items-center space-x-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition disabled:opacity-50"
                     >
                         <Bell className="h-5 w-5" />
                         <span>{loading ? 'Logging...' : "I'm Awake!"}</span>
                     </button>
                 ) : (
-                    <div className="flex items-center space-x-2 text-green-600">
+                    <div className="flex items-center space-x-2 text-accent">>
                         <CheckCircle className="h-5 w-5" />
                         <span className="font-medium">You're awake!</span>
                     </div>
@@ -99,21 +99,21 @@ export default function WakeUpTracker({ groupId, members }) {
                         <div
                             key={member.id}
                             className={`flex items-center justify-between p-4 rounded-lg border ${isAwake
-                                ? 'bg-green-50 border-green-200'
-                                : 'bg-gray-50 border-gray-200'
+                                ? 'bg-accent/10 border-accent/30'
+                                : 'bg-muted/30 border-muted'
                                 }`}
                         >
                             <div className="flex items-center space-x-3">
                                 <div
-                                    className={`w-3 h-3 rounded-full ${isAwake ? 'bg-green-500' : 'bg-gray-300'
+                                    className={`w-3 h-3 rounded-full ${isAwake ? 'bg-accent' : 'bg-muted'
                                         }`}
                                 ></div>
                                 <div>
-                                    <div className="font-medium text-gray-900">
+                                    <div className="font-medium text-dark">
                                         {member.profiles.display_name || member.profiles.email}
                                     </div>
                                     {isAwake && wakeUpTime && (
-                                        <div className="text-sm text-gray-500">
+                                        <div className="text-sm text-dark/60">
                                             Woke up at{' '}
                                             {new Date(wakeUpTime).toLocaleTimeString('en-US', {
                                                 hour: '2-digit',
@@ -123,14 +123,14 @@ export default function WakeUpTracker({ groupId, members }) {
                                     )}
                                 </div>
                             </div>
-                            {isAwake && <CheckCircle className="h-5 w-5 text-green-600" />}
+                            {isAwake && <CheckCircle className="h-5 w-5 text-accent" />}
                         </div>
                     )
                 })}
             </div>
 
             {wakeUpLogs.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-dark/50">
                     No one has woken up yet today. Be the first!
                 </div>
             )}
