@@ -16,6 +16,34 @@
   /* Charcoal – for text and contrast */
 }
 
+button{
+  cursor: pointer;
+}
+
+@theme {
+  --animate-navBar: navBar 0.5s ease-in-out 0s 1;
+  @keyframes navBar {
+    0% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+}
+
+/* @theme {
+  --animate-asideBar: asideBar 0.5s ease-in-out 0s 1;
+  @keyframes asideBar {
+    0% {
+      transform: translateX(-100px);
+    }
+    100% {
+      transform: translateX(0px);
+    }
+  }
+} */
+
 body {
   min-height: 100vh;
   background-color: white;

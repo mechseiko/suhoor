@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Users, Calendar, Share } from 'lucide-react'
+import { Users, Calendar, Share, Copy } from 'lucide-react'
 
 export default function GroupList({ groups }) {
   const navigate = useNavigate()
@@ -34,7 +34,7 @@ export default function GroupList({ groups }) {
                     navigator.clipboard.writeText(`https://suhoor-group.web.app/dashboard/groups?groupKey=${group.group_key}`)
                      alert(`Link to join ${groupName} has been copied to your clipboard!`)
                     }}
-                     ><Share /></span>
+                     ><Copy /></span>
                   </span>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
@@ -7,7 +7,7 @@ import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'fire
 export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
     const { currentUser } = useAuth()
     const [groupKey, setGroupKey] = useState('')
-    const [groups, setGroups] = useState()
+    const [invitedGroupName, setInvitedGroupName] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -21,7 +21,6 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
             const groupsRef = collection(db, 'groups')
             const q = query(groupsRef, where('group_key', '==', groupKey.toUpperCase()))
             const querySnapshot = await getDocs(q)
-            setGroups(groupsRef)
 
             if (querySnapshot.empty) {
                 setError('Group not found. Please check the group key.')
@@ -63,7 +62,23 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
             setLoading(false)
         }
     }
-    const groupName = groups.find(group => group.group_key === linkGroupKey).name
+    useEffect(() => {
+        const fetchInvitedGroup = async () => {
+            if (linkGroupKey) {
+                try {
+                    const groupsRef = collection(db, 'groups')
+                    const q = query(groupsRef, where('group_key', '==', linkGroupKey))
+                    const querySnapshot = await getDocs(q)
+                    if (!querySnapshot.empty) {
+                        setInvitedGroupName(querySnapshot.docs[0].data().name)
+                    }
+                } catch (err) {
+                    console.error("Error fetching invited group:", err)
+                }
+            }
+        }
+        fetchInvitedGroup()
+    }, [linkGroupKey])
 
     return (
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center p-6 z-50">
@@ -84,7 +99,7 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                         {error}
                     </div>
                 )}
-                {groupName && <p>You have been invited to join <b>{groupName}</b></p>}
+                {invitedGroupName && <p>You have been invited to join <b>{invitedGroupName}</b></p>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>

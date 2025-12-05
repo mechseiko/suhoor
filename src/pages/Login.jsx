@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Moon } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import AuthWrapper from '../components/AuthWrapper'
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -27,23 +27,7 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center px-6">
-            <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
-                <div className="flex items-center justify-center mb-8">
-                    <Moon className="h-12 w-12 text-blue-600" />
-                </div>
-                <h2 className="text-3xl font-bold text-center text-gray-900 mb-2">
-                    Welcome Back
-                </h2>
-                <p className="text-center text-gray-600 mb-8">
-                    Login to your Suhoor account
-                </p>
-
-                {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
-                        {error}
-                    </div>
-                )}
+        <AuthWrapper error={error} title="Welcome Back" subtitle="Login to your account">
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
@@ -89,14 +73,6 @@ export default function Login() {
                         Sign up
                     </Link>
                 </p>
-
-                <Link
-                    to="/"
-                    className="block text-center text-gray-500 hover:text-gray-700 mt-4"
-                >
-                    Back to home
-                </Link>
-            </div>
-        </div>
+            </AuthWrapper>
     )
 }

@@ -1,0 +1,45 @@
+import { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
+import Container from '../components/Container'
+
+
+export const navBar = [
+  { label: 'Home', to: '/' },
+  { label: 'Books', to: '/books' },
+  { label: 'Contribute', to: 'https://devseiko.vercel.app/contact?from=suhoor' },
+]
+
+
+export default function PageLayout({ children }) {
+    const navigate = useNavigate()
+    const location = useLocation()
+    const currentNavItem = `/${location.pathname.split('/')[1]}`
+    const [isScrolled, setIsScrolled] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50)
+        }
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+            <Container>
+                <Header
+                    isScrolled={isScrolled}
+                    currentNavItem={currentNavItem}
+                    navBar={navBar}
+                    navigate={navigate}
+                />
+                <main className="container mx-auto px-1">
+                    {children}
+                </main>
+            </Container>
+            <Footer />
+        </div>
+    )
+}

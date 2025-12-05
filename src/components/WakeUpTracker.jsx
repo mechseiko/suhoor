@@ -10,9 +10,7 @@ export default function WakeUpTracker({ groupId, members }) {
     const [hasWokenUp, setHasWokenUp] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
-        fetchTodayLogs()
-    }, [fetchTodayLogs])
+
 
     const fetchTodayLogs = useCallback(async () => {
         try {
@@ -39,6 +37,10 @@ export default function WakeUpTracker({ groupId, members }) {
             console.error('Error fetching wake up logs:', err)
         }
     }, [groupId, currentUser.uid])
+
+    useEffect(() => {
+        fetchTodayLogs()
+    }, [fetchTodayLogs])
 
     const handleWakeUp = async () => {
         setLoading(true)
@@ -81,7 +83,7 @@ export default function WakeUpTracker({ groupId, members }) {
                         <span>{loading ? 'Logging...' : "I'm Awake!"}</span>
                     </button>
                 ) : (
-                    <div className="flex items-center space-x-2 text-accent">>
+                    <div className="flex items-center space-x-2 text-accent">
                         <CheckCircle className="h-5 w-5" />
                         <span className="font-medium">You're awake!</span>
                     </div>
