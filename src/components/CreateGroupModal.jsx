@@ -48,27 +48,30 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
     }
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
-            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-bold text-dark">Create New Group</h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all scale-100 animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 className="text-2xl font-bold text-gray-900">Create New Group</h3>
+                        <p className="text-gray-500 text-sm mt-1">Start a new community for Suhoor</p>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="text-dark/40 hover:text-dark/60"
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
                     >
                         <X className="h-6 w-6" />
                     </button>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
-                        {error}
+                    <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl mb-6 text-sm flex items-center">
+                        <span className="mr-2">⚠️</span> {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-dark/80 mb-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Group Name
                         </label>
                         <input
@@ -76,25 +79,30 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
                             value={groupName}
                             onChange={e => setGroupName(e.target.value)}
                             required
-                            className="w-full px-4 py-3 border border-muted rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                            placeholder="Family Suhoor Group"
+                            className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-gray-400 text-gray-900"
+                            placeholder="e.g. Family Ramadan 2025"
                         />
                     </div>
 
-                    <div className="flex space-x-3 pt-4">
+                    <div className="flex gap-3 pt-2">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-3 border border-muted text-dark/80 rounded-lg hover:bg-muted/30 font-medium"
+                            className="flex-1 px-4 py-3.5 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 font-medium disabled:opacity-50"
+                            className="flex-1 px-4 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold shadow-lg shadow-blue-200 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
                         >
-                            {loading ? 'Creating...' : 'Create Group'}
+                            {loading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Creating...
+                                </span>
+                            ) : 'Create Group'}
                         </button>
                     </div>
                 </form>

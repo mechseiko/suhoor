@@ -11,6 +11,8 @@ import FastingTimes from '../components/FastingTimes'
 import Logo from '../components/Logo'
 import Loader from '../components/Loader'
 import StatsCard from '../components/StatsCard'
+import DailyQuote from '../components/DailyQuote'
+import ProfileButton from '../components/ProfileButton'
 
 console.info("imported from firebase/firestore", db, collection, getDoc, setDoc, query, where, getDocs)
 
@@ -110,57 +112,59 @@ export default function Dashboard() {
     }, [linkGroupKey]);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50/50">
             {/* Mobile Sidebar Overlay */}
             {showSidebar && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
                     onClick={() => setShowSidebar(false)}
                 />
             )}
 
             {/* Top Navigation */}
-            <nav className="bg-white shadow-sm sticky top-0 z-40">
-                <div className="container mx-auto py-3 px-3 md:px-4">
+            <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100">
+                <div className="container mx-auto px-4 py-3">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-4">
                             <button
                                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+                                className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
                             >
-                                {showMobileMenu ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                                {showMobileMenu ? <X className="h-6 w-6 text-gray-600" /> : <Menu className="h-6 w-6 text-gray-600" />}
                             </button>
                             <Logo />
                         </div>
-                        <div className="flex items-center space-x-2 md:space-x-4">
+                        <div className="flex items-center gap-4">
                             <button
                                 onClick={() => setShowSidebar(!showSidebar)}
-                                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+                                className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
                                 title="Fasting Times"
                             >
                                 <Clock className="h-5 w-5 text-blue-600" />
                             </button>
-                            <span className="text-gray-600 text-sm md:text-base hidden sm:inline">{currentUser?.email}</span>
+
+                            <ProfileButton currentUser={currentUser} navigate={navigate} />
+
                             <button
                                 onClick={handleLogout}
-                                className="flex items-center space-x-2 px-3 md:px-4 py-2 text-gray-600 hover:text-gray-900 transition"
+                                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
                             >
                                 <LogOut className="h-5 w-5" />
-                                <span className="hidden sm:inline">Logout</span>
+                                <span className="hidden sm:inline font-medium">Logout</span>
                             </button>
                         </div>
                     </div>
 
                     {/* Mobile Menu Dropdown */}
                     {showMobileMenu && (
-                        <div className="lg:hidden mt-4 pb-4 border-t pt-4">
+                        <div className="lg:hidden mt-4 pb-4 border-t border-gray-100 pt-4 animate-in slide-in-from-top-2">
                             <div className="flex flex-col gap-3">
                                 <button
                                     onClick={() => {
                                         setShowJoinModal(true)
                                         setShowMobileMenu(false)
                                     }}
-                                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-white border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-blue-200 text-blue-600 rounded-xl hover:bg-blue-50 transition-colors font-medium"
                                 >
                                     <Users className="h-5 w-5" />
                                     <span>Join Group</span>
@@ -170,7 +174,7 @@ export default function Dashboard() {
                                         setShowCreateModal(true)
                                         setShowMobileMenu(false)
                                     }}
-                                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium shadow-lg shadow-blue-200"
                                 >
                                     <Plus className="h-5 w-5" />
                                     <span>Create Group</span>
@@ -181,96 +185,166 @@ export default function Dashboard() {
                 </div>
             </nav>
 
-            <div className="flex">
-                {/* Main Content */}
-                <main className="flex-1 container mx-auto px-3 md:px-4 py-6">
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-6">
-                        <StatsCard
-                            icon={Users}
-                            title="Total Groups"
-                            value={stats.totalGroups}
-                            subtitle="Groups you're part of"
-                            color="blue"
-                        />
-                        <StatsCard
-                            icon={TrendingUp}
-                            title="Total Members"
-                            value={stats.totalMembers}
-                            subtitle="Across all groups"
-                            color="green"
-                        />
-                        <StatsCard
-                            icon={Award}
-                            title="Active Today"
-                            value={stats.activeToday}
-                            subtitle="Groups with activity"
-                            color="purple"
-                        />
-                    </div>
-
-                    {/* Groups Section */}
-                    <div>
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
-                            <h2 className="text-xl md:text-2xl font-bold text-gray-900">Your Groups</h2>
-                            <div className="hidden lg:flex gap-3">
-                                <button
-                                    onClick={() => setShowJoinModal(true)}
-                                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-white border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition"
-                                >
-                                    <Users className="h-5 w-5" />
-                                    <span>Join Group</span>
-                                </button>
-                                <button
-                                    onClick={() => setShowCreateModal(true)}
-                                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                                >
-                                    <Plus className="h-5 w-5" />
-                                    <span>Create Group</span>
-                                </button>
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Main Content */}
+                    <main className="flex-1 min-w-0">
+                        {/* Welcome & Quote Section */}
+                        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
+                            <div className="xl:col-span-2 flex flex-col justify-center">
+                                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                                    Welcome back, {currentUser?.displayName || currentUser?.email?.split('@')[0]} 👋
+                                </h1>
+                                <p className="text-lg text-gray-500 mb-6">
+                                    May your fasts be accepted and your prayers answered. Here's your daily summary.
+                                </p>
+                                <div className="flex flex-wrap gap-3">
+                                    <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
+                                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="xl:col-span-1">
+                                <DailyQuote />
                             </div>
                         </div>
 
-                        {loading ?
-                            <Loader />
-                            : groups.length === 0 ?
-                                <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                                    <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        {/* Stats Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                            <StatsCard
+                                icon={Users}
+                                title="Total Groups"
+                                value={stats.totalGroups}
+                                subtitle="Groups you're part of"
+                                color="blue"
+                            />
+                            <StatsCard
+                                icon={TrendingUp}
+                                title="Total Members"
+                                value={stats.totalMembers}
+                                subtitle="Across all groups"
+                                color="green"
+                            />
+                            <StatsCard
+                                icon={Award}
+                                title="Active Today"
+                                value={stats.activeToday}
+                                subtitle="Groups with activity"
+                                color="purple"
+                            />
+                        </div>
+
+                        {/* Groups Section */}
+                        <div className="space-y-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
+                                    <p className="text-sm text-gray-500 mt-1">Manage and monitor your group activities</p>
+                                </div>
+                                <div className="hidden lg:flex gap-3">
+                                    <button
+                                        onClick={() => setShowJoinModal(true)}
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 font-medium"
+                                    >
+                                        <Users className="h-5 w-5" />
+                                        <span>Join Group</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setShowCreateModal(true)}
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 font-medium"
+                                    >
+                                        <Plus className="h-5 w-5" />
+                                        <span>Create Group</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {loading ? (
+                                <div className="flex justify-center py-12">
+                                    <Loader />
+                                </div>
+                            ) : groups.length === 0 ? (
+                                <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center">
+                                    <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <Users className="h-10 w-10 text-gray-400" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
                                         No groups yet
                                     </h3>
-                                    <p className="text-gray-600 mb-6">
-                                        Create a new group or join an existing one to get started
+                                    <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+                                        Create a new group to invite friends or join an existing one to get started with your journey.
+                                    </p>
+                                    <div className="flex justify-center gap-4">
+                                        <button
+                                            onClick={() => setShowCreateModal(true)}
+                                            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium transition-colors"
+                                        >
+                                            Create Group
+                                        </button>
+                                        <button
+                                            onClick={() => setShowJoinModal(true)}
+                                            className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-medium transition-colors"
+                                        >
+                                            Join Group
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <GroupList groups={groups} onUpdate={fetchGroups} />
+                            )}
+                        </div>
+                    </main>
+
+                    {/* Desktop Sidebar - Fasting Times */}
+                    <aside className="hidden lg:block w-80 xl:w-96 shrink-0">
+                        <div className="sticky top-24">
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                                <div className="p-4 border-b border-gray-50 bg-gray-50/50">
+                                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                        <Clock className="h-5 w-5 text-blue-600" />
+                                        Fasting Schedule
+                                    </h3>
+                                </div>
+                                <div className="p-4">
+                                    <FastingTimes />
+                                </div>
+                            </div>
+
+                            {/* Optional: Add more widgets here later */}
+                            <div className="mt-6 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden">
+                                <div className="relative z-10">
+                                    <h4 className="font-bold text-lg mb-2">Pro Tip</h4>
+                                    <p className="text-blue-100 text-sm leading-relaxed">
+                                        Stay hydrated during non-fasting hours. Try to drink at least 8 glasses of water between Iftar and Suhoor.
                                     </p>
                                 </div>
-                                : (
-                                    <GroupList groups={groups} onUpdate={fetchGroups} />
-                                )}
-                    </div>
-                </main>
-
-                {/* Desktop Sidebar - Fasting Times */}
-                <aside className="hidden lg:block w-80 xl:w-96 p-4">
-                    <FastingTimes />
-                </aside>
-
-                {/* Mobile Sidebar - Fasting Times */}
-                <aside className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${showSidebar ? 'translate-x-0' : 'translate-x-full'
-                    }`}>
-                    <div className="p-4 border-b flex items-center justify-between">
-                        <h3 className="font-bold text-lg">Fasting Times</h3>
-                        <button
-                            onClick={() => setShowSidebar(false)}
-                            className="p-2 hover:bg-gray-100 rounded-lg"
-                        >
-                            <X className="h-5 w-5" />
-                        </button>
-                    </div>
-                    <div className="p-4 overflow-y-auto h-[calc(100%-4rem)]">
-                        <FastingTimes />
-                    </div>
-                </aside>
+                                <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 bg-white opacity-10 rounded-full blur-2xl"></div>
+                                <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-20 w-20 bg-blue-400 opacity-20 rounded-full blur-xl"></div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
             </div>
+
+            {/* Mobile Sidebar - Fasting Times */}
+            <aside className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${showSidebar ? 'translate-x-0' : 'translate-x-full'
+                }`}>
+                <div className="p-4 border-b flex items-center justify-between bg-gray-50">
+                    <h3 className="font-bold text-lg flex items-center gap-2">
+                        <Clock className="h-5 w-5 text-blue-600" />
+                        Fasting Times
+                    </h3>
+                    <button
+                        onClick={() => setShowSidebar(false)}
+                        className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                    >
+                        <X className="h-5 w-5 text-gray-500" />
+                    </button>
+                </div>
+                <div className="p-4 overflow-y-auto h-[calc(100%-4rem)]">
+                    <FastingTimes />
+                </div>
+            </aside>
 
             {showCreateModal && (
                 <CreateGroupModal

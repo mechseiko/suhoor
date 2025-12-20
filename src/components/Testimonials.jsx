@@ -6,21 +6,9 @@ export default function Testimonials() {
 
     const testimonials = [
         {
-            name: "Ahmed K.",
-            role: "Community Leader",
-            text: "This app changed how our family approaches Ramadan. Everyone wakes up on time now!",
-            rating: 5
-        },
-        {
-            name: "Fatima S.",
-            role: "Student",
-            text: "Love how easy it is to stay connected with my friends during the blessed month.",
-            rating: 5
-        },
-        {
-            name: "Ibrahim M.",
-            role: "Professional",
-            text: "Simple, effective, and exactly what we needed for our community group.",
+            name: "Abdulqoyum Amuda",
+            role: "Developer",
+            text: "Simple, effective, and exactly what is needed for any community group.",
             rating: 5
         }
     ]

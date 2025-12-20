@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 export default function Hero({ navigate }) {
     const [text, setText] = useState("In groups")
     const indexRef = useRef(0)
-    const keys = ["In groups", "With friends"]
+    const keys = ["in groups", "with friends", "with family"]
 
     useEffect(() => {
         const textInterval = setInterval(() => {

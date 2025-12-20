@@ -6,6 +6,7 @@ import HowItWorks from '../components/HowItWorks'
 import WhyChoose from '../components/WhyChoose'
 import Testimonials from '../components/Testimonials'
 import CtaSection from '../components/CtaSection'
+import Faq from '../components/Faq'
 
 export default function Landing() {
   const navigate = useNavigate()
@@ -17,6 +18,7 @@ export default function Landing() {
       <HowItWorks />
       <WhyChoose />
       <Testimonials />
+      <Faq />
       <CtaSection navigate={navigate} />
     </PageLayout>
   )

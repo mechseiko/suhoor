@@ -52,6 +52,7 @@ export default function HowItWorks() {
                             <div
                                 key={idx}
                                 onMouseEnter={() => setActiveStep(idx)}
+                                onMouseLeave={() => setActiveStep()}
                                 className={`p-6 rounded-xl cursor-pointer transition-all duration-300 ${isActive
                                         ? 'bg-blue-600 text-white shadow-xl scale-105'
                                         : 'bg-white text-gray-900 shadow-sm hover:shadow-md'

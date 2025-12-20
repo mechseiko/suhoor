@@ -8,12 +8,15 @@ import {
     Check,
     Moon,
     LogOut,
+    Shield,
+    Crown
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import WakeUpTracker from '../components/WakeUpTracker'
 import InviteMemberModal from '../components/InviteMemberModal'
+import Loader from '../components/Loader'
 
 export default function GroupDetail() {
     const { groupId } = useParams()
@@ -77,7 +80,7 @@ export default function GroupDetail() {
     }, [groupId])
 
     const copyGroupKey = () => {
-        navigator.clipboard.writeText(group.group_key)
+        navigator.clipboard.writeText(`https://suhoor-group.web.app/dashboard/groups?groupKey=${group.group_key}`)
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
     }
@@ -94,105 +97,148 @@ export default function GroupDetail() {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <Loader />
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-sm border-b">
-                <div className="container mx-auto px-6 py-4">
+        <div className="min-h-screen bg-gray-50/50">
+            {/* Header */}
+            <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100">
+                <div className="container mx-auto px-4 py-3">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="text-gray-600 hover:text-gray-900"
+                                className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-600"
                             >
-                                <ArrowLeft className="h-6 w-6" />
+                                <ArrowLeft className="h-5 w-5" />
                             </button>
-                            <Moon className="h-8 w-8 text-blue-600" />
-                            <span className="text-2xl font-bold text-gray-900">Suhoor</span>
+                            <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                                    <Moon className="h-5 w-5 text-white" />
+                                </div>
+                                <span className="text-xl font-bold text-gray-900 hidden sm:block">Suhoor</span>
+                            </div>
                         </div>
                         <button
                             onClick={handleLogout}
-                            className="p-2 text-gray-600 hover:text-red-600 transition"
+                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                             title="Sign Out"
                         >
-                            <LogOut className="h-6 w-6" />
+                            <LogOut className="h-5 w-5" />
                         </button>
                     </div>
                 </div>
             </nav>
 
-            <main className="container mx-auto px-6 py-8">
+            <main className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
-                    <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-                        <div className="flex items-start justify-between mb-6">
+                    {/* Group Header Card */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50"></div>
+
+                        <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6">
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                    {group?.name}
-                                </h1>
-                                <div className="flex items-center space-x-2">
-                                    <span className="text-sm text-gray-500">Group Key:</span>
-                                    <code className="px-3 py-1 bg-gray-100 rounded text-sm font-mono">
-                                        {group?.group_key}
-                                    </code>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <h1 className="text-3xl font-bold text-gray-900">
+                                        {group?.name}
+                                    </h1>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
+                                        {members.length} Members
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-3 mt-4">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                                        <span className="text-sm text-gray-500">Group Key:</span>
+                                        <code className="font-mono font-bold text-gray-900">{group?.group_key}</code>
+                                    </div>
                                     <button
                                         onClick={copyGroupKey}
-                                        className="p-1 hover:bg-gray-100 rounded transition"
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors font-medium"
                                     >
                                         {copied ? (
-                                            <Check className="h-4 w-4 text-green-600" />
+                                            <>
+                                                <Check className="h-4 w-4" />
+                                                <span>Copied</span>
+                                            </>
                                         ) : (
-                                            <Copy className="h-4 w-4 text-gray-600" />
+                                            <>
+                                                <Copy className="h-4 w-4" />
+                                                <span>Copy Invite Link</span>
+                                            </>
                                         )}
                                     </button>
                                 </div>
                             </div>
+
                             <button
                                 onClick={() => setShowInviteModal(true)}
-                                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5"
                             >
                                 <UserPlus className="h-5 w-5" />
                                 <span>Invite Member</span>
                             </button>
                         </div>
+                    </div>
 
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                                <Users className="h-5 w-5" />
-                                <span>Members ({members.length})</span>
-                            </h3>
-                            <div className="grid gap-3">
-                                {members.map(member => (
-                                    <div
-                                        key={member.id}
-                                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                                    >
-                                        <div>
-                                            <div className="font-medium text-gray-900">
-                                                {member.profiles.display_name || member.profiles.email}
-                                            </div>
-                                            <div className="text-sm text-gray-500">
-                                                {member.profiles.email}
-                                            </div>
-                                        </div>
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs font-medium ${member.role === 'admin'
-                                                ? 'bg-blue-100 text-blue-700'
-                                                : 'bg-gray-200 text-gray-700'
-                                                }`}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Main Content - Wake Up Tracker */}
+                        <div className="lg:col-span-2">
+                            <WakeUpTracker groupId={groupId} members={members} />
+                        </div>
+
+                        {/* Sidebar - Members List */}
+                        <div className="space-y-6">
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                                <div className="p-4 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
+                                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                        <Users className="h-5 w-5 text-blue-600" />
+                                        Members
+                                    </h3>
+                                    <span className="text-xs font-medium text-gray-500 bg-white px-2 py-1 rounded-md border border-gray-200">
+                                        {members.length} total
+                                    </span>
+                                </div>
+                                <div className="divide-y divide-gray-50">
+                                    {members.map(member => (
+                                        <div
+                                            key={member.id}
+                                            className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group"
                                         >
-                                            {member.role}
-                                        </span>
-                                    </div>
-                                ))}
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-blue-700 font-bold">
+                                                    {member.profiles.display_name?.charAt(0).toUpperCase() || member.profiles.email?.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-gray-900 flex items-center gap-2">
+                                                        {member.profiles.display_name || member.profiles.email.split('@')[0]}
+                                                        {member.role === 'admin' && (
+                                                            <Crown className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                                        )}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 truncate max-w-[150px]">
+                                                        {member.profiles.email}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {member.role === 'admin' ? (
+                                                <span className="px-2 py-1 bg-yellow-50 text-yellow-700 text-xs font-medium rounded-lg border border-yellow-100">
+                                                    Admin
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
+                                                    Member
+                                                </span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <WakeUpTracker groupId={groupId} members={members} />
                 </div>
             </main>
 
