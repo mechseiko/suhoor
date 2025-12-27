@@ -129,33 +129,33 @@ export default function FastingTimes() {
           </div>
 
           <div className="border-t pt-6 space-y-4">
-            <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Moon className="h-5 w-5 text-blue-600" />
+                <Moon className="h-5 w-5 text-primary" />
                 <span className="font-medium text-gray-900">Suhoor Ends</span>
               </div>
-              <span className="text-xl font-bold text-blue-600">
+              <span className="text-xl font-bold text-primary">
                 {todayData.time.sahur}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-secondary/10 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Sun className="h-5 w-5 text-orange-500" />
+                <Sun className="h-5 w-5 text-secondary" />
                 <span className="font-medium text-gray-900">Iftar Begins</span>
               </div>
-              <span className="text-xl font-bold text-orange-500">
+              <span className="text-xl font-bold text-secondary">
                 {todayData.time.iftar}
               </span>
             </div>
 
             {todayData.time.duration && (
-              <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <Clock className="h-5 w-5 text-purple-600" />
+                  <Clock className="h-5 w-5 text-accent" />
                   <span className="font-medium text-gray-900">Fasting Duration</span>
                 </div>
-                <span className="text-lg font-bold text-purple-600">
+                <span className="text-lg font-bold text-accent">
                   {todayData.time.duration}
                 </span>
               </div>

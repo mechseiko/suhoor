@@ -31,7 +31,7 @@ export default function Testimonials() {
 
                 <div className="relative">
                     <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg">
-                        <Quote className="h-10 w-10 text-blue-600 mb-6 opacity-50" />
+                        <Quote className="h-10 w-10 text-primary mb-6 opacity-50" />
 
                         <div className="mb-6">
                             <p className="text-xl md:text-2xl text-gray-700 leading-relaxed">
@@ -58,7 +58,7 @@ export default function Testimonials() {
                             <button
                                 key={idx}
                                 onClick={() => setCurrent(idx)}
-                                className={`h-2 rounded-full transition-all ${current === idx ? 'w-8 bg-blue-600' : 'w-2 bg-gray-300'
+                                className={`h-2 rounded-full transition-all ${current === idx ? 'w-8 bg-primary' : 'w-2 bg-gray-300'
                                     }`}
                             />
                         ))}

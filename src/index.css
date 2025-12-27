@@ -16,16 +16,18 @@
   /* Charcoal – for text and contrast */
 }
 
-button{
+button {
   cursor: pointer;
 }
 
 @theme {
   --animate-navBar: navBar 0.5s ease-in-out 0s 1;
+
   @keyframes navBar {
     0% {
       transform: translateY(-20px);
     }
+
     100% {
       transform: translateY(0px);
     }
@@ -49,4 +51,40 @@ body {
   background-color: white;
   color: var(--color-dark);
   font-family: var(--font-helvetica);
+}
+
+@utility b-primary {
+  border-color: var(--color-primary);
+}
+
+@utility b-secondary {
+  border-color: var(--color-secondary);
+}
+
+@utility b-accent {
+  border-color: var(--color-accent);
+}
+
+@utility b-muted {
+  border-color: var(--color-muted);
+}
+
+@utility b-dark {
+  border-color: var(--color-dark);
+}
+
+@utility text-primary {
+  color: var(--color-primary);
+}
+
+@utility bg-primary {
+  background-color: var(--color-primary);
+}
+
+@utility text-secondary {
+  color: var(--color-secondary);
+}
+
+@utility bg-secondary {
+  background-color: var(--color-secondary);
 }

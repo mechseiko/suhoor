@@ -56,23 +56,23 @@ export default function DailyQuote() {
     }
 
     return (
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg">
+        <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg">
             {/* Background Decorations */}
             <div className="absolute top-0 right-0 -mt-8 -mr-8 h-32 w-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-24 w-24 bg-blue-400 opacity-20 rounded-full blur-xl"></div>
+            <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-24 w-24 bg-accent opacity-20 rounded-full blur-xl"></div>
 
             <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <Quote className="h-5 w-5 text-blue-200" />
-                        <span className="text-blue-100 text-sm font-medium uppercase tracking-wider">Daily Inspiration</span>
+                        <Quote className="h-5 w-5 text-white/80" />
+                        <span className="text-white/90 text-sm font-medium uppercase tracking-wider">Daily Inspiration</span>
                     </div>
                     <button
                         onClick={getNewQuote}
                         className={`p-2 hover:bg-white/10 rounded-full transition-all duration-300 ${isAnimating ? 'rotate-180' : ''}`}
                         title="New Quote"
                     >
-                        <RefreshCw className="h-4 w-4 text-blue-100" />
+                        <RefreshCw className="h-4 w-4 text-white/90" />
                     </button>
                 </div>
 
@@ -80,7 +80,7 @@ export default function DailyQuote() {
                     <p className="text-xl md:text-2xl font-serif leading-relaxed mb-4">
                         "{quote.text}"
                     </p>
-                    <p className="text-sm text-blue-200 font-medium">
+                    <p className="text-sm text-white/80 font-medium">
                         — {quote.source}
                     </p>
                 </div>

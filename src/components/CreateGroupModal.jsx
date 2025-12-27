@@ -79,7 +79,7 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
                             value={groupName}
                             onChange={e => setGroupName(e.target.value)}
                             required
-                            className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-gray-400 text-gray-900"
+                            className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 text-gray-900"
                             placeholder="e.g. Family Ramadan 2025"
                         />
                     </div>
@@ -95,7 +95,7 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 px-4 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold shadow-lg shadow-blue-200 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
+                            className="flex-1 px-4 py-3.5 bg-primary text-white rounded-xl hover:opacity-90 font-semibold shadow-lg shadow-primary/20 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">

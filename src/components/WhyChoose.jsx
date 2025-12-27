@@ -22,7 +22,7 @@ export default function WhyChoose() {
             title: "Works Everywhere",
             desc: "Access from any device, anywhere in the world. Always free."
         }
-    ]
+    ];
 
     return (
         <div className="py-16 px-4 bg-white">
@@ -44,8 +44,8 @@ export default function WhyChoose() {
                                 key={idx}
                                 className="group text-center"
                             >
-                                <div className="inline-flex p-4 bg-blue-50 rounded-2xl mb-4 group-hover:bg-blue-600 transition-colors duration-300">
-                                    <Icon className="h-8 w-8 text-blue-600 group-hover:text-white transition-colors" />
+                                <div className="inline-flex p-4 bg-primary/10 rounded-2xl mb-4 group-hover:bg-primary transition-colors duration-300">
+                                    <Icon className="h-8 w-8 text-primary group-hover:text-white transition-colors" />
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                                     {item.title}

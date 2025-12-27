@@ -1,4 +1,4 @@
-    import { useState } from 'react'
+import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
 const faqs = [
@@ -53,7 +53,7 @@ export default function Faq() {
                                     {faq.question}
                                 </span>
                                 {openIndex === idx ? (
-                                    <ChevronUp className="w-5 h-5 text-blue-600" />
+                                    <ChevronUp className="w-5 h-5 text-primary" />
                                 ) : (
                                     <ChevronDown className="w-5 h-5 text-gray-400" />
                                 )}

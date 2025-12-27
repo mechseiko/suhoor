@@ -54,16 +54,16 @@ export default function HowItWorks() {
                                 onMouseEnter={() => setActiveStep(idx)}
                                 onMouseLeave={() => setActiveStep()}
                                 className={`p-6 rounded-xl cursor-pointer transition-all duration-300 ${isActive
-                                        ? 'bg-blue-600 text-white shadow-xl scale-105'
-                                        : 'bg-white text-gray-900 shadow-sm hover:shadow-md'
+                                    ? 'bg-primary text-white shadow-xl scale-105'
+                                    : 'bg-white text-gray-900 shadow-sm hover:shadow-md'
                                     }`}
                             >
-                                <div className={`inline-flex p-3 rounded-lg mb-4 ${isActive ? 'bg-white/20' : 'bg-blue-50'
+                                <div className={`inline-flex p-3 rounded-lg mb-4 ${isActive ? 'bg-white/20' : 'bg-primary/10'
                                     }`}>
-                                    <Icon className={`h-6 w-6 ${isActive ? 'text-white' : 'text-blue-600'}`} />
+                                    <Icon className={`h-6 w-6 ${isActive ? 'text-white' : 'text-primary'}`} />
                                 </div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className={`text-sm font-semibold ${isActive ? 'text-white/80' : 'text-blue-600'
+                                    <span className={`text-sm font-semibold ${isActive ? 'text-white/80' : 'text-primary'
                                         }`}>
                                         Step {idx + 1}
                                     </span>
