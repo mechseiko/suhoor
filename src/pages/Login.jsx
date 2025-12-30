@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import AuthWrapper from '../components/AuthWrapper'
+import PageLayout from '../layouts/PageLayout'
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -27,8 +28,8 @@ export default function Login() {
     }
 
     return (
-        <AuthWrapper error={error} title="Welcome Back" subtitle="Login to your account">
-
+        <PageLayout>
+            <AuthWrapper error={error} title="Welcome Back" subtitle="Login to your account">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -74,5 +75,6 @@ export default function Login() {
                     </Link>
                 </p>
             </AuthWrapper>
+        </PageLayout>
     )
 }

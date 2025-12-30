@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import AuthWrapper from '../components/AuthWrapper'
+import PageLayout from '../layouts/PageLayout'
 
 export default function Signup() {
     const [email, setEmail] = useState('')
@@ -37,8 +38,8 @@ export default function Signup() {
     }
 
     return (
-        <AuthWrapper error={error} title="Create Account" subtitle="Join Suhoor and stay connected">
-
+        <PageLayout>
+            <AuthWrapper error={error} title="Create Account" subtitle="Join Suhoor and stay connected">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -98,5 +99,6 @@ export default function Signup() {
                     </Link>
                 </p>
             </AuthWrapper>
+        </PageLayout>
     )
 }

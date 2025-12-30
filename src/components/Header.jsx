@@ -9,7 +9,7 @@ import ProfileButton from "../components/ProfileButton"
 
 export default function Header({ isScrolled, currentNavItem, navBar, navigate }) {
 
-    const { currentUser } = useAuth();
+    const { currentUser, logout } = useAuth();
 
     const NavBar = ({ style }) => {
         return (
@@ -45,7 +45,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                     {
                         !currentUser ? <Cta /> :
 
-                        <ProfileButton currentUser={currentUser} navigate={navigate} />
+                            <ProfileButton currentUser={currentUser} navigate={navigate} />
                     }
                 </div>
             </header>
@@ -70,7 +70,28 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                                 </Link>
 
                             ))}
-                            <Cta flex='col' />
+                            {currentUser ? (
+                                <div className="flex flex-col items-center gap-4 mt-2">
+                                    <div className="scale-110">
+                                        <ProfileButton currentUser={currentUser} navigate={navigate} />
+                                    </div>
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                await logout();
+                                                navigate('/');
+                                            } catch (error) {
+                                                console.error("Logout failed", error);
+                                            }
+                                        }}
+                                        className="text-red-500 font-medium py-2 px-4 hover:bg-red-50 rounded-lg w-full text-center"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            ) : (
+                                <Cta flex='col' />
+                            )}
                         </div> :
                         <></>
                 }

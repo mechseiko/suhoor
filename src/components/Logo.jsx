@@ -5,7 +5,7 @@ export default function () {
     return (
 
         <Link to="/" className="flex items-center space-x-2">
-            <Moon className="h-8 w-8 text-primary" />
+            <Moon className="h-6 w-6 text-primary" />
             <span className="text-2xl font-bold text-gray-900">Suhoor</span>
         </Link>
     )

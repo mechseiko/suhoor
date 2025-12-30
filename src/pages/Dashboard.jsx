@@ -193,7 +193,7 @@ export default function Dashboard() {
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
                             <div className="xl:col-span-2 flex flex-col justify-center">
                                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                                    Welcome back, {currentUser?.displayName || currentUser?.email?.split('@')[0]} 👋
+                                    Welcome back, {(currentUser?.displayName || currentUser?.email?.split('@')[0])?.split(' ')[0]} 👋
                                 </h1>
                                 <p className="text-lg text-gray-500 mb-6">
                                     May your fasts be accepted and your prayers answered. Here's your daily summary.

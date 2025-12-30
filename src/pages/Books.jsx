@@ -6,38 +6,8 @@ const baseBooks = [
   {
     title: 'Book of Fasting',
     file: '/books/Book of Fasting.pdf',
-    description: 'Comprehensive guide to fasting in Islam',
-    pages: '120'
-  },
-  {
-    title: 'The Sealed Nectar',
-    file: '/books/The Sealed Nectar.pdf',
-    description: 'Biography of the Prophet Muhammad (PBUH)',
-    pages: '600'
-  },
-  {
-    title: 'Fortress of the Muslim',
-    file: '/books/Fortress of the Muslim.pdf',
-    description: 'Collection of daily supplications and duas',
-    pages: '250'
-  },
-  {
-    title: 'Riyad as-Salihin',
-    file: '/books/Riyad as-Salihin.pdf',
-    description: 'The Gardens of the Righteous - Hadith collection',
-    pages: '800'
-  },
-  {
-    title: 'Stories of the Prophets',
-    file: '/books/Stories of the Prophets.pdf',
-    description: 'Lives of the Prophets in Islam',
-    pages: '400'
-  },
-  {
-    title: '40 Hadith Nawawi',
-    file: '/books/40 Hadith Nawawi.pdf',
-    description: 'Collection of forty hadiths by Imam An-Nawawi',
-    pages: '100'
+    description: 'A comprehensive guide to the spiritual and legal rulings of fasting in Islam.',
+    pages: null
   }
 ];
 

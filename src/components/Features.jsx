@@ -6,23 +6,23 @@ export default function Features() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             <FeatureCard
                 icon={<Users className="h-12 w-12 text-primary" />}
-                title="Create Groups"
-                description="Start a group or join existing ones with friends and family using a shared group key."
+                title="Community Circles"
+                description="Form spiritual circles with friends and family. Share the blessings of Suhoor through a unified platform."
             />
             <FeatureCard
                 icon={<Bell className="h-12 w-12 text-primary" />}
-                title="Wake Up Alerts"
-                description="Get notified when it's time for Suhoor and see who's awake in your group."
+                title="Wake Up Calls"
+                description="Ensure no one misses the blessed meal. Send and receive real-time notifications to wake your circle."
             />
             <FeatureCard
                 icon={<Calendar className="h-12 w-12 text-primary" />}
-                title="Fasting Times"
-                description="View accurate Suhoor and Iftar times with Hijri dates and white days information."
+                title="Prayer & Iftar"
+                description="Accurate timings for Suhoor and Iftar, complete with Hijri dates and Sunnah fasting reminders."
             />
             <FeatureCard
                 icon={<Moon className="h-12 w-12 text-primary" />}
-                title="Track Together"
-                description="Keep everyone accountable and motivated throughout the blessed month."
+                title="Collective Consistency"
+                description="Motivate one another to maintain consistency in worship and fasting throughout the holy month."
             />
         </div>
     )
