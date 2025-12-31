@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, Outlet } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import Container from '../components/Container'
@@ -28,7 +28,7 @@ export default function PageLayout({ children }) {
     }, [])
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
             <Container>
                 <Header
                     isScrolled={isScrolled}
@@ -36,8 +36,8 @@ export default function PageLayout({ children }) {
                     navBar={navBar}
                     navigate={navigate}
                 />
-                <main className="container mx-auto px-1">
-                    {children}
+                <main className="container mx-auto px-1 flex-grow">
+                    {children ? children : <Outlet />}
                 </main>
             </Container>
             <Footer />

@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import PageLayout from '../layouts/PageLayout'
 import Hero from '../components/Hero'
 import Features from '../components/Features'
 import HowItWorks from '../components/HowItWorks'
@@ -12,7 +11,7 @@ export default function Landing() {
   const navigate = useNavigate()
 
   return (
-    <PageLayout>
+    <>
       <Hero navigate={navigate} />
       <Features />
       <HowItWorks />
@@ -20,6 +19,6 @@ export default function Landing() {
 
       <Faq />
       <CtaSection navigate={navigate} />
-    </PageLayout>
+    </>
   )
 }

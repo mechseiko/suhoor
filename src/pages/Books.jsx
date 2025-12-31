@@ -1,11 +1,10 @@
 import { Download, Search, BookOpen, Library } from 'lucide-react';
 import { useState } from 'react';
-import PageLayout from '../layouts/PageLayout';
 
 const baseBooks = [
   {
     title: 'Book of Fasting',
-    file: '/books/Book of Fasting.pdf',
+    file: '/books/Book_of_Fasting.pdf',
     description: 'A comprehensive guide to the spiritual and legal rulings of fasting in Islam.',
     pages: null
   }
@@ -79,77 +78,75 @@ export default function Books() {
   };
 
   return (
-    <PageLayout>
-      <div className="max-w-7xl mx-auto py-8 px-4">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
-            <Library className="h-8 w-8 text-blue-600" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-            Islamic Books Library
-          </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Explore our curated collection of essential Islamic books and resources.
-            Read online or download for offline access.
-          </p>
+    <div className="max-w-7xl mx-auto py-8 px-4">
+      {/* Hero Section */}
+      <div className="text-center mb-12">
+        <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
+          <Library className="h-8 w-8 text-blue-600" />
         </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+          Islamic Books Library
+        </h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Explore our curated collection of essential Islamic books and resources.
+          Read online or download for offline access.
+        </p>
+      </div>
 
-        {/* Search Bar */}
-        <div className="mb-12">
-          <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search books by title..."
-              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition shadow-sm"
-            />
-          </div>
+      {/* Search Bar */}
+      <div className="mb-12">
+        <div className="relative max-w-2xl mx-auto">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search books by title..."
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition shadow-sm"
+          />
         </div>
+      </div>
 
-        {/* Books Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredBooks.length > 0 ? (
-            filteredBooks.map((book, i) => <BookCard key={i} book={book} />)
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <div className="inline-flex items-center justify-center p-4 bg-gray-50 rounded-full mb-4">
-                <BookOpen className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                No books found
-              </h3>
-              <p className="text-gray-600 mb-6">
-                We couldn't find any books matching "{searchTerm}"
-              </p>
-              <button
-                onClick={() => setSearchTerm('')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-              >
-                Clear Search
-              </button>
+      {/* Books Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredBooks.length > 0 ? (
+          filteredBooks.map((book, i) => <BookCard key={i} book={book} />)
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <div className="inline-flex items-center justify-center p-4 bg-gray-50 rounded-full mb-4">
+              <BookOpen className="h-8 w-8 text-gray-400" />
             </div>
-          )}
-        </div>
-
-        {/* Show all books if searching */}
-        {searchTerm && filteredBooks.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Other Books
-            </h2>
-            <div className="space-y-4">
-              {baseBooks
-                .filter((book) => !filteredBooks.includes(book))
-                .map((book, i) => (
-                  <BookCard key={i} book={book} />
-                ))}
-            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No books found
+            </h3>
+            <p className="text-gray-600 mb-6">
+              We couldn't find any books matching "{searchTerm}"
+            </p>
+            <button
+              onClick={() => setSearchTerm('')}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Clear Search
+            </button>
           </div>
         )}
       </div>
-    </PageLayout>
+
+      {/* Show all books if searching */}
+      {searchTerm && filteredBooks.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Other Books
+          </h2>
+          <div className="space-y-4">
+            {baseBooks
+              .filter((book) => !filteredBooks.includes(book))
+              .map((book, i) => (
+                <BookCard key={i} book={book} />
+              ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

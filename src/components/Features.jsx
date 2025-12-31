@@ -1,9 +1,16 @@
 import { Users, Bell, Calendar, Moon } from 'lucide-react'
 import FeatureCard from './FeatureCard'
+import SectionHeader from './SectionHeader'
 
 export default function Features() {
     return (
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            <div className="col-span-full">
+                <SectionHeader
+                    title="Everything You Need"
+                    subtitle="Designed to help you make the most of your Ramadan"
+                />
+            </div>
             <FeatureCard
                 icon={<Users className="h-12 w-12 text-primary" />}
                 title="Community Circles"

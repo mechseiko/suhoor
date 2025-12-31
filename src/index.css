@@ -48,11 +48,13 @@ button {
   }
 } */
 
-body {
-  min-height: 100vh;
-  background-color: white;
-  color: var(--color-dark);
-  font-family: var(--font-helvetica);
+@layer base {
+  body {
+    min-height: 100vh;
+    @apply bg-blue-50 antialiased;
+    color: var(--color-dark);
+    font-family: var(--font-helvetica);
+  }
 }
 
 @utility b-primary {

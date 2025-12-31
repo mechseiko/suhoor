@@ -15,16 +15,19 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
         return (
             <>
                 {navBar.map((navItem, index) => {
+                    const isActive = currentNavItem === navItem.to || (navItem.to === '/' && currentNavItem === '/');
                     return (
-                        <Link
-                            title={navItem.label}
-                            target={`${!navItem.to.startsWith('/') ? '_blank' : '_parent'}`}
-                            key={index}
-                            className={`${style} `}
-                            to={navItem.to}
-                        >
-                            {navItem.label}
-                        </Link>
+                        <div key={index} className="relative group">
+                            <Link
+                                title={navItem.label}
+                                target={!navItem.to.startsWith('/') ? '_blank' : undefined}
+                                className={`${style} ${isActive ? 'text-primary' : 'text-gray-600'} transition-colors duration-300`}
+                                to={navItem.to}
+                            >
+                                {navItem.label}
+                            </Link>
+                            <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full ${isActive ? 'w-full' : ''}`}></span>
+                        </div>
                     );
                 })}
             </>
@@ -39,8 +42,8 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
             <header className={`${commonStyle} md:flex hidden`}>
                 <div className="container mx-auto flex items-center justify-between">
                     <Logo />
-                    <div className="space-x-3">
-                        <NavBar style={`text-md hover:underline py-0.5 px-2 rounded-sm text-light`} />
+                    <div className="flex gap-8">
+                        <NavBar style={`text-base font-medium py-1`} />
                     </div>
                     {
                         !currentUser ? <Cta /> :
@@ -61,7 +64,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                             {navBar.map((navItem, index) => (
                                 <Link
                                     title={navItem.label}
-                                    target={`${!navItem.to.startsWith('/') ? '_blank' : '_parent'}`}
+                                    target={!navItem.to.startsWith('/') ? '_blank' : undefined}
                                     key={index}
                                     className={`text-center p-2 rounded-md mx-10 ${currentNavItem === navItem.to ? 'bg-primary bg-blue-500 text-white' : 'hover:bg-blue-300'}`}
                                     to={navItem.to}
