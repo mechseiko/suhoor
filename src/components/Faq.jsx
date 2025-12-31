@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Minus } from 'lucide-react'
+import SectionHeader from './SectionHeader'
 
 const faqs = [
     {
@@ -28,47 +29,46 @@ export default function Faq() {
     const [openIndex, setOpenIndex] = useState(null)
 
     return (
-        <section className="py-24 bg-white">
+        <section className="py-24 bg-gray-50">
             <div className="container mx-auto px-6 max-w-4xl">
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                        Frequently Asked Questions
-                    </h2>
-                    <p className="text-xl text-gray-600">
-                        Everything you need to know about Suhoor
-                    </p>
-                </div>
+                <SectionHeader
+                    title="Frequently Asked Questions"
+                    subtitle="Everything you need to know about starting your journey with Suhoor."
+                />
 
                 <div className="space-y-4">
-                    {faqs.map((faq, idx) => (
-                        <div
-                            key={idx}
-                            className="border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md"
-                        >
-                            <button
-                                onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-                                className="w-full flex items-center justify-between p-6 text-left bg-white hover:bg-gray-50 transition-colors"
-                            >
-                                <span className="text-lg font-semibold text-gray-900">
-                                    {faq.question}
-                                </span>
-                                {openIndex === idx ? (
-                                    <ChevronUp className="w-5 h-5 text-primary" />
-                                ) : (
-                                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                                )}
-                            </button>
-
+                    {faqs.map((faq, idx) => {
+                        const isOpen = openIndex === idx
+                        return (
                             <div
-                                className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === idx ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
-                                    }`}
+                                key={idx}
+                                className={`bg-white rounded-2xl transition-all duration-300 border border-gray-100 shadow-sm hover:shadow-md ${isOpen ? 'shadow-md' : ''}`}
                             >
-                                <div className="p-6 pt-0 text-gray-600 leading-relaxed border-t border-gray-100">
-                                    {faq.answer}
+                                <button
+                                    onClick={() => setOpenIndex(isOpen ? null : idx)}
+                                    className="w-full flex items-center justify-between p-6 text-left cursor-pointer"
+                                >
+                                    <span className={`text-lg font-bold transition-colors ${isOpen ? 'text-primary' : 'text-gray-900'}`}>
+                                        {faq.question}
+                                    </span>
+                                    <div className={`p-2 rounded-full transition-colors ${isOpen ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                        {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                                    </div>
+                                </button>
+
+                                <div
+                                    className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                                        }`}
+                                >
+                                    <div className="overflow-hidden">
+                                        <div className="p-6 pt-0 text-gray-600 leading-relaxed">
+                                            {faq.answer}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </div>
         </section>

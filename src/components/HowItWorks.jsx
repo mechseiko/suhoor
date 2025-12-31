@@ -1,5 +1,6 @@
 import { Clock, Users, Bell, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
+import SectionHeader from './SectionHeader'
 
 export default function HowItWorks() {
     const [activeStep, setActiveStep] = useState(0)
@@ -34,14 +35,10 @@ export default function HowItWorks() {
     return (
         <div className="py-16 px-4">
             <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                        How It Works
-                    </h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
-                        Get started in minutes and never miss Suhoor again
-                    </p>
-                </div>
+                <SectionHeader
+                    title="How It Works"
+                    subtitle="Get started in minutes and never miss Suhoor again"
+                />
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {steps.map((step, idx) => {

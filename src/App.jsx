@@ -8,6 +8,7 @@ import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import GroupDetail from './pages/GroupDetail'
 import Books from './pages/Books'
+import Duas from './pages/Duas'
 import Profile from './pages/Profile'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/books" element={<Books />} />
+            <Route path="/duas" element={<Duas />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route

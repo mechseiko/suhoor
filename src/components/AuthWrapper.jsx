@@ -3,7 +3,7 @@ import { Moon } from "lucide-react"
 
 export default function AuthWrapper({ children, title, subtitle, error }) {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center px-6">
+        <div className="min-h-screen pt-24 pb-12 flex items-center justify-center px-6">
             <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
                 <div className="flex gap-2 items-center justify-center mb-5">
                     <Moon className="h-12 w-12 text-primary" />

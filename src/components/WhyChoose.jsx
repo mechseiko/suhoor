@@ -1,4 +1,5 @@
 import { Shield, Zap, Heart, Globe } from 'lucide-react'
+import SectionHeader from './SectionHeader'
 
 export default function WhyChoose() {
     const reasons = [
@@ -27,14 +28,10 @@ export default function WhyChoose() {
     return (
         <div className="py-16 px-4 bg-white">
             <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                        Why Choose Suhoor?
-                    </h2>
-                    <p className="text-gray-600">
-                        Built with the Ummah in mind
-                    </p>
-                </div>
+                <SectionHeader
+                    title="Why Choose Suhoor?"
+                    subtitle="Built with the Ummah in mind"
+                />
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {reasons.map((item, idx) => {
