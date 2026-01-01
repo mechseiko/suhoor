@@ -14,8 +14,6 @@ import StatsCard from '../components/StatsCard'
 import DailyQuote from '../components/DailyQuote'
 import ProfileButton from '../components/ProfileButton'
 
-console.info("imported from firebase/firestore", db, collection, getDoc, setDoc, query, where, getDocs)
-
 export default function Dashboard() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -29,8 +27,6 @@ export default function Dashboard() {
     const [stats, setStats] = useState({ totalGroups: 0, totalMembers: 0, activeToday: 0 })
     const [showSidebar, setShowSidebar] = useState(false)
     const [showMobileMenu, setShowMobileMenu] = useState(false)
-
-    console.log("!currentUser:", !currentUser)
 
     useEffect(() => {
         if (currentUser) {
@@ -140,7 +136,7 @@ export default function Dashboard() {
                                 className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
                                 title="Fasting Times"
                             >
-                                <Clock className="h-5 w-5 text-blue-600" />
+                                <Clock className="h-5 w-5 text-primary" />
                             </button>
 
                             <ProfileButton currentUser={currentUser} navigate={navigate} />
@@ -192,8 +188,8 @@ export default function Dashboard() {
                         {/* Welcome & Quote Section */}
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
                             <div className="xl:col-span-2 flex flex-col justify-center">
-                                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                                    Welcome back, {(currentUser?.displayName || currentUser?.email?.split('@')[0])?.split(' ')[0]} 👋
+                                <h1 className="text-gray-900 text-[20px] mb-3">
+                                    Welcome back, <span className='text-xl md:text-2xl font-bold'>{(currentUser?.displayName || currentUser?.email?.split('@')[0])?.split(' ')[0]}</span> 👋
                                 </h1>
                                 <p className="text-lg text-gray-500 mb-6">
                                     May your fasts be accepted and your prayers answered. Here's your daily summary.
@@ -277,7 +273,7 @@ export default function Dashboard() {
                                     <div className="flex justify-center gap-4">
                                         <button
                                             onClick={() => setShowCreateModal(true)}
-                                            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium transition-colors"
+                                            className="px-6 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 font-medium transition-colors"
                                         >
                                             Create Group
                                         </button>
@@ -331,7 +327,7 @@ export default function Dashboard() {
                 }`}>
                 <div className="p-4 border-b flex items-center justify-between bg-gray-50">
                     <h3 className="font-bold text-lg flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-blue-600" />
+                        <Clock className="h-5 w-5 text-primary" />
                         Fasting Times
                     </h3>
                     <button

@@ -1,6 +1,6 @@
 export default function SectionHeader({ title, subtitle, className = "" }) {
     return (
-        <div className={`text-center mb-12 ${className}`}>
+        <div className={`text-center md:mb-10 mb-8 ${className}`}>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
                 {title}
             </h2>
@@ -12,3 +12,4 @@ export default function SectionHeader({ title, subtitle, className = "" }) {
         </div>
     )
 }
+

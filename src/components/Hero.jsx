@@ -11,18 +11,18 @@ export default function Hero({ navigate }) {
         const textInterval = setInterval(() => {
             indexRef.current = (indexRef.current + 1) % keys.length
             setText(keys[indexRef.current])
-        }, 2500)
+        }, 3000)
 
         return () => clearInterval(textInterval)
     }, [])
 
     return (
         <div className="text-center max-w-4xl mx-auto mb-12 pt-20 md:pt-24">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight px-4">
+            <h1 className="text-4xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight px-4">
                 Wake Up for <span className='text-primary'>Suhoor {text}</span>
             </h1>
             <p className="text-base md:text-lg text-gray-600 mb-6 leading-relaxed px-4 max-w-2xl mx-auto">
-                Revive the Sunnah of the pre-dawn meal. Connect with loved ones, ensure everyone wakes up on time, and start your fast with blessings and unity.
+              Connect with loved ones, ensure everyone wakes up on time, and start your fast with blessings and unity.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
                 <button

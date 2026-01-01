@@ -37,7 +37,7 @@ export default function Signup() {
     }
 
     return (
-        <AuthWrapper error={error} title="Create Account" subtitle="Join Suhoor and stay connected">
+        <AuthWrapper error={error} title="Create Account" subtitle="Join Suhoor and stay connected" bottomTitle="Already have an account?" bottomsubTitle="Login">
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -48,7 +48,7 @@ export default function Signup() {
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                         placeholder="your@email.com"
                     />
                 </div>
@@ -62,7 +62,7 @@ export default function Signup() {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                         placeholder="••••••••"
                     />
                 </div>
@@ -76,7 +76,7 @@ export default function Signup() {
                         value={confirmPassword}
                         onChange={e => setConfirmPassword(e.target.value)}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                         placeholder="••••••••"
                     />
                 </div>
@@ -84,18 +84,11 @@ export default function Signup() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? 'Creating account...' : 'Sign Up'}
                 </button>
             </form>
-
-            <p className="text-center text-gray-600 mt-6">
-                Already have an account?{' '}
-                <Link to="/login" className="text-blue-600 hover:text-blue-700">
-                    Login
-                </Link>
-            </p>
         </AuthWrapper>
     )
 }

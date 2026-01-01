@@ -17,6 +17,7 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import WakeUpTracker from '../components/WakeUpTracker'
 import InviteMemberModal from '../components/InviteMemberModal'
 import Loader from '../components/Loader'
+import Logo from '../components/Logo'
 
 export default function GroupDetail() {
     const { groupId } = useParams()
@@ -104,7 +105,6 @@ export default function GroupDetail() {
 
     return (
         <div className="min-h-screen bg-gray-50/50">
-            {/* Header */}
             <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100">
                 <div className="container mx-auto px-4 py-3">
                     <div className="flex items-center justify-between">
@@ -115,12 +115,7 @@ export default function GroupDetail() {
                             >
                                 <ArrowLeft className="h-5 w-5" />
                             </button>
-                            <div className="flex items-center gap-2">
-                                <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                                    <Moon className="h-5 w-5 text-white" />
-                                </div>
-                                <span className="text-xl font-bold text-gray-900 hidden sm:block">Suhoor</span>
-                            </div>
+                            <Logo />
                         </div>
                         <button
                             onClick={handleLogout}
@@ -135,7 +130,6 @@ export default function GroupDetail() {
 
             <main className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
-                    {/* Group Header Card */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50"></div>
 
@@ -157,7 +151,7 @@ export default function GroupDetail() {
                                     </div>
                                     <button
                                         onClick={copyGroupKey}
-                                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors font-medium"
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-primary rounded-xl hover:bg-blue-100 transition-colors font-medium"
                                     >
                                         {copied ? (
                                             <>
@@ -167,7 +161,7 @@ export default function GroupDetail() {
                                         ) : (
                                             <>
                                                 <Copy className="h-4 w-4" />
-                                                <span>Copy Invite Link</span>
+                                                <span>Copy Group key</span>
                                             </>
                                         )}
                                     </button>
@@ -176,7 +170,7 @@ export default function GroupDetail() {
 
                             <button
                                 onClick={() => setShowInviteModal(true)}
-                                className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5"
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:opacity-90 shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5"
                             >
                                 <UserPlus className="h-5 w-5" />
                                 <span>Invite Member</span>
@@ -195,7 +189,7 @@ export default function GroupDetail() {
                             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                                 <div className="p-4 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
                                     <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                        <Users className="h-5 w-5 text-blue-600" />
+                                        <Users className="h-5 w-5 text-primary" />
                                         Members
                                     </h3>
                                     <span className="text-xs font-medium text-gray-500 bg-white px-2 py-1 rounded-md border border-gray-200">

@@ -19,14 +19,13 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                     return (
                         <div key={index} className="relative group">
                             <Link
-                                title={navItem.label}
                                 target={!navItem.to.startsWith('/') ? '_blank' : undefined}
                                 className={`${style} ${isActive ? 'text-primary' : 'text-gray-600'} transition-colors duration-300`}
                                 to={navItem.to}
                             >
                                 {navItem.label}
                             </Link>
-                            <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full ${isActive ? 'w-full' : ''}`}></span>
+                            <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full ${isActive ? 'hidden' : ''}`}></span>
                         </div>
                     );
                 })}
@@ -48,7 +47,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                     {
                         !currentUser ? <Cta /> :
 
-                            <ProfileButton currentUser={currentUser} navigate={navigate} />
+                        <ProfileButton currentUser={currentUser} navigate={navigate} />
                     }
                 </div>
             </header>
@@ -61,18 +60,23 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                 {
                     isMenuOpen ?
                         <div className="animate-navBar space-y-3 mb-2 mt-5 flex flex-col">
-                            {navBar.map((navItem, index) => (
+                            {navBar.map((navItem, index) => {
+                                                    const isActive = currentNavItem === navItem.to || (navItem.to === '/' && currentNavItem === '/');
+
+                                return(
+                            
                                 <Link
                                     title={navItem.label}
                                     target={!navItem.to.startsWith('/') ? '_blank' : undefined}
                                     key={index}
-                                    className={`text-center p-2 rounded-md mx-10 ${currentNavItem === navItem.to ? 'bg-primary bg-blue-500 text-white' : 'hover:bg-blue-300'}`}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className={`text-center p-2 rounded-md mx-10 ${isActive ? 'bg-primary bg-blue-500 text-white' : 'hover:bg-blue-300'}`}
                                     to={navItem.to}
                                 >
                                     {navItem.label}
                                 </Link>
 
-                            ))}
+                            )})}
                             {currentUser ? (
                                 <div className="flex flex-col items-center gap-4 mt-2">
                                     <div className="scale-110">

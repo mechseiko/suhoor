@@ -11,7 +11,7 @@ import GroupDetail from './pages/GroupDetail'
 import Books from './pages/Books'
 import Duas from './pages/Duas'
 import Profile from './pages/Profile'
-
+import ForgotPassword from './pages/ForgotPassword'
 import ScrollToTop from './components/ScrollToTop'
 
 function App() {
@@ -26,6 +26,7 @@ function App() {
               <Route path="/books" element={<Books />} />
               <Route path="/duas" element={<Duas />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/signup" element={<Signup />} />
             </Route>
 

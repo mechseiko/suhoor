@@ -5,11 +5,11 @@ import SectionHeader from './SectionHeader'
 const faqs = [
     {
         question: "Is Suhoor completely free to use?",
-        answer: "Yes! Suhoor is 100% free for all individuals and groups. Our mission is to help everyone track their fasts and stay connected during Ramadan and beyond."
+        answer: "Yes! Suhoor is 100% free for all individuals and groups. Our mission is to help everyone track their fasts and stay connected."
     },
     {
         question: "How do the groups work?",
-        answer: "You can create a group and invite friends or family using a unique code. Once they join, you can see each other's progress on a shared leaderboard, motivating everyone to keep up with their goals."
+        answer: "You can create a group and invite friends or family using a unique code. Once they join, you can see each other's progress on a shared platform, motivating everyone to keep up with their goals."
     },
     {
         question: "Can I track missed fasts?",

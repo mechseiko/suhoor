@@ -174,7 +174,7 @@ export default function WakeUpTracker({ groupId, members }) {
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                    <h3 className="text-xl font-bold text-dark flex items-center space-x-2">
+                    <h3 className="md:text-xl text-lg font-bold text-dark flex items-center space-x-2">
                         <Moon className="h-6 w-6 text-primary" />
                         <span>Today's Wake Up Tracker</span>
                     </h3>
@@ -201,7 +201,7 @@ export default function WakeUpTracker({ groupId, members }) {
                         <button
                             onClick={handleWakeUp}
                             disabled={loading || !isConnected}
-                            className="flex items-center space-x-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center md:space-x-2 space-x-1 w-full px-2 md:px-4 md:py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Bell className="h-5 w-5" />
                             <span>{loading ? 'Logging...' : "I'm Awake!"}</span>
@@ -267,15 +267,10 @@ export default function WakeUpTracker({ groupId, members }) {
 
             {wakeUpLogs.length === 0 && (
                 <div className="text-center py-8 text-dark/50">
-                    No one has woken up yet today. Be the first!
+                    No one has woken up yet today.
                 </div>
             )}
 
-            {!isConnected && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-                    ⚠️ Connecting to real-time server...
-                </div>
-            )}
         </div>
     )
 }

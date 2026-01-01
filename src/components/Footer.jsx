@@ -1,52 +1,49 @@
 import { Link } from 'react-router-dom'
-import { Moon, Heart } from 'lucide-react'
+import { Heart } from 'lucide-react'
 import { navBar } from '../layouts/PageLayout'
+import Logo from './Logo'
 
-export default function Footer() {
+export default function Footer({currentNavItem}) {
   return (
     <footer className="bg-gray-50 border-t border-gray-100 pt-16 pb-8 mt-auto">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          {/* Brand Column */}
           <div className="md:col-span-2">
-            <Link to="/" className="flex items-center space-x-2 mb-4">
-              <Moon className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-gray-900">Suhoor</span>
-            </Link>
+            <Logo />
             <p className="text-gray-500 leading-relaxed max-w-sm">
-              Reviving the Sunnah of the pre-dawn meal. Connect with loved ones, ensure everyone wakes up on time, and start your fast with blessings.
+              Connect with loved ones, ensure everyone wakes up on time, and start your fast with blessings and unity.
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h3 className="font-bold text-gray-900 mb-4">Quick Links</h3>
             <ul className="space-y-3">
-              {navBar.map((item, idx) => (
-                <li key={idx}>
-                  {item.to.startsWith('http') ? (
+              {navBar.map((navItem, idx) => {
+                const isActive = currentNavItem === navItem.to || (navItem.to === '/' && currentNavItem === '/');
+                return(
+                <li key={idx} className='flex gap-2 items-center'>
+                  {navItem.to.startsWith('http') ? (
                     <a
-                      href={item.to}
+                      href={navItem.to}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-gray-600 hover:text-primary transition-colors"
+                    className={`${isActive  && 'text-primary'} text-gray-600 hover:text-primary transition-colors`}
                     >
-                      {item.label}
+                      {navItem.label}
                     </a>
                   ) : (
                     <Link
-                      to={item.to}
-                      className="text-gray-600 hover:text-primary transition-colors"
+                      to={navItem.to}
+                    className={`${isActive  && 'text-primary'} text-gray-600 hover:text-primary transition-colors`}
                     >
-                      {item.label}
+                      {navItem.label}
                     </Link>
                   )}
                 </li>
-              ))}
+              )})}
             </ul>
           </div>
 
-          {/* Community */}
           <div>
             <h3 className="font-bold text-gray-900 mb-4">Community</h3>
             <ul className="space-y-3">
@@ -66,7 +63,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} Suhoor by Dev.Seiko. All rights reserved.
+            © {new Date().getFullYear()} Suhoor by <Link to="https://devseiko.vercel.app" className="text-primary text-[12px]">MECHSEIKO</Link>. All rights reserved.
           </p>
           <div className="flex items-center gap-1 text-sm text-gray-400">
             <span>Built with</span>

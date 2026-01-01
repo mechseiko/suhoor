@@ -1,20 +1,33 @@
 import { Download, Search, BookOpen, Library } from 'lucide-react';
 import { useState } from 'react';
+import SectionHeader from '../components/SectionHeader';
 
 const baseBooks = [
   {
     title: 'Book of Fasting',
-    file: '/books/Book_of_Fasting.pdf',
-    description: 'A comprehensive guide to the spiritual and legal rulings of fasting in Islam.',
-    pages: null
-  }
+    file: '/books/Book of Fasting.pdf',
+    description: "A translation of a small pocket-size booklet written by Shaikh Usaamah Al-Qoosee, which was given the title 'As-Siyaam wa Ahkaamuhu' (Fasting and Its Rulings).",
+    pages: 32
+  },
+  {
+    title: "Ramadhan: Let's avoid the losses",
+    file: "/books/Ramadhan - Let's avoid the losses.pdf",
+    description: 'A book on the avoidance of loosing the Blessings of Ramadan.',
+    pages: 40
+  },
+  {
+    title: 'A Guide For Ramadhan',
+    file: '/books/A Guide For Ramadhan.pdf',
+    description: "A mini guide to help those who may be confused about what to do to make their Ramadhan productive.",
+    pages: 21
+  },
 ];
 
 export default function Books() {
   const [searchTerm, setSearchTerm] = useState('');
-
   const filteredBooks = baseBooks.filter((book) =>
-    book.title.toLowerCase().includes(searchTerm.toLowerCase())
+    book.title.toLowerCase().includes(searchTerm.toLowerCase()
+)
   );
 
   const BookCard = ({ book }) => {
@@ -25,7 +38,7 @@ export default function Books() {
       <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-5 border border-gray-100 flex flex-col h-full">
         <div className="flex items-start gap-4 mb-4">
           <div className="p-3 bg-blue-50 rounded-lg shrink-0">
-            <BookOpen className="h-6 w-6 text-blue-600" />
+            <BookOpen className="h-6 w-6 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
@@ -56,7 +69,7 @@ export default function Books() {
           <div className="flex gap-2">
             <a
               href={book.file}
-              className="flex-1 text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+              className="flex-1 text-sm px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -78,22 +91,18 @@ export default function Books() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      {/* Hero Section */}
+    <div className="max-w-7xl mx-auto py-8 px-4 mt-5">
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
-          <Library className="h-8 w-8 text-blue-600" />
+          <Library className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-          Islamic Books Library
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Explore our curated collection of essential Islamic books and resources.
-          Read online or download for offline access.
-        </p>
+        <SectionHeader
+            title="Library"
+            subtitle="Explore a curated collection of essential Islamic books on fasting.
+          Read online or download for offline access."
+        />
       </div>
 
-      {/* Search Bar */}
       <div className="mb-12">
         <div className="relative max-w-2xl mx-auto">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -107,7 +116,6 @@ export default function Books() {
         </div>
       </div>
 
-      {/* Books Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredBooks.length > 0 ? (
           filteredBooks.map((book, i) => <BookCard key={i} book={book} />)
@@ -132,7 +140,6 @@ export default function Books() {
         )}
       </div>
 
-      {/* Show all books if searching */}
       {searchTerm && filteredBooks.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">

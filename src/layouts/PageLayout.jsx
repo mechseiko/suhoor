@@ -29,7 +29,7 @@ export default function PageLayout({ children }) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
-            <Container>
+            {/* <Container> */}
                 <Header
                     isScrolled={isScrolled}
                     currentNavItem={currentNavItem}
@@ -39,8 +39,11 @@ export default function PageLayout({ children }) {
                 <main className="container mx-auto px-1 flex-grow">
                     {children ? children : <Outlet />}
                 </main>
-            </Container>
-            <Footer />
+            {/* </Container> */}
+            <Footer 
+                currentNavItem={currentNavItem}
+            />
+
         </div>
     )
 }

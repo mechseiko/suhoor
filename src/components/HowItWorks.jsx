@@ -21,13 +21,13 @@ export default function HowItWorks() {
         {
             icon: Bell,
             title: "Stay Connected",
-            desc: "See who's awake and keep each other motivated",
+            desc: "See who's awake and wake those that are not",
             color: "purple"
         },
         {
             icon: CheckCircle,
             title: "Track Progress",
-            desc: "Monitor your group's consistency throughout Ramadan",
+            desc: "Monitor your group's consistency",
             color: "orange"
         }
     ]
@@ -37,7 +37,7 @@ export default function HowItWorks() {
             <div className="max-w-6xl mx-auto">
                 <SectionHeader
                     title="How It Works"
-                    subtitle="Get started in minutes and never miss Suhoor again"
+                    subtitle="Get started in minutes and you'll never miss Suhoor again if Allah wishes."
                 />
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

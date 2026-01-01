@@ -41,7 +41,6 @@ export default function DailyQuote() {
     const [isAnimating, setIsAnimating] = useState(false)
 
     useEffect(() => {
-        // Pick a random quote on mount based on the day of the year to be consistent for the day
         const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24)
         setQuote(quotes[dayOfYear % quotes.length])
     }, [])
@@ -57,7 +56,6 @@ export default function DailyQuote() {
 
     return (
         <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg">
-            {/* Background Decorations */}
             <div className="absolute top-0 right-0 -mt-8 -mr-8 h-32 w-32 bg-white opacity-10 rounded-full blur-2xl"></div>
             <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-24 w-24 bg-accent opacity-20 rounded-full blur-xl"></div>
 
