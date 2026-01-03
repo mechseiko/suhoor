@@ -18,7 +18,7 @@ export default function Dashboard() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const linkGroupKey = queryParams.get("groupKey");
-    const { currentUser, logout } = useAuth()
+    const { currentUser } = useAuth()
     const navigate = useNavigate()
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [showJoinModal, setShowJoinModal] = useState(false)
@@ -34,6 +34,27 @@ export default function Dashboard() {
             fetchGroups()
         }
     }, [currentUser])
+
+    const GroupAction = ({className}) => {
+        return(
+            <div className={className}>
+                <button
+                    onClick={() => setShowJoinModal(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-blue-300 hover:text-primary transition-all duration-200 font-medium"
+                >
+                    <Users className="h-5 w-5" />
+                    <span>Join Group</span>
+                </button>
+                <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 font-medium"
+                >
+                    <Plus className="h-5 w-5" />
+                    <span>Create Group</span>
+                </button>
+            </div>
+        )
+    }
 
     const createOrUpdateProfile = async () => {
         try {
@@ -63,11 +84,11 @@ export default function Dashboard() {
                 groupIds.push(doc.data().group_id)
             })
 
-            if (groupIds.length === 0) {
-                setGroups([])
-                setLoading(false)
-                return
-            }
+            // if (groupIds.length === 0) {
+            //     setGroups([])
+            //     setLoading(false)
+            //     return
+            // }
 
             const groupsData = []
             for (const groupId of groupIds) {
@@ -91,7 +112,7 @@ export default function Dashboard() {
             setLoading(false)
         }
     }
-
+    
     const handleLogout = async () => {
         try {
             await logout()
@@ -121,7 +142,7 @@ export default function Dashboard() {
             <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100">
                 <div className="container mx-auto px-4 py-3">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center">
                             <button
                                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                                 className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
@@ -130,7 +151,8 @@ export default function Dashboard() {
                             </button>
                             <Logo />
                         </div>
-                        <div className="flex items-center gap-4">
+                        
+                        <div className="flex items-center">
                             <button
                                 onClick={() => setShowSidebar(!showSidebar)}
                                 className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
@@ -143,10 +165,10 @@ export default function Dashboard() {
 
                             <button
                                 onClick={handleLogout}
-                                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                                className="hidden sm:flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
                             >
                                 <LogOut className="h-5 w-5" />
-                                <span className="hidden sm:inline font-medium">Logout</span>
+                                <span className="inline font-medium">Logout</span>
                             </button>
                         </div>
                     </div>
@@ -160,7 +182,7 @@ export default function Dashboard() {
                                         setShowJoinModal(true)
                                         setShowMobileMenu(false)
                                     }}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-blue-200 text-blue-600 rounded-xl hover:bg-blue-50 transition-colors font-medium"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-blue-200 text-primary rounded-xl hover:bg-blue-50 transition-colors font-medium"
                                 >
                                     <Users className="h-5 w-5" />
                                     <span>Join Group</span>
@@ -170,7 +192,7 @@ export default function Dashboard() {
                                         setShowCreateModal(true)
                                         setShowMobileMenu(false)
                                     }}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium shadow-lg shadow-blue-200"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-xl hover:opacity-90 transition-colors font-medium shadow-lg shadow-blue-200"
                                 >
                                     <Plus className="h-5 w-5" />
                                     <span>Create Group</span>
@@ -181,22 +203,23 @@ export default function Dashboard() {
                 </div>
             </nav>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-6">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Main Content */}
                     <main className="flex-1 min-w-0">
                         {/* Welcome & Quote Section */}
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
                             <div className="xl:col-span-2 flex flex-col justify-center">
-                                <h1 className="text-gray-900 text-[20px] mb-3">
+                                <h1 className="text-gray-900 text-[20px] mb-2">
                                     Welcome back, <span className='text-xl md:text-2xl font-bold'>{(currentUser?.displayName || currentUser?.email?.split('@')[0])?.split(' ')[0]}</span> 👋
                                 </h1>
-                                <p className="text-lg text-gray-500 mb-6">
+                                <p className="text-lg text-gray-500 mb-4">
                                     May your fasts be accepted and your prayers answered. Here's your daily summary.
                                 </p>
                                 <div className="flex flex-wrap gap-3">
                                     <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
-                                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} <br />
+                                        {window.localStorage.getItem('Hijri Date')}
                                     </div>
                                 </div>
                             </div>
@@ -237,22 +260,7 @@ export default function Dashboard() {
                                     <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
                                     <p className="text-sm text-gray-500 mt-1">Manage and monitor your group activities</p>
                                 </div>
-                                <div className="hidden lg:flex gap-3">
-                                    <button
-                                        onClick={() => setShowJoinModal(true)}
-                                        className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 font-medium"
-                                    >
-                                        <Users className="h-5 w-5" />
-                                        <span>Join Group</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setShowCreateModal(true)}
-                                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 font-medium"
-                                    >
-                                        <Plus className="h-5 w-5" />
-                                        <span>Create Group</span>
-                                    </button>
-                                </div>
+                                {groups.length > 0 && <GroupAction className="hidden lg:flex gap-3"/>}
                             </div>
 
                             {loading ? (
@@ -270,20 +278,7 @@ export default function Dashboard() {
                                     <p className="text-gray-500 mb-8 max-w-sm mx-auto">
                                         Create a new group to invite friends or join an existing one to get started with your journey.
                                     </p>
-                                    <div className="flex justify-center gap-4">
-                                        <button
-                                            onClick={() => setShowCreateModal(true)}
-                                            className="px-6 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 font-medium transition-colors"
-                                        >
-                                            Create Group
-                                        </button>
-                                        <button
-                                            onClick={() => setShowJoinModal(true)}
-                                            className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-medium transition-colors"
-                                        >
-                                            Join Group
-                                        </button>
-                                    </div>
+                                    <GroupAction className="flex justify-center gap-4"/>
                                 </div>
                             ) : (
                                 <GroupList groups={groups} onUpdate={fetchGroups} />
@@ -298,7 +293,7 @@ export default function Dashboard() {
                                 <div className="p-4 border-b border-gray-50 bg-gray-50/50">
                                     <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                         <Clock className="h-5 w-5 text-blue-600" />
-                                        Fasting Schedule
+                                        Fasting Times
                                     </h3>
                                 </div>
                                 <div className="p-4">
@@ -359,7 +354,7 @@ export default function Dashboard() {
                         setShowJoinModal(false)
                         fetchGroups()
                     }}
-                    linkGroupKey={linkGroupKey && linkGroupKey}
+                    linkGroupKey={linkGroupKey}
                 />
             )}
         </div>

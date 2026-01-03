@@ -3,13 +3,17 @@ import { X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
+import { useNavigate } from 'react-router-dom'
 
 export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
+    const navigate = useNavigate();
     const { currentUser } = useAuth()
     const [groupKey, setGroupKey] = useState('')
     const [invitedGroupName, setInvitedGroupName] = useState('')
     const [loading, setLoading] = useState(false)
+    const [status, setStatus] = useState(linkGroupKey !== null || '' ? true : false)
     const [error, setError] = useState('')
+    const iWantToJoin = (linkGroupKey !== null || '') && status === true;
 
     const handleSubmit = async e => {
         e.preventDefault()
@@ -62,9 +66,10 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
             setLoading(false)
         }
     }
+
     useEffect(() => {
         const fetchInvitedGroup = async () => {
-            if (linkGroupKey) {
+            if (iWantToJoin) {
                 try {
                     const groupsRef = collection(db, 'groups')
                     const q = query(groupsRef, where('group_key', '==', linkGroupKey))
@@ -77,7 +82,7 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                 }
             }
         }
-        fetchInvitedGroup()
+        fetchInvitedGroup();
     }, [linkGroupKey])
 
     return (
@@ -116,17 +121,17 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                         </label>
                         <input
                             type="text"
-                            value={groupKey || linkGroupKey || ''}
+                            value={iWantToJoin ? linkGroupKey : groupKey}
+                            disabled={status === true}
                             onChange={e => setGroupKey(e.target.value)}
                             required
-                            disabled={!!linkGroupKey}
                             className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 text-gray-900 uppercase font-mono tracking-wider"
                             placeholder="ABC123XY"
                             maxLength={8}
                         />
-                        {!linkGroupKey && (
+                        {!iWantToJoin && (
                             <p className="text-xs text-gray-500 mt-2">
-                                Enter the 8-character code shared by the group admin
+                                Enter the 8-character code shared with you
                             </p>
                         )}
                     </div>
@@ -134,10 +139,10 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                     <div className="flex gap-3 pt-2">
                         <button
                             type="button"
-                            onClick={onClose}
+                            onClick={iWantToJoin ? () => {setStatus(false); navigate('/dashboard')} : onClose}
                             className="flex-1 px-4 py-3.5 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-colors"
                         >
-                            Cancel
+                            {iWantToJoin ? 'Reject' : 'Cancel'}
                         </button>
                         <button
                             type="submit"

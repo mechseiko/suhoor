@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Clock, Sun, Moon, Calendar } from 'lucide-react'
+import Loader from './Loader';
 
 export default function FastingTimes() {
 
-  // -----------------------------
-  // HOOKS MUST ALWAYS COME FIRST
-  // -----------------------------
   const [location, setLocation] = useState({
     loaded: false,
     coordinates: { lat: null, lng: null },
@@ -13,10 +11,9 @@ export default function FastingTimes() {
   });
 
   const [fastingData, setFastingData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // --- Location Fetch ---
   const onSuccess = (position) => {
     setLocation({
       loaded: true,
@@ -44,7 +41,6 @@ export default function FastingTimes() {
     navigator.geolocation.getCurrentPosition(onSuccess, onError);
   }, []);
 
-  // --- Fetch Fasting Times ---
   useEffect(() => {
     if (!location.loaded) return;
     if (!location.coordinates.lat || !location.coordinates.lng) return;
@@ -59,6 +55,7 @@ export default function FastingTimes() {
 
         if (data.code === 200 && data.data.fasting) {
           setFastingData({ fasting: data.data.fasting });
+          window.localStorage.setItem('Hijri Date', fastingData?.fasting?.[0].hijri_readable)
         }
       } catch (err) {
         setError("Failed to load fasting times");
@@ -70,29 +67,18 @@ export default function FastingTimes() {
     fetchFastingTimes();
   }, [location.loaded, location.coordinates.lat, location.coordinates.lng]);
 
-  // -----------------------------
-  // CONDITIONAL UI RETURNS BELOW
-  // -----------------------------
-
-  if (!location.loaded) {
-    return <div><strong>Loading location...</strong></div>;
-  }
-
-  if (location.error) {
-    return <div><strong>Error:</strong> {location.error}</div>;
-  }
-
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="text-center p-6">
+        <Loader />
         Loading fasting times...
       </div>
     );
   }
-
+         
   if (error) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="text-center p-6">
         <p className="text-red-600">{error}</p>
       </div>
     );
@@ -101,7 +87,7 @@ export default function FastingTimes() {
   const todayData = fastingData?.fasting?.[0];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-8">
+    <div className="md:p-1 p-3 sticky top-8">
       <div className="flex items-center space-x-2 mb-6">
         <Calendar className="h-6 w-6 text-blue-600" />
         <h3 className="text-xl font-bold text-gray-900">Today's Fasting Times</h3>

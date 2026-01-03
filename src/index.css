@@ -2,7 +2,6 @@
 
 @theme {
   --font-helvetica: "Helvetica", system-ui, sans-serif;
-
   /* Heroship Color Palette */
   --color-primary: #3D1F94;
   /* Deep Indigo – bold and creative */
@@ -35,18 +34,6 @@ button {
     }
   }
 }
-
-/* @theme {
-  --animate-asideBar: asideBar 0.5s ease-in-out 0s 1;
-  @keyframes asideBar {
-    0% {
-      transform: translateX(-100px);
-    }
-    100% {
-      transform: translateX(0px);
-    }
-  }
-} */
 
 @layer base {
   body {

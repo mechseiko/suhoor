@@ -5,11 +5,9 @@ import {
     Users,
     UserPlus,
     Copy,
-    Check,
-    Moon,
     LogOut,
-    Shield,
-    Crown
+    Crown,
+    CopyCheck
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
@@ -80,10 +78,12 @@ export default function GroupDetail() {
         fetchMembers()
     }, [groupId])
 
-    const copyGroupKey = () => {
-        navigator.clipboard.writeText(`https://suhoor-group.web.app/dashboard/groups?groupKey=${group.group_key}`)
+    const copyInviteLink = () => {
         setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
+        navigator.clipboard.writeText(`https://suhoor-group.web.app/dashboard?groupKey=${group.group_key}`)
+        setTimeout(() => {
+            setCopied(false)
+        }, 2000)
     }
 
     const handleLogout = async () => {
@@ -150,18 +150,18 @@ export default function GroupDetail() {
                                         <code className="font-mono font-bold text-gray-900">{group?.group_key}</code>
                                     </div>
                                     <button
-                                        onClick={copyGroupKey}
+                                        onClick={copyInviteLink}
                                         className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-primary rounded-xl hover:bg-blue-100 transition-colors font-medium"
                                     >
                                         {copied ? (
                                             <>
-                                                <Check className="h-4 w-4" />
+                                                <CopyCheck className="h-4 w-4" />
                                                 <span>Copied</span>
                                             </>
                                         ) : (
                                             <>
                                                 <Copy className="h-4 w-4" />
-                                                <span>Copy Group key</span>
+                                                <span>Copy Invite Link</span>
                                             </>
                                         )}
                                     </button>

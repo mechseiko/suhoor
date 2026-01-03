@@ -21,6 +21,12 @@ const baseBooks = [
     description: "A mini guide to help those who may be confused about what to do to make their Ramadhan productive.",
     pages: 21
   },
+  {
+    title: 'Causes Behind The Increase and Decrease of Eemaan',
+    file: '/books/Causes Behind The Increase and Decrease of Eemaan.pdf',
+    description: "An explanation and clarification of the most important causes for the increase and decrease of eemaan",
+    pages: 164
+  },
 ];
 
 export default function Books() {
@@ -111,7 +117,7 @@ export default function Books() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search books by title..."
-            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition shadow-sm"
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition shadow-sm"
           />
         </div>
       </div>

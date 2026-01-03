@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom'
 import { Heart } from 'lucide-react'
 import { navBar } from '../layouts/PageLayout'
 import Logo from './Logo'
+import Container from './Container';
 
 export default function Footer({currentNavItem}) {
   return (
-    <footer className="bg-gray-50 border-t border-gray-100 pt-16 pb-8 mt-auto">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+    <footer className="bg-gray-50 border-t border-gray-100 pt-16 md:pb-6 pb-4 mt-auto">
+      <Container>
+      <div className="container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:mb-12 mb:10">
           <div className="md:col-span-2">
             <Logo />
             <p className="text-gray-500 leading-relaxed max-w-sm">
@@ -22,16 +24,7 @@ export default function Footer({currentNavItem}) {
                 const isActive = currentNavItem === navItem.to || (navItem.to === '/' && currentNavItem === '/');
                 return(
                 <li key={idx} className='flex gap-2 items-center'>
-                  {navItem.to.startsWith('http') ? (
-                    <a
-                      href={navItem.to}
-                      target="_blank"
-                      rel="noreferrer"
-                    className={`${isActive  && 'text-primary'} text-gray-600 hover:text-primary transition-colors`}
-                    >
-                      {navItem.label}
-                    </a>
-                  ) : (
+                  {(
                     <Link
                       to={navItem.to}
                     className={`${isActive  && 'text-primary'} text-gray-600 hover:text-primary transition-colors`}
@@ -61,7 +54,7 @@ export default function Footer({currentNavItem}) {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="border-t border-gray-200 md:pt-6 pt-4 flex flex-col md:flex-row justify-between items-center gap-3">
           <p className="text-gray-400 text-sm">
             © {new Date().getFullYear()} Suhoor by <Link to="https://devseiko.vercel.app" className="text-primary text-[12px]">MECHSEIKO</Link>. All rights reserved.
           </p>
@@ -72,6 +65,7 @@ export default function Footer({currentNavItem}) {
           </div>
         </div>
       </div>
+      </Container>
     </footer>
   );
 }

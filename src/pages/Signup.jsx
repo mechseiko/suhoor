@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import AuthWrapper from '../components/AuthWrapper'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function Signup() {
     const [email, setEmail] = useState('')
@@ -9,6 +10,8 @@ export default function Signup() {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const { signup } = useAuth()
     const navigate = useNavigate()
 
@@ -57,28 +60,44 @@ export default function Signup() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Password
                     </label>
+                    <div className='relative'>
                     <input
-                        type="password"
+                        type={`${showPassword ? 'text' : 'password'}`}
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                         placeholder="••••••••"
                     />
+                    <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        className={`${showPassword ? 'text-primary' : 'text-gray-500'} absolute right-3 top-3.5 cursor-pointer`}
+                    >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </span>
+                    </div>
                 </div>
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Confirm Password
                     </label>
+                    <div className='relative'>
                     <input
-                        type="password"
+                        type={`${showConfirmPassword ? 'text' : 'password'}`}
                         value={confirmPassword}
                         onChange={e => setConfirmPassword(e.target.value)}
                         required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                         placeholder="••••••••"
                     />
+                    <span
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className={`${showConfirmPassword ? 'text-primary' : 'text-gray-500'} absolute right-3 top-3.5 cursor-pointer`}
+                    >
+                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </span>
+                    </div>
                 </div>
 
                 <button

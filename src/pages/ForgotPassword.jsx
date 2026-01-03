@@ -23,7 +23,7 @@ export default function ForgotPassword() {
     }
 
     return (
-        <AuthWrapper error={error} title="Forgot your password?" subtitle="We'll mail you a password reset link" bottomTitle="Remembered your password?" bottomsubTitle="Login">
+        <AuthWrapper error={error} title="Forgot your password?" subtitle="If you have an account with us, We'll mail you a password reset link." bottomTitle="Remembered your password?" bottomsubTitle="Login">
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

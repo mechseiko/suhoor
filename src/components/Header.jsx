@@ -5,6 +5,7 @@ import Cta from "./Cta";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import ProfileButton from "../components/ProfileButton"
+import Container from "./Container";
 
 
 export default function Header({ isScrolled, currentNavItem, navBar, navigate }) {
@@ -19,7 +20,6 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                     return (
                         <div key={index} className="relative group">
                             <Link
-                                target={!navItem.to.startsWith('/') ? '_blank' : undefined}
                                 className={`${style} ${isActive ? 'text-primary' : 'text-gray-600'} transition-colors duration-300`}
                                 to={navItem.to}
                             >
@@ -34,25 +34,24 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
     }
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const commonStyle = `fixed top-0 left-0 px-1 right-0 z-50 transition-all duration-300 ${isScrolled || isMenuOpen === true ? 'bg-white/80 backdrop-blur-md shadow-sm py-2' : 'bg-transparent py-4'}`
 
     return (
-        <>
-            <header className={`${commonStyle} md:flex hidden`}>
-                <div className="container mx-auto flex items-center justify-between">
+        <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || isMenuOpen === true ? 'bg-white/80 backdrop-blur-md shadow-sm py-2' : 'bg-transparent py-4'}`}>
+            <Container>
+            <header className="md:flex hidden">
+                <div className="container mx-auto flex items-center justify-between xl:px-15">
                     <Logo />
                     <div className="flex gap-8">
                         <NavBar style={`text-base font-medium py-1`} />
                     </div>
                     {
                         !currentUser ? <Cta /> :
-
                         <ProfileButton currentUser={currentUser} navigate={navigate} />
                     }
                 </div>
             </header>
 
-            <header className={`${commonStyle} md:hidden`}>
+            <header className="md:hidden">
                 <div className="flex justify-between items-center px-3">
                     <Logo />
                     <div onClick={() => setIsMenuOpen(!isMenuOpen)}>{isMenuOpen ? <X /> : <Menu />}</div>
@@ -61,13 +60,11 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                     isMenuOpen ?
                         <div className="animate-navBar space-y-3 mb-2 mt-5 flex flex-col">
                             {navBar.map((navItem, index) => {
-                                                    const isActive = currentNavItem === navItem.to || (navItem.to === '/' && currentNavItem === '/');
+                                const isActive = currentNavItem === navItem.to || (navItem.to === '/' && currentNavItem === '/');
 
                                 return(
-                            
                                 <Link
                                     title={navItem.label}
-                                    target={!navItem.to.startsWith('/') ? '_blank' : undefined}
                                     key={index}
                                     onClick={() => setIsMenuOpen(false)}
                                     className={`text-center p-2 rounded-md mx-10 ${isActive ? 'bg-primary bg-blue-500 text-white' : 'hover:bg-blue-300'}`}
@@ -103,6 +100,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                         <></>
                 }
             </header>
-        </>
+            </Container>
+        </div>
     )
 }

@@ -60,10 +60,10 @@ export default function DailyQuote() {
             <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-24 w-24 bg-accent opacity-20 rounded-full blur-xl"></div>
 
             <div className="relative z-10">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                        <Quote className="h-5 w-5 text-white/80" />
-                        <span className="text-white/90 text-sm font-medium uppercase tracking-wider">Daily Inspiration</span>
+                        <Quote className="h-4 w-4 text-white/80" />
+                        <span className="text-white/90 text-sm font-medium uppercase tracking-wider">Knowledge Box</span>
                     </div>
                     <button
                         onClick={getNewQuote}
@@ -75,7 +75,7 @@ export default function DailyQuote() {
                 </div>
 
                 <div className={`transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-                    <p className="text-xl md:text-2xl font-serif leading-relaxed mb-4">
+                    <p className="text-lg md:text-xl font-serif leading-relaxed mb-3">
                         "{quote.text}"
                     </p>
                     <p className="text-sm text-white/80 font-medium">

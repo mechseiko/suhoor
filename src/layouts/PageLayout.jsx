@@ -9,7 +9,6 @@ export const navBar = [
     { label: 'Home', to: '/' },
     { label: 'Books', to: '/books' },
     { label: 'Duas', to: '/duas' },
-    { label: 'Contribute', to: 'https://devseiko.vercel.app/contact?from=suhoor' },
 ]
 
 
