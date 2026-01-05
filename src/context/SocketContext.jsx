@@ -135,6 +135,19 @@ export const SocketProvider = ({ children }) => {
         }
     }, [socket])
 
+    // Helper function to buzz a user
+    const buzzUser = useCallback((toUserId, groupId, fromUserName) => {
+        if (socket && currentUser) {
+            socket.emit('buzz-user', {
+                fromUserId: currentUser.uid,
+                fromUserName: fromUserName || currentUser.email,
+                toUserId,
+                groupId
+            })
+            console.log(`🔔 Buzzing user: ${toUserId}`)
+        }
+    }, [socket, currentUser])
+
     const value = {
         socket,
         isConnected,
@@ -142,6 +155,7 @@ export const SocketProvider = ({ children }) => {
         joinGroup,
         leaveGroup,
         emitWakeUp,
+        buzzUser,
         on,
         off
     }

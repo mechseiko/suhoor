@@ -13,12 +13,13 @@ import Loader from '../components/Loader'
 import StatsCard from '../components/StatsCard'
 import DailyQuote from '../components/DailyQuote'
 import ProfileButton from '../components/ProfileButton'
+import HydrationTracker from '../components/HydrationTracker'
 
 export default function Dashboard() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const linkGroupKey = queryParams.get("groupKey");
-    const { currentUser } = useAuth()
+    const { currentUser, logout } = useAuth()
     const navigate = useNavigate()
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [showJoinModal, setShowJoinModal] = useState(false)
@@ -35,8 +36,8 @@ export default function Dashboard() {
         }
     }, [currentUser])
 
-    const GroupAction = ({className}) => {
-        return(
+    const GroupAction = ({ className }) => {
+        return (
             <div className={className}>
                 <button
                     onClick={() => setShowJoinModal(true)}
@@ -112,7 +113,7 @@ export default function Dashboard() {
             setLoading(false)
         }
     }
-    
+
     const handleLogout = async () => {
         try {
             await logout()
@@ -151,7 +152,7 @@ export default function Dashboard() {
                             </button>
                             <Logo />
                         </div>
-                        
+
                         <div className="flex items-center">
                             <button
                                 onClick={() => setShowSidebar(!showSidebar)}
@@ -219,7 +220,6 @@ export default function Dashboard() {
                                 <div className="flex flex-wrap gap-3">
                                     <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
                                         {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} <br />
-                                        {window.localStorage.getItem('Hijri Date')}
                                     </div>
                                 </div>
                             </div>
@@ -260,7 +260,7 @@ export default function Dashboard() {
                                     <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
                                     <p className="text-sm text-gray-500 mt-1">Manage and monitor your group activities</p>
                                 </div>
-                                {groups.length > 0 && <GroupAction className="hidden lg:flex gap-3"/>}
+                                {groups.length > 0 && <GroupAction className="hidden lg:flex gap-3" />}
                             </div>
 
                             {loading ? (
@@ -278,7 +278,7 @@ export default function Dashboard() {
                                     <p className="text-gray-500 mb-8 max-w-sm mx-auto">
                                         Create a new group to invite friends or join an existing one to get started with your journey.
                                     </p>
-                                    <GroupAction className="flex justify-center gap-4"/>
+                                    <GroupAction className="flex justify-center gap-4" />
                                 </div>
                             ) : (
                                 <GroupList groups={groups} onUpdate={fetchGroups} />
@@ -299,6 +299,10 @@ export default function Dashboard() {
                                 <div className="p-4">
                                     <FastingTimes />
                                 </div>
+                            </div>
+
+                            <div className="mt-6">
+                                <HydrationTracker />
                             </div>
 
                             {/* Optional: Add more widgets here later */}

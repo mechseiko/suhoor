@@ -7,7 +7,7 @@ import { collection, query, where, getDocs, addDoc } from 'firebase/firestore'
 
 export default function WakeUpTracker({ groupId, members }) {
     const { currentUser } = useAuth()
-    const { isConnected, joinGroup, leaveGroup, emitWakeUp, on, off } = useSocket()
+    const { isConnected, joinGroup, leaveGroup, emitWakeUp, buzzUser, on, off } = useSocket()
     const [wakeUpLogs, setWakeUpLogs] = useState([])
     const [hasWokenUp, setHasWokenUp] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -125,14 +125,34 @@ export default function WakeUpTracker({ groupId, members }) {
             setOnlineMembers(data.onlineMembers || [])
         }
 
+        const handleGotBuzzed = (data) => {
+            console.log('🔔 Buzzed by:', data.fromUserName)
+            if (soundEnabled) {
+                // High pitch notification sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+                const oscillator = audioContext.createOscillator()
+                const gainNode = audioContext.createGain()
+                oscillator.connect(gainNode)
+                gainNode.connect(audioContext.destination)
+                oscillator.frequency.value = 1200
+                oscillator.type = 'square'
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime)
+                oscillator.start(audioContext.currentTime)
+                oscillator.stop(audioContext.currentTime + 0.3)
+            }
+            alert(`🌅 Wake up! ${data.fromUserName} is buzzing you!`)
+        }
+
         on('member-woke-up', handleMemberWokeUp)
         on('group-members-update', handleGroupMembersUpdate)
+        on('get-buzzed', handleGotBuzzed)
 
         return () => {
             off('member-woke-up', handleMemberWokeUp)
             off('group-members-update', handleGroupMembersUpdate)
+            off('get-buzzed', handleGotBuzzed)
         }
-    }, [isConnected, on, off, groupId, currentUser.uid, playNotificationSound])
+    }, [isConnected, on, off, groupId, currentUser.uid, playNotificationSound, soundEnabled])
 
     // Handle wake-up button click
     const handleWakeUp = async () => {
@@ -259,7 +279,19 @@ export default function WakeUpTracker({ groupId, members }) {
                                     )}
                                 </div>
                             </div>
-                            {isAwake && <CheckCircle className="h-5 w-5 text-accent" />}
+                            <div className="flex items-center gap-2">
+                                {!isAwake && memberOnline && member.profiles.id !== currentUser.uid && (
+                                    <button
+                                        onClick={() => buzzUser(member.profiles.id, groupId, getCurrentUserName())}
+                                        className="p-2 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors flex items-center gap-2"
+                                        title={`Buzz ${member.profiles.display_name || member.profiles.email}`}
+                                    >
+                                        <Bell className="h-4 w-4 animate-bounce" />
+                                        <span className="text-xs font-bold uppercase tracking-tighter">Buzz</span>
+                                    </button>
+                                )}
+                                {isAwake && <CheckCircle className="h-5 w-5 text-accent" />}
+                            </div>
                         </div>
                     )
                 })}

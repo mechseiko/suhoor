@@ -12,11 +12,21 @@ export const navBar = [
 ]
 
 
+import { useAuth } from '../context/AuthContext'
+
 export default function PageLayout({ children }) {
+    const { currentUser } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
     const currentNavItem = `/${location.pathname.split('/')[1]}`
     const [isScrolled, setIsScrolled] = useState(false)
+
+    const dynamicNavBar = [
+        { label: 'Home', to: '/' },
+        ...(currentUser ? [{ label: 'Dashboard', to: '/dashboard' }] : []),
+        { label: 'Books', to: '/books' },
+        { label: 'Duas', to: '/duas' },
+    ]
 
     useEffect(() => {
         const handleScroll = () => {
@@ -29,17 +39,17 @@ export default function PageLayout({ children }) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
             {/* <Container> */}
-                <Header
-                    isScrolled={isScrolled}
-                    currentNavItem={currentNavItem}
-                    navBar={navBar}
-                    navigate={navigate}
-                />
-                <main className="container mx-auto px-1 flex-grow">
-                    {children ? children : <Outlet />}
-                </main>
+            <Header
+                isScrolled={isScrolled}
+                currentNavItem={currentNavItem}
+                navBar={dynamicNavBar}
+                navigate={navigate}
+            />
+            <main className="container mx-auto px-1 flex-grow">
+                {children ? children : <Outlet />}
+            </main>
             {/* </Container> */}
-            <Footer 
+            <Footer
                 currentNavItem={currentNavItem}
             />
 

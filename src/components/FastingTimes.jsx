@@ -55,7 +55,6 @@ export default function FastingTimes() {
 
         if (data.code === 200 && data.data.fasting) {
           setFastingData({ fasting: data.data.fasting });
-          window.localStorage.setItem('Hijri Date', fastingData?.fasting?.[0].hijri_readable)
         }
       } catch (err) {
         setError("Failed to load fasting times");

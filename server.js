@@ -100,18 +100,25 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Handle user status update
-    socket.on('user-status', ({ userId, groupId, status }) => {
-        console.log(`📊 User ${userId} status: ${status}`);
+    // Handle buzz (nudge) notification
+    socket.on('buzz-user', ({ fromUserId, fromUserName, toUserId, groupId }) => {
+        console.log(`🔔 ${fromUserName} buzzed user ${toUserId} in group ${groupId}`);
 
-        io.to(`group:${groupId}`).emit('member-status-update', {
-            userId,
-            status,
-            timestamp: new Date().toISOString()
-        });
+        // Find the target user's socket
+        for (const [userId, data] of activeUsers.entries()) {
+            if (userId === toUserId) {
+                io.to(data.socketId).emit('get-buzzed', {
+                    fromUserId,
+                    fromUserName,
+                    groupId,
+                    timestamp: new Date().toISOString()
+                });
+                break;
+            }
+        }
     });
 
-    // Handle disconnection
+    // Handle user disconnection
     socket.on('disconnect', () => {
         console.log(`❌ User disconnected: ${socket.id}`);
 
