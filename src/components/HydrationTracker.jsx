@@ -19,7 +19,7 @@ export default function HydrationTracker() {
     }
 
     return (
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mt-3">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-50 rounded-lg">

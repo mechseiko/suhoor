@@ -140,7 +140,7 @@ export default function GroupDetail() {
                                         {group?.name}
                                     </h1>
                                     <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
-                                        {members.length} Members
+                                        {members.length} {members.length === 1 ? 'Member' : 'Members'}
                                     </span>
                                 </div>
 

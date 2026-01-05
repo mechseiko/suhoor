@@ -97,48 +97,6 @@ export default function Profile() {
                             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
                         >
                             <LogOut className="h-5 w-5" />
-                            This is a news agency webiste callled shalash
-the name of the app is shalash
-
-so i'm going to be explaining evrything to you 
-
-it is a react + ts + firebase + vite + tailwind project
-
-before i proceed to explaining, the first thing i want you to do is to define utility classes in my index.css file
-classes like colors to be used throughout the app
-
-primary
-secondary
-accent
-light
-dark
-muted
-
-
-
-then use then throughout the app
-
-Now, i'll explain
-There are three types of users
-1. People that come to read the news, they won't create an account, they just came to read different news, that means the way they see the website will be the default way which any other person sees it
-
-2. The different BLOGGERS, they'll be the one to create a blogger  account(Firebase auth comes in here, but their role blogger in the db), they will have access to posting blogs on the website
-The link for their signup and login will of course not be on the website, although people in category number one can view their profile which will contain
-name
-school: (this is their university)
-the time they posted it
-
-they will have  adashboard of course, where they can see alll of their posts as well as if they want to add or delete a post , like medium, yes like medium
-
-
-
-3. The admin: (now this person will have  arole of admin, he can also write blogs and he has access to register or remove a  blogger, he can see all the posts (he can delete them)), he can see the number of registered bloggerers
-
-
-get to work
-remeber this is a typescript project
-when yure done
-Giver me the set of instructions to create the project database on firebase
                             <span className="inline font-medium">Logout</span>
                         </button>
                     </div>

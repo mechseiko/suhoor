@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { LogOut, Plus, Users, TrendingUp, Award, Menu, X, Clock } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
-import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore'
+import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer } from 'firebase/firestore'
 import GroupList from '../components/GroupList'
 import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
@@ -14,6 +14,7 @@ import StatsCard from '../components/StatsCard'
 import DailyQuote from '../components/DailyQuote'
 import ProfileButton from '../components/ProfileButton'
 import HydrationTracker from '../components/HydrationTracker'
+import ProTip from '../components/ProTip'
 
 export default function Dashboard() {
     const location = useLocation();
@@ -96,7 +97,16 @@ export default function Dashboard() {
                 const groupRef = doc(db, 'groups', groupId)
                 const groupSnap = await getDoc(groupRef)
                 if (groupSnap.exists()) {
-                    groupsData.push({ id: groupSnap.id, ...groupSnap.data() })
+                    // Fetch member count
+                    const membersRef = collection(db, 'group_members')
+                    const memberCountQuery = query(membersRef, where('group_id', '==', groupId))
+                    const memberCountSnap = await getCountFromServer(memberCountQuery)
+
+                    groupsData.push({
+                        id: groupSnap.id,
+                        ...groupSnap.data(),
+                        member_count: memberCountSnap.data().count
+                    })
                 }
             }
             setGroups(groupsData)
@@ -153,20 +163,11 @@ export default function Dashboard() {
                             <Logo />
                         </div>
 
-                        <div className="flex items-center">
-                            <button
-                                onClick={() => setShowSidebar(!showSidebar)}
-                                className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
-                                title="Fasting Times"
-                            >
-                                <Clock className="h-5 w-5 text-primary" />
-                            </button>
-
+                        <div className="flex md:gap-2 items-center">
                             <ProfileButton currentUser={currentUser} navigate={navigate} />
-
                             <button
                                 onClick={handleLogout}
-                                className="hidden sm:flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                                className="hidden sm:flex items-center gap-2 px-3 py-1 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
                             >
                                 <LogOut className="h-5 w-5" />
                                 <span className="inline font-medium">Logout</span>
@@ -197,6 +198,12 @@ export default function Dashboard() {
                                 >
                                     <Plus className="h-5 w-5" />
                                     <span>Create Group</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowSidebar(!showSidebar)}
+                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-primary/90 text-white rounded-xl hover:opacity-90 transition-colors font-medium shadow-lg shadow-blue-200">
+                                    <Clock className="h-5 w-5" />
+                                    <span>Fasting Times</span>
                                 </button>
                             </div>
                         </div>
@@ -292,7 +299,7 @@ export default function Dashboard() {
                             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                                 <div className="p-4 border-b border-gray-50 bg-gray-50/50">
                                     <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                        <Clock className="h-5 w-5 text-blue-600" />
+                                        <Clock className="h-5 w-5 text-primary" />
                                         Fasting Times
                                     </h3>
                                 </div>
@@ -300,22 +307,8 @@ export default function Dashboard() {
                                     <FastingTimes />
                                 </div>
                             </div>
-
-                            <div className="mt-6">
-                                <HydrationTracker />
-                            </div>
-
-                            {/* Optional: Add more widgets here later */}
-                            <div className="mt-6 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden">
-                                <div className="relative z-10">
-                                    <h4 className="font-bold text-lg mb-2">Pro Tip</h4>
-                                    <p className="text-blue-100 text-sm leading-relaxed">
-                                        Stay hydrated during non-fasting hours. Try to drink at least 8 glasses of water between Iftar and Suhoor.
-                                    </p>
-                                </div>
-                                <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 bg-white opacity-10 rounded-full blur-2xl"></div>
-                                <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-20 w-20 bg-blue-400 opacity-20 rounded-full blur-xl"></div>
-                            </div>
+                            <ProTip />
+                            <HydrationTracker />
                         </div>
                     </aside>
                 </div>
@@ -338,6 +331,8 @@ export default function Dashboard() {
                 </div>
                 <div className="p-4 overflow-y-auto h-[calc(100%-4rem)]">
                     <FastingTimes />
+                    <ProTip />
+                    <HydrationTracker />
                 </div>
             </aside>
 

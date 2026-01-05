@@ -33,7 +33,7 @@ export default function Duas() {
     ]
 
     return (
-        <div className="py-8 md:py-12">
+        <div className="py-8 md:py-12 px-4">
             <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full">
                     <Hand className="h-8 w-8 text-primary" />

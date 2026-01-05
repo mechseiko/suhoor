@@ -140,7 +140,7 @@ export default function FastingTimes() {
                   <Clock className="h-5 w-5 text-accent" />
                   <span className="font-medium text-gray-900">Fasting Duration</span>
                 </div>
-                <span className="text-lg font-bold text-accent">
+                <span className="text-[16px] font-bold text-accent">
                   {todayData.time.duration}
                 </span>
               </div>

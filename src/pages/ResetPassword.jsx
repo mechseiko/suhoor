@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import AuthWrapper from '../components/AuthWrapper'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore'
@@ -118,7 +118,7 @@ export default function ResetPassword() {
             error={error}
             title={success ? "Password Reset Successfully" : "Reset Your Password"}
             subtitle={success ? "Your password has been updated. Redirecting to login..." : `Enter a new password for ${resetEmail}`}
-            bottomTitle={success ? "" : "Wait, I remember it now!"}
+            bottomTitle={success ? "" : "Remembered your password?"}
             bottomsubTitle={success ? "" : "Login"}
         >
             {!success && !error && (

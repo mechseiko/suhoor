@@ -1,8 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { Users, Calendar, Share, Copy } from 'lucide-react'
+import { Users, Calendar, Copy, CopyCheck } from 'lucide-react'
+import { useState } from 'react';
 
 export default function GroupList({ groups }) {
   const navigate = useNavigate()
+  const [copied, setCopied] = useState(false);
+  const [clicked, setClicked] = useState();
 
   return (
     <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
@@ -12,20 +15,16 @@ export default function GroupList({ groups }) {
           <div
             key={group.id}
             onClick={() => navigate(`/group/${group.id}`)}
-            className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-xl hover:border-primary/20 transition-all duration-300 cursor-pointer relative overflow-hidden"
+            className="group bg-white rounded-2xl shadow-xs border border-gray-50 p-4 hover:shadow-sm hover:border-primary/20 transition-all duration-200 relative overflow-hidden cursor-pointer"
           >
-            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Share className="h-5 w-5 text-gray-400 hover:text-primary" />
-            </div>
-
             <div className="flex flex-col h-full justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
                     {groupName.charAt(0).toUpperCase()}
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 line-clamp-1">
-                    {groupName}
+                  <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
+                    {groupName.charAt(0).toUpperCase()}{groupName.slice(1, groupName.length)}
                   </h3>
                 </div>
 
@@ -36,21 +35,33 @@ export default function GroupList({ groups }) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigator.clipboard.writeText(`https://suhoor-group.web.app/dashboard/groups?groupKey=${group.group_key}`)
-                        // You might want to add a toast notification here instead of alert
-                        alert(`Link copied!`)
+                        setCopied(true);
+                        setClicked(group.id)
+                        navigator.clipboard.writeText(`https://suhoor-group.web.app/dashboard?groupKey=${group.group_key}`)
+                        setTimeout(() => {
+                          setCopied(false)
+                        }, 2000)
                       }}
                       className="ml-auto p-1.5 hover:bg-white rounded-md text-gray-400 hover:text-primary transition-colors"
                       title="Copy Invite Link"
                     >
-                      <Copy className="h-4 w-4" />
+                      {copied && clicked === group.id ? <div className='flex gap-2 items-center text-xs'><CopyCheck className="h-4 w-4" /><span>Copied</span></div> : <Copy className="h-4 w-4" />}
                     </button>
                   </div>
 
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                    <span>
-                      Created {new Date(group.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                      <span>
+                        Created {group.created_at ?
+                          (group.created_at.toDate ? group.created_at.toDate() : new Date(group.created_at))
+                            .toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+                          : 'Just now'
+                        }
+                      </span>
+                    </div>
+                    <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
+                      {group.member_count || 0} Members
                     </span>
                   </div>
                 </div>

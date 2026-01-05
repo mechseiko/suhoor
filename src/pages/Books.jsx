@@ -27,6 +27,12 @@ const baseBooks = [
     description: "An explanation and clarification of the most important causes for the increase and decrease of eemaan",
     pages: 164
   },
+  {
+    title: "Bulugh Al Maram Fee Adilatil Ahkaam",
+    file: "/books/Bulugh Al Maram Fee Adilatil Ahkaam.pdf",
+    description: "Bulugh Al-Maram is a book which was written by Imam Ibn Hajar(773H - 852H) with the objective of compiling many of the Ahadith particularly related to the Ahkam(Judgements) of the islamic Shari'ah",
+    pages: 576
+  },
 ];
 
 export default function Books() {

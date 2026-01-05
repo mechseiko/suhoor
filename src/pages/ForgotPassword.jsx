@@ -76,7 +76,7 @@ export default function ForgotPassword() {
         <AuthWrapper
             error={error}
             title="Forgot your password?"
-            subtitle="Enter your email address and we'll send you a custom link to reset your password."
+            subtitle="Enter your email address and we'll send you a link to reset your password."
             bottomTitle="Remembered your password?"
             bottomsubTitle="Login"
         >
@@ -100,7 +100,7 @@ export default function ForgotPassword() {
                     disabled={loading}
                     className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {loading ? 'Sending Link...' : 'Send Reset Link'}
+                    {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
                 </button>
             </form>
         </AuthWrapper>
