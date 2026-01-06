@@ -13,6 +13,7 @@ import Duas from './pages/Duas'
 import Profile from './pages/Profile'
 import ResetPassword from './pages/ResetPassword'
 import ForgotPassword from './pages/ForgotPassword'
+import VerifyEmail from './pages/VerifyEmail'
 import ScrollToTop from './components/ScrollToTop'
 import PWAManager from './components/PWAManager'
 
@@ -32,6 +33,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
             </Route>
 
             <Route

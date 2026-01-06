@@ -8,13 +8,13 @@ import GroupList from '../components/GroupList'
 import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
 import FastingTimes from '../components/FastingTimes'
-import Logo from '../components/Logo'
 import Loader from '../components/Loader'
 import StatsCard from '../components/StatsCard'
 import DailyQuote from '../components/DailyQuote'
-import ProfileButton from '../components/ProfileButton'
 import HydrationTracker from '../components/HydrationTracker'
 import ProTip from '../components/ProTip'
+import MissedFastsTracker from '../components/MissedFastsTracker'
+import DashboardLayout from '../layouts/DashboardLayout'
 
 export default function Dashboard() {
     const location = useLocation();
@@ -33,8 +33,7 @@ export default function Dashboard() {
         const cached = localStorage.getItem(`suhoor_stats_${currentUser?.uid}`)
         return cached ? JSON.parse(cached) : { totalGroups: 0, totalMembers: 0, activeToday: 0 }
     })
-    const [showSidebar, setShowSidebar] = useState(false)
-    const [showMobileMenu, setShowMobileMenu] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
 
     useEffect(() => {
         if (currentUser) {
@@ -133,241 +132,149 @@ export default function Dashboard() {
         }
     }
 
-    const handleLogout = async () => {
-        try {
-            // Clear cache on logout
-            localStorage.removeItem(`suhoor_groups_${currentUser?.uid}`)
-            localStorage.removeItem(`suhoor_stats_${currentUser?.uid}`)
-            await logout()
-            navigate('/')
-        } catch (err) {
-            console.error('Logout failed:', err)
-        }
-    }
-
     useEffect(() => {
         if (linkGroupKey) {
             setShowJoinModal(true);
         }
     }, [linkGroupKey]);
 
+    if (loading && !groups.length) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <Loader />
+            </div>
+        )
+    }
+
+    const rightSidebar = (
+        <>
+            <div id="fasting-times">
+                <FastingTimes />
+            </div>
+            <ProTip />
+            <HydrationTracker />
+            <MissedFastsTracker />
+        </>
+    )
+
     return (
-        <div className="min-h-screen bg-gray-50/50">
-            {/* Mobile Sidebar Overlay */}
-            {showSidebar && (
-                <div
-                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
-                    onClick={() => setShowSidebar(false)}
-                />
-            )}
-
-            {/* Top Navigation */}
-            <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                            <button
-                                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                                className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
-                            >
-                                {showMobileMenu ? <X className="h-6 w-6 text-gray-600" /> : <Menu className="h-6 w-6 text-gray-600" />}
-                            </button>
-                            <Logo />
-                        </div>
-
-                        <div className="flex md:gap-2 items-center">
-                            <ProfileButton currentUser={currentUser} navigate={navigate} />
-                            <button
-                                onClick={handleLogout}
-                                className="hidden sm:flex items-center gap-2 px-3 py-1 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
-                            >
-                                <LogOut className="h-5 w-5" />
-                                <span className="inline font-medium">Logout</span>
-                            </button>
+        <DashboardLayout
+            setShowJoinModal={setShowJoinModal}
+            setShowCreateModal={setShowCreateModal}
+            rightSidebar={rightSidebar}
+        >
+            {/* Welcome & Quote Section */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
+                <div className="xl:col-span-2 flex flex-col justify-center">
+                    <h1 className="text-gray-900 text-[20px] mb-2 font-medium">
+                        Welcome back, <span className='text-xl md:text-2xl font-bold'>{(currentUser?.displayName || currentUser?.email?.split('@')[0])?.split(' ')[0]}</span>
+                    </h1>
+                    <p className="text-base text-gray-500 mb-4">
+                        May your fasts be accepted and your prayers answered.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                        <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                         </div>
                     </div>
-
-                    {/* Mobile Menu Dropdown */}
-                    {showMobileMenu && (
-                        <div className="lg:hidden mt-4 pb-4 border-t border-gray-100 pt-4 animate-in slide-in-from-top-2">
-                            <div className="flex flex-col gap-3">
-                                <button
-                                    onClick={() => {
-                                        setShowJoinModal(true)
-                                        setShowMobileMenu(false)
-                                    }}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-blue-200 text-primary rounded-xl hover:bg-blue-50 transition-colors font-medium"
-                                >
-                                    <Users className="h-5 w-5" />
-                                    <span>Join Group</span>
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setShowCreateModal(true)
-                                        setShowMobileMenu(false)
-                                    }}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-xl hover:opacity-90 transition-colors font-medium shadow-lg shadow-blue-200"
-                                >
-                                    <Plus className="h-5 w-5" />
-                                    <span>Create Group</span>
-                                </button>
-                                <button
-                                    onClick={() => setShowSidebar(!showSidebar)}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 bg-primary/90 text-white rounded-xl hover:opacity-90 transition-colors font-medium shadow-lg shadow-blue-200">
-                                    <Clock className="h-5 w-5" />
-                                    <span>Fasting Times</span>
-                                </button>
-                            </div>
-                        </div>
-                    )}
                 </div>
-            </nav>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Main Content */}
-                    <main className="flex-1 min-w-0">
-                        {/* Welcome & Quote Section */}
-                        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
-                            <div className="xl:col-span-2 flex flex-col justify-center">
-                                <h1 className="text-gray-900 text-[20px] mb-2">
-                                    Welcome back, <span className='text-xl md:text-2xl font-bold'>{(currentUser?.displayName || currentUser?.email?.split('@')[0])?.split(' ')[0]}</span> 👋
-                                </h1>
-                                <p className="text-lg text-gray-500 mb-4">
-                                    May your fasts be accepted and your prayers answered. Here's your daily summary.
-                                </p>
-                                <div className="flex flex-wrap gap-3">
-                                    <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
-                                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} <br />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="xl:col-span-1">
-                                <DailyQuote />
-                            </div>
-                        </div>
-
-                        {/* Stats Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                            <StatsCard
-                                icon={Users}
-                                title="Total Groups"
-                                value={stats.totalGroups}
-                                subtitle="Groups you're part of"
-                                color="blue"
-                            />
-                            <StatsCard
-                                icon={TrendingUp}
-                                title="Total Members"
-                                value={stats.totalMembers}
-                                subtitle="Across all groups"
-                                color="green"
-                            />
-                            <StatsCard
-                                icon={Award}
-                                title="Active Today"
-                                value={stats.activeToday}
-                                subtitle="Groups with activity"
-                                color="purple"
-                            />
-                        </div>
-
-                        {/* Groups Section */}
-                        <div className="space-y-6">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
-                                    <p className="text-sm text-gray-500 mt-1">Manage and monitor your group activities</p>
-                                </div>
-                                {groups.length > 0 && <GroupAction className="hidden lg:flex gap-3" />}
-                            </div>
-
-                            {loading ? (
-                                <div className="flex justify-center py-12">
-                                    <Loader />
-                                </div>
-                            ) : groups.length === 0 ? (
-                                <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center">
-                                    <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <Users className="h-10 w-10 text-gray-400" />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                        No groups yet
-                                    </h3>
-                                    <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-                                        Create a new group to invite friends or join an existing one to get started with your journey.
-                                    </p>
-                                    <GroupAction className="flex justify-center gap-4" />
-                                </div>
-                            ) : (
-                                <GroupList groups={groups} onUpdate={fetchGroups} />
-                            )}
-                        </div>
-                    </main>
-
-                    {/* Desktop Sidebar - Fasting Times */}
-                    <aside className="hidden lg:block w-80 xl:w-96 shrink-0">
-                        <div className="sticky top-24">
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="p-4 border-b border-gray-50 bg-gray-50/50">
-                                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                        <Clock className="h-5 w-5 text-primary" />
-                                        Fasting Times
-                                    </h3>
-                                </div>
-                                <div className="p-4">
-                                    <FastingTimes />
-                                </div>
-                            </div>
-                            <ProTip />
-                            <HydrationTracker />
-                        </div>
-                    </aside>
+                <div className="xl:col-span-1">
+                    <DailyQuote />
                 </div>
             </div>
 
-            {/* Mobile Sidebar - Fasting Times */}
-            <aside className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${showSidebar ? 'translate-x-0' : 'translate-x-full'
-                }`}>
-                <div className="p-4 border-b flex items-center justify-between bg-gray-50">
-                    <h3 className="font-bold text-lg flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-primary" />
-                        Fasting Times
-                    </h3>
-                    <button
-                        onClick={() => setShowSidebar(false)}
-                        className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-                    >
-                        <X className="h-5 w-5 text-gray-500" />
-                    </button>
-                </div>
-                <div className="p-4 overflow-y-auto h-[calc(100%-4rem)]">
-                    <FastingTimes />
-                    <ProTip />
-                    <HydrationTracker />
-                </div>
-            </aside>
-
-            {showCreateModal && (
-                <CreateGroupModal
-                    onClose={() => setShowCreateModal(false)}
-                    onSuccess={() => {
-                        setShowCreateModal(false)
-                        fetchGroups()
-                    }}
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                <StatsCard
+                    icon={Users}
+                    title="Total Groups"
+                    value={stats.totalGroups}
+                    subtitle="Groups joined"
+                    color="blue"
                 />
-            )}
-
-            {showJoinModal && (
-                <JoinGroupModal
-                    onClose={() => setShowJoinModal(false)}
-                    onSuccess={() => {
-                        setShowJoinModal(false)
-                        fetchGroups()
-                    }}
-                    linkGroupKey={linkGroupKey}
+                <StatsCard
+                    icon={TrendingUp}
+                    title="Total Members"
+                    value={stats.totalMembers}
+                    subtitle="Across all groups"
+                    color="green"
                 />
-            )}
-        </div>
+                <StatsCard
+                    icon={Award}
+                    title="Active Today"
+                    value={stats.activeToday}
+                    subtitle="Recent activity"
+                    color="purple"
+                />
+            </div>
+
+            {/* Groups Section */}
+            <div className="space-y-6" id="groups-section">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
+                        <p className="text-sm text-gray-500">Manage and monitor your circular activities</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 flex-1 max-w-md">
+                        <div className="relative flex-1">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Users className="h-4 w-4 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search groups..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
+                            />
+                        </div>
+                        {groups.length > 0 && (
+                            <button
+                                onClick={() => setShowCreateModal(true)}
+                                className="hidden lg:flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:opacity-90 transition-all text-sm font-medium"
+                            >
+                                <Plus className="h-4 w-4" />
+                                <span>Create</span>
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {groups.length === 0 ? (
+                    <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center">
+                        <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Users className="h-10 w-10 text-gray-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">No groups yet</h3>
+                        <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+                            Create a new group to invite friends or join an existing one to get started.
+                        </p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={() => setShowJoinModal(true)}
+                                className="px-6 py-2 border border-gray-200 rounded-xl font-medium"
+                            >
+                                Join Group
+                            </button>
+                            <button
+                                onClick={() => setShowCreateModal(true)}
+                                className="px-6 py-2 bg-primary text-white rounded-xl font-medium"
+                            >
+                                Create Group
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <GroupList
+                        groups={groups.filter(group =>
+                            group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            group.group_key.toLowerCase().includes(searchQuery.toLowerCase())
+                        )}
+                        onUpdate={fetchGroups}
+                    />
+                )}
+            </div>
+
+        </DashboardLayout>
     )
 }

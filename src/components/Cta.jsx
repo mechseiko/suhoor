@@ -6,7 +6,7 @@ export default function Cta({ flex = 'row' }) {
     return (<div className={`flex flex-${flex} space-x-3`}>
         <button
             onClick={() => navigate('/login')}
-            className="px-6 py-2 text-primary hover:text-primary hover:bg-white rounded-lg font-medium transition"
+            className="px-6 py-2 text-primary border-primary border-2 hover:text-primary hover:bg-white rounded-lg font-medium transition"
         >
             Login
         </button>

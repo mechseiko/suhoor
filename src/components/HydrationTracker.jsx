@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Activity } from 'react'
 import { Droplet, Plus, Minus } from 'lucide-react'
 
 export default function HydrationTracker() {
@@ -13,18 +13,20 @@ export default function HydrationTracker() {
     }, [today])
 
     const updateGlasses = (val) => {
+        if(glasses >= 8 && val === 1) return;
         const newVal = Math.max(0, glasses + val)
         setGlasses(newVal)
         localStorage.setItem(`hydration_${today}`, newVal.toString())
     }
 
     return (
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mt-3">
-            <div className="flex items-center justify-between mb-6">
+        <div className="bg-white/80 rounded-2xl p-6 border border-gray-100 shadow-sm mt-3">
+            {glasses < 8 ?
+            <><div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-50 rounded-lg">
-                        <Droplet className="h-5 w-5 text-blue-600" />
-                    </div>
+                        <Droplet className="h-5 w-5 text-primary" />
+                    </div>  
                     <div>
                         <h3 className="font-bold text-gray-900">Hydration</h3>
                         <p className="text-xs text-gray-500">Goal: 8 glasses</p>
@@ -55,11 +57,14 @@ export default function HydrationTracker() {
                 >
                     <Plus className="h-4 w-4 text-blue-600" />
                 </button>
-            </div>
-
-            <p className="text-xs text-center text-gray-400">
-                Drink water between Iftar and Suhoor to stay healthy.
-            </p>
+            </div></> :
+            
+            <div className='flex items-center bg-blue-50 rounded-lg'>
+                <div className="p-2 ">
+                    <Droplet className="h-5 w-5 text-primary" />
+                </div> 
+                <h3 className="font-bold text-center text-gray-900">Hydration goal reached.</h3>
+            </div>}
         </div>
     )
 }

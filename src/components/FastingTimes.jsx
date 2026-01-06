@@ -49,7 +49,6 @@ export default function FastingTimes() {
     if (!location.coordinates.lat || !location.coordinates.lng) return;
 
     const fetchFastingTimes = async () => {
-      console.log(location.coordinates.lat, location.coordinates.lng)
       try {
         const response = await fetch(
           `https://islamicapi.com/api/v1/fasting/?lat=${location.coordinates.lat}&lon=${location.coordinates.lng}&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs`
@@ -62,7 +61,7 @@ export default function FastingTimes() {
           localStorage.setItem('suhoor_fasting_times', JSON.stringify(fastingData))
         }
       } catch (err) {
-        setError("Failed to load fasting times");
+        setError("Failed to load fasting times.");
       } finally {
         setLoading(false);
       }
@@ -91,7 +90,7 @@ export default function FastingTimes() {
   const todayData = fastingData?.fasting?.[0];
 
   return (
-    <div className="md:p-1 p-3 sticky top-8">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden md:p-6 p-3">
       <div className="flex items-center space-x-2 mb-6">
         <Calendar className="h-6 w-6 text-blue-600" />
         <h3 className="text-xl font-bold text-gray-900">Today's Fasting Times</h3>

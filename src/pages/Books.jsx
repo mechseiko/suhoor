@@ -1,6 +1,8 @@
 import { Download, Search, BookOpen, Library } from 'lucide-react';
 import { useState } from 'react';
 import SectionHeader from '../components/SectionHeader';
+import { useAuth } from '../context/AuthContext';
+import DashboardLayout from '../layouts/DashboardLayout';
 
 const baseBooks = [
   {
@@ -39,7 +41,7 @@ export default function Books() {
   const [searchTerm, setSearchTerm] = useState('');
   const filteredBooks = baseBooks.filter((book) =>
     book.title.toLowerCase().includes(searchTerm.toLowerCase()
-)
+    )
   );
 
   const BookCard = ({ book }) => {
@@ -102,16 +104,17 @@ export default function Books() {
     );
   };
 
-  return (
-    <div className="max-w-7xl mx-auto py-8 px-4 mt-5">
+  const { currentUser } = useAuth();
+
+  const content = (
+    <div className={`${currentUser ? '' : 'max-w-7xl mx-auto py-8 px-4 mt-5'}`}>
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
           <Library className="h-8 w-8 text-primary" />
         </div>
         <SectionHeader
-            title="Library"
-            subtitle="Explore a curated collection of essential Islamic books on fasting.
-          Read online or download for offline access."
+          title="Library"
+          subtitle="Explore a curated collection of essential Islamic books on fasting. Read online or download for offline access."
         />
       </div>
 
@@ -123,7 +126,7 @@ export default function Books() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search books by title..."
-            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition shadow-sm"
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition shadow-sm text-sm"
           />
         </div>
       </div>
@@ -139,12 +142,12 @@ export default function Books() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               No books found
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-6 font-medium">
               We couldn't find any books matching "{searchTerm}"
             </p>
             <button
               onClick={() => setSearchTerm('')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-6 py-2 bg-primary text-white rounded-xl hover:opacity-90 transition font-medium"
             >
               Clear Search
             </button>
@@ -153,11 +156,11 @@ export default function Books() {
       </div>
 
       {searchTerm && filteredBooks.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="mt-12">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">
             Other Books
           </h2>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {baseBooks
               .filter((book) => !filteredBooks.includes(book))
               .map((book, i) => (
@@ -168,4 +171,6 @@ export default function Books() {
       )}
     </div>
   );
+
+  return currentUser ? <DashboardLayout>{content}</DashboardLayout> : content;
 }

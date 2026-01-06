@@ -12,9 +12,9 @@ export default function ForgotPassword() {
     const [loading, setLoading] = useState(false)
 
     // EmailJS Credentials
-    const SERVICE_ID = 'service_zh0vj84'
-    const TEMPLATE_ID = 'template_ol09wxr'
-    const USER_ID = '9nHCjbJ8w8yQTswge'
+    const SERVICE_ID = 'service_3flsb3n'
+    const TEMPLATE_ID = 'template_vhylt41'
+    const USER_ID = 'JKRA71R40HTU6vo6W'
 
     const handleSubmit = async e => {
         e.preventDefault()
@@ -37,11 +37,16 @@ export default function ForgotPassword() {
             // 3. Send email via EmailJS
             const resetLink = `${window.location.origin}/reset-password?token=${token}`
             const templateParams = {
+                subject: 'Suhoor - Reset Your Password',
+                name: 'Suhoor',
+                company_name: 'Suhoor',
+                title: 'Reset Your Password',
+                body_intro: `We received a request to reset the password for your account associated with ${email}.`,
+                button_text: 'Reset My Password',
+                action_link: resetLink,
+                accent_note: 'This link will expire in 60 minutes.',
                 user_email: email,
-                name: 'MECHSEIKO From Suhoor',
-                time: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`,
-                subject: 'Reset Your Password - Suhoor',
-                message: `😃Hello! You have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}`
+                link: window.location.origin
             }
 
             await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID)
@@ -61,7 +66,7 @@ export default function ForgotPassword() {
                 title="Check your inbox"
                 subtitle={`We've sent a password reset link to ${email}. Please check your email.`}
                 bottomTitle="Didn't get the email?"
-                bottomsubTitle="Forgot Password"
+                bottomsubTitle="Request another one"
             >
                 <div className="text-center">
                     <Link to="/login" className="inline-block bg-primary text-white px-8 py-3 rounded-lg hover:opacity-90 font-medium transition">

@@ -63,7 +63,7 @@ export default function DailyQuote() {
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                         <Quote className="h-4 w-4 text-white/80" />
-                        <span className="text-white/90 text-sm font-medium uppercase tracking-wider">Knowledge Box</span>
+                        <span className="text-white/90 text-sm font-medium uppercase tracking-wider">Inspiration Box</span>
                     </div>
                     <button
                         onClick={getNewQuote}

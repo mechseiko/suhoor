@@ -12,7 +12,7 @@ export default function Footer({currentNavItem}) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:mb-12 mb:10">
           <div className="md:col-span-2">
             <Logo />
-            <p className="text-gray-500 leading-relaxed max-w-sm">
+            <p className="text-gray-500 leading-relaxed max-w-sm mt-3">
               Connect with loved ones, ensure everyone wakes up on time, and start your fast with blessings and unity.
             </p>
           </div>

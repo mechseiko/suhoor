@@ -37,7 +37,7 @@ export default function GroupList({ groups }) {
                         e.stopPropagation();
                         setCopied(true);
                         setClicked(group.id)
-                        navigator.clipboard.writeText(`https://suhoor-group.web.app/dashboard?groupKey=${group.group_key}`)
+                        navigator.clipboard.writeText(`${group.group_key}`)
                         setTimeout(() => {
                           setCopied(false)
                         }, 2000)
