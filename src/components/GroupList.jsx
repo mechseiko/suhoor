@@ -8,7 +8,7 @@ export default function GroupList({ groups }) {
   const [clicked, setClicked] = useState();
 
   return (
-    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
       {groups.map((group) => {
         const groupName = group.name;
         return (
@@ -61,7 +61,7 @@ export default function GroupList({ groups }) {
                       </span>
                     </div>
                     <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
-                      {group.member_count || 0} Members
+                      {group.member_count || 0} {group.member_count === 1 ? 'Member' : 'Members'}
                     </span>
                   </div>
                 </div>

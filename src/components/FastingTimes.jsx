@@ -10,8 +10,11 @@ export default function FastingTimes() {
     error: null,
   });
 
-  const [fastingData, setFastingData] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [fastingData, setFastingData] = useState(() => {
+    const cached = localStorage.getItem('suhoor_fasting_times')
+    return cached ? JSON.parse(cached) : null
+  })
+  const [loading, setLoading] = useState(!fastingData)
   const [error, setError] = useState('')
 
   const onSuccess = (position) => {
@@ -54,7 +57,9 @@ export default function FastingTimes() {
         const data = await response.json();
 
         if (data.code === 200 && data.data.fasting) {
-          setFastingData({ fasting: data.data.fasting });
+          const fastingData = { fasting: data.data.fasting }
+          setFastingData(fastingData);
+          localStorage.setItem('suhoor_fasting_times', JSON.stringify(fastingData))
         }
       } catch (err) {
         setError("Failed to load fasting times");
@@ -74,7 +79,7 @@ export default function FastingTimes() {
       </div>
     );
   }
-         
+
   if (error) {
     return (
       <div className="text-center p-6">
@@ -113,34 +118,40 @@ export default function FastingTimes() {
             </div>
           </div>
 
-          <div className="border-t pt-6 space-y-4">
-            <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg">
+          <div className="border-t pt-6 space-y-3">
+            <div className="flex items-center justify-between p-3 bg-primary/5 rounded-xl border border-primary/10">
               <div className="flex items-center space-x-3">
-                <Moon className="h-5 w-5 text-primary" />
-                <span className="font-medium text-gray-900">Suhoor Ends</span>
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Moon className="h-4 w-4 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Suhoor Ends</span>
               </div>
-              <span className="text-xl font-bold text-primary">
+              <span className="text-lg font-bold text-primary">
                 {todayData.time.sahur}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-secondary/10 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-xl border border-secondary/10">
               <div className="flex items-center space-x-3">
-                <Sun className="h-5 w-5 text-secondary" />
-                <span className="font-medium text-gray-900">Iftar Begins</span>
+                <div className="p-2 bg-secondary/10 rounded-lg">
+                  <Sun className="h-4 w-4 text-secondary" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Iftar Begins</span>
               </div>
-              <span className="text-xl font-bold text-secondary">
+              <span className="text-lg font-bold text-secondary">
                 {todayData.time.iftar}
               </span>
             </div>
 
             {todayData.time.duration && (
-              <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-accent/5 rounded-xl border border-accent/10">
                 <div className="flex items-center space-x-3">
-                  <Clock className="h-5 w-5 text-accent" />
-                  <span className="font-medium text-gray-900">Fasting Duration</span>
+                  <div className="p-2 bg-accent/10 rounded-lg">
+                    <Clock className="h-4 w-4 text-accent" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Fasting Duration</span>
                 </div>
-                <span className="text-[16px] font-bold text-accent">
+                <span className="text-sm font-bold text-accent">
                   {todayData.time.duration}
                 </span>
               </div>

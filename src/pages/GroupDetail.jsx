@@ -21,9 +21,15 @@ export default function GroupDetail() {
     const { groupId } = useParams()
     const navigate = useNavigate()
     const { currentUser, logout } = useAuth()
-    const [group, setGroup] = useState(null)
-    const [members, setMembers] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [group, setGroup] = useState(() => {
+        const cached = localStorage.getItem(`suhoor_group_${groupId}`)
+        return cached ? JSON.parse(cached) : null
+    })
+    const [members, setMembers] = useState(() => {
+        const cached = localStorage.getItem(`suhoor_members_${groupId}`)
+        return cached ? JSON.parse(cached) : []
+    })
+    const [loading, setLoading] = useState(!group)
     const [copied, setCopied] = useState(false)
     const [showInviteModal, setShowInviteModal] = useState(false)
 
@@ -34,7 +40,9 @@ export default function GroupDetail() {
                 const groupSnap = await getDoc(groupRef)
 
                 if (groupSnap.exists()) {
-                    setGroup({ id: groupSnap.id, ...groupSnap.data() })
+                    const groupData = { id: groupSnap.id, ...groupSnap.data() }
+                    setGroup(groupData)
+                    localStorage.setItem(`suhoor_group_${groupId}`, JSON.stringify(groupData))
                 }
             } catch (err) {
                 console.error('Error fetching group:', err)
@@ -69,6 +77,7 @@ export default function GroupDetail() {
                 }
 
                 setMembers(membersData)
+                localStorage.setItem(`suhoor_members_${groupId}`, JSON.stringify(membersData))
             } catch (err) {
                 console.error('Error fetching members:', err)
             }
@@ -88,6 +97,10 @@ export default function GroupDetail() {
 
     const handleLogout = async () => {
         try {
+            // Clear cache on logout (could be multiple groups, but clearing keys if we can)
+            // For now, simple clear of basic items if we were to track them all
+            localStorage.removeItem(`suhoor_group_${groupId}`)
+            localStorage.removeItem(`suhoor_members_${groupId}`)
             await logout()
             navigate('/')
         } catch (err) {
@@ -106,7 +119,7 @@ export default function GroupDetail() {
     return (
         <div className="min-h-screen bg-gray-50/50">
             <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100">
-                <div className="container mx-auto px-4 py-3">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <button
@@ -128,7 +141,7 @@ export default function GroupDetail() {
                 </div>
             </nav>
 
-            <main className="container mx-auto px-4 py-8">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="max-w-6xl mx-auto">
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50"></div>

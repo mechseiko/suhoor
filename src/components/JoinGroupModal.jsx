@@ -108,9 +108,9 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                     </div>
                 )}
 
-                {invitedGroupName && (
+                {invitedGroupName && iWantToJoin && (
                     <div className="bg-primary/10 border border-primary/20 text-primary p-4 rounded-xl mb-6 text-sm">
-                        You have been invited to join <span className="font-bold">{invitedGroupName}</span>
+                        You have {status === true ? 'been invited' : 'rejected'} to join <span className="font-bold">{invitedGroupName}</span>
                     </div>
                 )}
 

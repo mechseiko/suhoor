@@ -24,9 +24,15 @@ export default function Dashboard() {
     const navigate = useNavigate()
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [showJoinModal, setShowJoinModal] = useState(false)
-    const [groups, setGroups] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [stats, setStats] = useState({ totalGroups: 0, totalMembers: 0, activeToday: 0 })
+    const [groups, setGroups] = useState(() => {
+        const cached = localStorage.getItem(`suhoor_groups_${currentUser?.uid}`)
+        return cached ? JSON.parse(cached) : []
+    })
+    const [loading, setLoading] = useState(!groups.length)
+    const [stats, setStats] = useState(() => {
+        const cached = localStorage.getItem(`suhoor_stats_${currentUser?.uid}`)
+        return cached ? JSON.parse(cached) : { totalGroups: 0, totalMembers: 0, activeToday: 0 }
+    })
     const [showSidebar, setShowSidebar] = useState(false)
     const [showMobileMenu, setShowMobileMenu] = useState(false)
 
@@ -110,13 +116,16 @@ export default function Dashboard() {
                 }
             }
             setGroups(groupsData)
+            localStorage.setItem(`suhoor_groups_${currentUser.uid}`, JSON.stringify(groupsData))
 
             const totalMembers = groupsData.reduce((sum, group) => sum + (group.member_count || 0), 0)
-            setStats({
+            const newStats = {
                 totalGroups: groupsData.length,
                 totalMembers: totalMembers,
                 activeToday: groupsData.filter(g => g.last_activity === new Date().toISOString().split('T')[0]).length
-            })
+            }
+            setStats(newStats)
+            localStorage.setItem(`suhoor_stats_${currentUser.uid}`, JSON.stringify(newStats))
         } catch (err) {
             console.error('Error fetching groups:', err)
         } finally {
@@ -126,6 +135,9 @@ export default function Dashboard() {
 
     const handleLogout = async () => {
         try {
+            // Clear cache on logout
+            localStorage.removeItem(`suhoor_groups_${currentUser?.uid}`)
+            localStorage.removeItem(`suhoor_stats_${currentUser?.uid}`)
             await logout()
             navigate('/')
         } catch (err) {
@@ -151,7 +163,7 @@ export default function Dashboard() {
 
             {/* Top Navigation */}
             <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100">
-                <div className="container mx-auto px-4 py-3">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
                             <button
@@ -211,7 +223,7 @@ export default function Dashboard() {
                 </div>
             </nav>
 
-            <div className="container mx-auto px-4 py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Main Content */}
                     <main className="flex-1 min-w-0">

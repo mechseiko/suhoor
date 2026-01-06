@@ -79,6 +79,7 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
                             value={groupName}
                             onChange={e => setGroupName(e.target.value)}
                             required
+                            maxLength={30}
                             className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 text-gray-900"
                             placeholder="e.g. Ayamul-beed circle"
                         />
