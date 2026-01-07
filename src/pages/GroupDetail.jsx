@@ -14,6 +14,7 @@ import WakeUpTracker from '../components/WakeUpTracker'
 import InviteMemberModal from '../components/InviteMemberModal'
 import GroupAnalytics from '../components/GroupAnalytics'
 import Loader from '../components/Loader'
+import SkeletonLoader from '../components/SkeletonLoader'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useSocket } from '../context/SocketContext'
 
@@ -31,8 +32,9 @@ export default function GroupDetail() {
     const [loading, setLoading] = useState(!group)
     const [copied, setCopied] = useState(false)
     const [showInviteModal, setShowInviteModal] = useState(false)
+    const [toast, setToast] = useState(null)
 
-    const { socket, on, off } = useSocket()
+    const { socket, on, off, isConnected } = useSocket()
 
     // Function to fetch members (hoisted for reuse)
     const fetchMembers = async () => {
@@ -87,26 +89,40 @@ export default function GroupDetail() {
 
         fetchGroupData()
         fetchMembers()
+    }, [groupId])
 
-        // Socket listeners for real-time updates
+    // Toast auto-hide
+    useEffect(() => {
+        if (toast) {
+            const timer = setTimeout(() => setToast(null), 3000)
+            return () => clearTimeout(timer)
+        }
+    }, [toast])
+
+    // Socket listeners for real-time updates
+    useEffect(() => {
         const handleMemberJoined = (data) => {
             console.log('New member joined:', data)
+            setToast({ type: 'success', message: 'A new member has joined the group!' })
             fetchMembers()
         }
 
         const handleGroupUpdated = (data) => {
             console.log('Group updated:', data)
+            setToast({ type: 'info', message: 'Group information updated.' })
             fetchGroupData()
         }
 
-        on('member-joined', handleMemberJoined)
-        on('group-updated', handleGroupUpdated)
+        if (isConnected) {
+            on('member-joined', handleMemberJoined)
+            on('group-updated', handleGroupUpdated)
+        }
 
         return () => {
             off('member-joined', handleMemberJoined)
             off('group-updated', handleGroupUpdated)
         }
-    }, [groupId, on, off])
+    }, [groupId, on, off, isConnected])
 
     const copyInviteLink = () => {
         setCopied(true)
@@ -139,29 +155,43 @@ export default function GroupDetail() {
                     </span>
                 </div>
                 <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
-                    {members.map(member => (
-                        <div
-                            key={member.id}
-                            className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                    {member.profiles.display_name?.charAt(0).toUpperCase() || member.profiles.email?.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <div className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
-                                        {member.profiles.display_name || member.profiles.email.split('@')[0]}
-                                        {member.role === 'admin' && (
-                                            <Crown className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                                        )}
+                    {loading && !members.length ? (
+                        <div className="p-4 space-y-4">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="flex items-center gap-3">
+                                    <SkeletonLoader variant="circle" width="w-8" height="h-8" />
+                                    <div className="space-y-1">
+                                        <SkeletonLoader width="w-24" height="h-3" />
+                                        <SkeletonLoader width="w-32" height="h-2" />
                                     </div>
-                                    <div className="text-[10px] text-gray-500 truncate max-w-[120px]">
-                                        {member.profiles.email}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        members.map(member => (
+                            <div
+                                key={member.id}
+                                className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                        {member.profiles.display_name?.charAt(0).toUpperCase() || member.profiles.email?.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <div className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
+                                            {member.profiles.display_name || member.profiles.email.split('@')[0]}
+                                            {member.role === 'admin' && (
+                                                <Crown className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                            )}
+                                        </div>
+                                        <div className="text-[10px] text-gray-500 truncate max-w-[120px]">
+                                            {member.profiles.email}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>
@@ -174,13 +204,19 @@ export default function GroupDetail() {
 
                 <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6">
                     <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="md:text-3xl text-2xl font-bold text-gray-900">
+                        <div className="flex md:flex-row flex-col md:items-center gap-3 mb-2">
+                            <h1 className="md:text-2xl text-xl font-bold text-gray-900">
                                 {group?.name}
                             </h1>
                             <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
                                 {members.length} {members.length === 1 ? 'Member' : 'Members'}
                             </span>
+                            {isConnected && (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-200 animate-pulse">
+                                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                                    Live
+                                </span>
+                            )}
                         </div>
 
                         <div className="flex items-center gap-3 mt-4">
@@ -226,6 +262,17 @@ export default function GroupDetail() {
                     groupKey={group?.group_key}
                     onClose={() => setShowInviteModal(false)}
                 />
+            )}
+
+            {/* Toast Notification */}
+            {toast && (
+                <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+                    <div className={`px-4 py-3 rounded-xl shadow-lg border flex items-center gap-3 ${toast.type === 'success' ? 'bg-white border-green-100 text-green-800' : 'bg-white border-blue-100 text-blue-800'
+                        }`}>
+                        <div className={`w-2 h-2 rounded-full ${toast.type === 'success' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
+                        <span className="text-sm font-medium">{toast.message}</span>
+                    </div>
+                </div>
             )}
         </DashboardLayout>
     )

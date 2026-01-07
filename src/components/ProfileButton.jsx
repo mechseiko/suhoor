@@ -6,6 +6,7 @@ export default function ProfileButton({ currentUser , navigate }) {
 
     return (
         <button
+            title={`Logged in as ${currentUser?.email ? currentUser?.email : currentUser}`}
             onClick={() => navigate('/profile')}
             className="flex items-center gap-3 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-100 hover:bg-gray-100 transition-colors"
         >

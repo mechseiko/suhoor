@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import {  useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Plus, Users, TrendingUp, Award } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
@@ -62,7 +62,7 @@ export default function Dashboard() {
     }
 
     const Modals = () => {
-        return(
+        return (
             <div className="flex gap-3 justify-center *:cursor-pointer">
                 <button
                     onClick={() => setShowJoinModal(true)}
@@ -151,29 +151,23 @@ export default function Dashboard() {
         }
     }, [linkGroupKey]);
 
-    if (loading && !groups.length) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <Loader />
-            </div>
-        )
-    }
+
 
     const rightSidebar = null
 
     const CloseJoinModal = () => {
-        if(from === 'join') {
+        if (from === 'join') {
             navigate('/dashboard')
-            setShowJoinModal(false) 
+            setShowJoinModal(false)
         }
         else {
             setShowJoinModal(false)
         }
     }
     const CloseCreateModal = () => {
-        if(from === 'create') {
+        if (from === 'create') {
             navigate('/dashboard')
-            setShowCreateModal(false) 
+            setShowCreateModal(false)
         }
         else {
             setShowCreateModal(false)
@@ -242,31 +236,47 @@ export default function Dashboard() {
                         <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
                         <p className="text-sm text-gray-500">Manage and monitor your group activities</p>
                     </div>
-                
+
 
                     {/* Search and Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3">
-                        {groups.length > 0 &&  <>
-                        <div className="relative flex-1">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Users className="h-4 w-4 text-gray-400" />
+                        {groups.length > 0 && <>
+                            <div className="relative flex-1">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Users className="h-4 w-4 text-gray-400" />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Search groups..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
+                                />
                             </div>
-                            <input
-                                type="text"
-                                placeholder="Search groups..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
-                            />
-                        </div>
-                        <Modals />
+                            <Modals />
                         </>
                         }
                     </div>
                 </div>
 
 
-                {groups.length === 0 ? (
+                {loading && groups.length === 0 ? (
+                    <div className="space-y-4">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center justify-between">
+                                <div className="space-y-3 w-full">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse" />
+                                        <div className="space-y-2 flex-1">
+                                            <div className="h-5 w-48 bg-gray-200 rounded animate-pulse" />
+                                            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : groups.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-dashed border-gray-300 px-6 py-8 text-center">
                         <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Users className="h-10 w-10 text-gray-400" />

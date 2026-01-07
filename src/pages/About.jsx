@@ -7,7 +7,7 @@ export default function About() {
     const { currentUser } = useAuth()
 
     return(
-         <div className="max-w-7xl mx-auto md:pt-15 pt-12 pb-8 px-4 mt-5">
+         <div className="max-w-7xl mx-auto md:pt-15 pt-12 pb-8 md:px-4 px-2 mt-5">
             <div>
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
@@ -26,13 +26,13 @@ export default function About() {
                 )}
             </div>
 
-            <div className="bg-white py-20 border-y border-gray-50">
+            <div className="bg-white py-10 p-2 rounded-lg md:rounded-b-lg rounded-b-full border-y border-gray-50">
                 <div className="max-w-6xl mx-auto px-4">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6">
-                            <h2 className="text-3xl font-bold text-gray-900">Our Mission</h2>
+                            <h2 className="text-3xl font-bold text-gray-900">The Mission</h2>
                             <p className="text-gray-600 leading-loose">
-                                We realized that waking up for Suhoor alone can be difficult, and traditional alarms are easy to snooze. Suhoor (the app) revives the Sunnah of communal waking, allowing groups of friends and families to hold each other accountable.
+                                We realized that waking up for Suhoor alone can be difficult, and traditional alarms are easy to snooze. Suhoor revives the Sunnah of communal waking, allowing groups of friends and families to hold each other accountable.
                             </p>
                             <p className="text-gray-600 leading-loose">
                                 Our goal is to leverage technology to strengthen spiritual bonds, ensuring that every Muslim can maximize the blessings of their fasting days starting with a nourishing Suhoor.
@@ -50,7 +50,7 @@ export default function About() {
                         </div>
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-purple-100 rounded-3xl transform rotate-3 scale-105 opacity-90"></div>
-                            <div className="relative bg-white rounded-3xl p-8 shadow-sm border border-gray-100 grid grid-cols-2 gap-">
+                            <div className="relative bg-white rounded-3xl p-8 shadow-sm border border-gray-100 grid grid-cols-2 gap-4">
                                 <div className="space-y-4">
                                     <div className="bg-blue-50 p-4 rounded-2xl">
                                         <Bell className="h-8 w-8 text-primary mb-2" />

@@ -14,4 +14,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
+import { enableIndexedDbPersistence } from 'firebase/firestore'
+
+enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code == 'failed-precondition') {
+        console.warn('Persistence failed: Multiple tabs open.')
+    } else if (err.code == 'unimplemented') {
+        console.warn('Persistence not supported by browser.')
+    }
+})
 
