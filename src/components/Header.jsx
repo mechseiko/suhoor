@@ -32,6 +32,29 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
             </>
         )
     }
+
+    const UserCta = () => {
+        return(
+            <div className="flex md:flex-row flex-col items-center gap-4 mt-2">
+                <div className="scale-110">
+                    <ProfileButton currentUser={currentUser} />
+                </div>
+                <button
+                    onClick={async () => {
+                        try {
+                            await logout();
+                            navigate('/');
+                        } catch (error) {
+                            console.error("Logout failed", error);
+                        }
+                    }}
+                    className="text-red-500 cursor-pointer font-medium py-2 px-4 hover:bg-red-50 rounded-lg w-full text-center"
+                >
+                    Logout
+                </button>
+            </div>
+        )
+    }
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 
@@ -46,7 +69,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                         </div>
                         {
                             !currentUser ? <Cta /> :
-                                <ProfileButton currentUser={currentUser} navigate={navigate} />
+                            <UserCta />
                         }
                     </div>
                 </header>
@@ -64,7 +87,6 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
 
                                     return (
                                         <Link
-                                            title={navItem.label}
                                             key={index}
                                             onClick={() => setIsMenuOpen(false)}
                                             className={`text-center p-2 rounded-md mx-10 ${isActive ? 'bg-primary bg-blue-500 text-white' : 'hover:bg-blue-300'}`}
@@ -76,24 +98,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                                     )
                                 })}
                                 {currentUser ? (
-                                    <div className="flex flex-col items-center gap-4 mt-2">
-                                        <div className="scale-110">
-                                            <ProfileButton currentUser={currentUser} navigate={navigate} />
-                                        </div>
-                                        <button
-                                            onClick={async () => {
-                                                try {
-                                                    await logout();
-                                                    navigate('/');
-                                                } catch (error) {
-                                                    console.error("Logout failed", error);
-                                                }
-                                            }}
-                                            className="text-red-500 font-medium py-2 px-4 hover:bg-red-50 rounded-lg w-full text-center"
-                                        >
-                                            Logout
-                                        </button>
-                                    </div>
+                                    <UserCta />
                                 ) : (
                                     <Cta flex='col' />
                                 )}

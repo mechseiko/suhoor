@@ -55,32 +55,35 @@ export default function DailyQuote() {
     }
 
     return (
-        <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg">
-            <div className="absolute top-0 right-0 -mt-8 -mr-8 h-32 w-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-24 w-24 bg-accent opacity-20 rounded-full blur-xl"></div>
-
+        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
+            <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
             <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <Quote className="h-4 w-4 text-white/80" />
-                        <span className="text-white/90 text-sm font-medium uppercase tracking-wider">Inspiration Box</span>
+                        <div className="p-1.5 bg-primary/10 rounded-lg">
+                            <Quote className="h-4 w-4 text-primary" />
+                        </div>
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Inspiration Box</span>
                     </div>
                     <button
                         onClick={getNewQuote}
-                        className={`p-2 hover:bg-white/10 rounded-full transition-all duration-300 ${isAnimating ? 'rotate-180' : ''}`}
+                        className={`p-2 hover:bg-gray-50 rounded-full transition-all duration-300 ${isAnimating ? 'rotate-180' : ''}`}
                         title="New Quote"
                     >
-                        <RefreshCw className="h-4 w-4 text-white/90" />
+                        <RefreshCw className="h-4 w-4 text-gray-400" />
                     </button>
                 </div>
 
-                <div className={`transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-                    <p className="text-lg md:text-xl font-serif leading-relaxed mb-3">
+                <div className={`transition-all duration-300 ${isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
+                    <p className="text-lg md:text-xl font-serif text-gray-800 leading-relaxed italic mb-4">
                         "{quote.text}"
                     </p>
-                    <p className="text-sm text-white/80 font-medium">
-                        — {quote.source}
-                    </p>
+                    <div className="flex items-center gap-2">
+                        <div className="h-px w-8 bg-primary/20"></div>
+                        <p className="text-sm text-primary font-bold">
+                            {quote.source}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

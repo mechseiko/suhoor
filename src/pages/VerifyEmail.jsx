@@ -46,28 +46,40 @@ export default function VerifyEmail() {
             })
 
             // 2. Update the profile document
-            const email = verificationDoc.data().email
-            const profilesQuery = query(collection(db, 'profiles'), where('email', '==', email))
-            const profileSnapshot = await getDocs(profilesQuery)
-
-            if (!profileSnapshot.empty) {
-                await updateDoc(doc(db, 'profiles', profileSnapshot.docs[0].id), {
+            const uid = verificationDoc.data().uid
+            if (uid) {
+                const profileRef = doc(db, 'profiles', uid)
+                // Check if profile exists (for legacy random-ID profiles, we might fallback, but let's assume standard)
+                // Actually, let's try to update direct path first.
+                await updateDoc(profileRef, {
                     isVerified: true
+                }).catch(async (err) => {
+                    // Fallback for legacy data: Query by email if direct update fails (e.g. doc doesn't exist at UID path)
+                    console.log("Direct profile update failed, trying query fallback", err)
+                    const email = verificationDoc.data().email
+                    const profilesQuery = query(collection(db, 'profiles'), where('email', '==', email))
+                    const profileSnapshot = await getDocs(profilesQuery)
+
+                    if (!profileSnapshot.empty) {
+                        await updateDoc(doc(db, 'profiles', profileSnapshot.docs[0].id), {
+                            isVerified: true
+                        })
+                    }
                 })
             }
 
             setStatus('success')
-            setMessage('Your email has been successfully verified! You can now log in.')
+            setMessage('Your email has been successfully verified!')
 
-            // Auto-redirect after 3 seconds
+            // Auto-redirect after 2 seconds
             setTimeout(() => {
                 navigate('/login')
-            }, 3000)
+            }, 2000)
 
         } catch (err) {
             console.error('Verification error:', err)
             setStatus('error')
-            setMessage('An error occurred during verification. Please try again later.')
+            setMessage('An error occurred during verification. Try this later in your profile page.')
         }
     }
 
@@ -75,10 +87,8 @@ export default function VerifyEmail() {
         <AuthWrapper
             title={status === 'success' ? "Verification Successful" : status === 'error' ? "Verification Failed" : "Verifying Email"}
             subtitle={message || "Please wait while we verify your account..."}
-            bottomTitle={status === 'error' ? "Something went wrong?" : ""}
-            bottomsubTitle={status === 'error' ? "Go back home" : ""}
         >
-            <div className="text-center py-8">
+            <div className="text-center">
                 {status === 'verifying' && (
                     <div className="flex flex-col items-center">
                         <Loader2 className="w-16 h-16 text-primary animate-spin mb-4" />
@@ -89,24 +99,24 @@ export default function VerifyEmail() {
                 {status === 'success' && (
                     <div className="flex flex-col items-center">
                         <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-                        <Link
-                            to="/login"
-                            className="bg-primary text-white px-8 py-3 rounded-lg hover:opacity-90 font-medium transition"
+                        <button
+                            className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => navigate('/login')}
                         >
-                            Go to Login
-                        </Link>
+                            Login
+                        </button>
                     </div>
                 )}
 
                 {status === 'error' && (
                     <div className="flex flex-col items-center">
                         <XCircle className="w-16 h-16 text-red-500 mb-4" />
-                        <Link
-                            to="/signup"
-                            className="text-primary hover:underline font-medium"
+                        <button
+                            className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => navigate('/login')}
                         >
-                            Back to Sign Up
-                        </Link>
+                            Login
+                        </button>
                     </div>
                 )}
             </div>

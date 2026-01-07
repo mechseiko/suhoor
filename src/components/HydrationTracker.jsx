@@ -59,11 +59,11 @@ export default function HydrationTracker() {
                 </button>
             </div></> :
             
-            <div className='flex items-center bg-blue-50 rounded-lg'>
+            <div className='flex items-center rounded-lg'>
                 <div className="p-2 ">
                     <Droplet className="h-5 w-5 text-primary" />
                 </div> 
-                <h3 className="font-bold text-center text-gray-900">Hydration goal reached.</h3>
+                <h3 className="font-bold text-center text-gray-900">Hydration goal reached for today.</h3>
             </div>}
         </div>
     )

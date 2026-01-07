@@ -4,12 +4,19 @@ import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
-export default function InviteMemberModal({ groupId, onClose }) {
+import emailjs from 'emailjs-com'
+
+export default function InviteMemberModal({ groupId, groupName, groupKey, onClose }) {
     const { currentUser } = useAuth()
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
     const [error, setError] = useState('')
+
+    // EmailJS Credentials
+    const SERVICE_ID = 'service_3flsb3n'
+    const TEMPLATE_ID = 'template_vhylt41'
+    const USER_ID = 'JKRA71R40HTU6vo6W'
 
     const generateInviteCode = () => {
         return Math.random().toString(36).substring(2, 10).toUpperCase()
@@ -23,6 +30,7 @@ export default function InviteMemberModal({ groupId, onClose }) {
         try {
             const inviteCode = generateInviteCode()
 
+            // 1. Create DB record
             await addDoc(collection(db, 'group_invites'), {
                 group_id: groupId,
                 invited_by: currentUser.uid,
@@ -31,6 +39,24 @@ export default function InviteMemberModal({ groupId, onClose }) {
                 status: 'pending',
                 created_at: serverTimestamp(),
             })
+
+            // 2. Send Email
+            const inviteLink = `${window.location.origin}/dashboard?groupKey=${groupKey}`
+
+            const templateParams = {
+                subject: 'Join my group on Suhoor',
+                name: 'Suhoor',
+                company_name: 'Suhoor',
+                title: 'You\'ve been invited!',
+                body_intro: `${currentUser.displayName || currentUser.email} has invited you to join their Suhoor group "${groupName}".`,
+                button_text: 'Join Group',
+                action_link: inviteLink,
+                accent_note: `Group Key: ${groupKey}`,
+                user_email: email,
+                link: window.location.origin
+            }
+
+            await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID)
 
             setSuccess(true)
             setTimeout(() => {
@@ -95,7 +121,7 @@ export default function InviteMemberModal({ groupId, onClose }) {
                                 </p>
                             </div>
 
-                            <div className="flex space-x-3 pt-4">
+                            <div className="flex space-x-3 pt-4 *:cursor-pointer">
                                 <button
                                     type="button"
                                     onClick={onClose}

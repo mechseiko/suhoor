@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-    ArrowLeft,
     Users,
     UserPlus,
     Copy,
@@ -9,7 +8,6 @@ import {
     Crown,
     CopyCheck
 } from 'lucide-react'
-import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import WakeUpTracker from '../components/WakeUpTracker'
@@ -17,11 +15,11 @@ import InviteMemberModal from '../components/InviteMemberModal'
 import GroupAnalytics from '../components/GroupAnalytics'
 import Loader from '../components/Loader'
 import DashboardLayout from '../layouts/DashboardLayout'
+import { useSocket } from '../context/SocketContext'
 
 export default function GroupDetail() {
     const { groupId } = useParams()
     const navigate = useNavigate()
-    const { currentUser, logout } = useAuth()
     const [group, setGroup] = useState(() => {
         const cached = localStorage.getItem(`suhoor_group_${groupId}`)
         return cached ? JSON.parse(cached) : null
@@ -33,6 +31,41 @@ export default function GroupDetail() {
     const [loading, setLoading] = useState(!group)
     const [copied, setCopied] = useState(false)
     const [showInviteModal, setShowInviteModal] = useState(false)
+
+    const { socket, on, off } = useSocket()
+
+    // Function to fetch members (hoisted for reuse)
+    const fetchMembers = async () => {
+        try {
+            const membersRef = collection(db, 'group_members')
+            const q = query(membersRef, where('group_id', '==', groupId))
+            const querySnapshot = await getDocs(q)
+
+            const membersData = []
+            for (const docSnap of querySnapshot.docs) {
+                const member = docSnap.data()
+                // Fetch profile for each member
+                const profileRef = doc(db, 'profiles', member.user_id)
+                const profileSnap = await getDoc(profileRef)
+
+                if (profileSnap.exists()) {
+                    membersData.push({
+                        id: docSnap.id,
+                        ...member,
+                        profiles: {
+                            id: profileSnap.id,
+                            ...profileSnap.data()
+                        }
+                    })
+                }
+            }
+
+            setMembers(membersData)
+            localStorage.setItem(`suhoor_members_${groupId}`, JSON.stringify(membersData))
+        } catch (err) {
+            console.error('Error fetching members:', err)
+        }
+    }
 
     useEffect(() => {
         const fetchGroupData = async () => {
@@ -52,45 +85,32 @@ export default function GroupDetail() {
             }
         }
 
-        const fetchMembers = async () => {
-            try {
-                const membersRef = collection(db, 'group_members')
-                const q = query(membersRef, where('group_id', '==', groupId))
-                const querySnapshot = await getDocs(q)
-
-                const membersData = []
-                for (const docSnap of querySnapshot.docs) {
-                    const member = docSnap.data()
-                    // Fetch profile for each member
-                    const profileRef = doc(db, 'profiles', member.user_id)
-                    const profileSnap = await getDoc(profileRef)
-
-                    if (profileSnap.exists()) {
-                        membersData.push({
-                            id: docSnap.id,
-                            ...member,
-                            profiles: {
-                                id: profileSnap.id,
-                                ...profileSnap.data()
-                            }
-                        })
-                    }
-                }
-
-                setMembers(membersData)
-                localStorage.setItem(`suhoor_members_${groupId}`, JSON.stringify(membersData))
-            } catch (err) {
-                console.error('Error fetching members:', err)
-            }
-        }
-
         fetchGroupData()
         fetchMembers()
-    }, [groupId])
+
+        // Socket listeners for real-time updates
+        const handleMemberJoined = (data) => {
+            console.log('New member joined:', data)
+            fetchMembers()
+        }
+
+        const handleGroupUpdated = (data) => {
+            console.log('Group updated:', data)
+            fetchGroupData()
+        }
+
+        on('member-joined', handleMemberJoined)
+        on('group-updated', handleGroupUpdated)
+
+        return () => {
+            off('member-joined', handleMemberJoined)
+            off('group-updated', handleGroupUpdated)
+        }
+    }, [groupId, on, off])
 
     const copyInviteLink = () => {
         setCopied(true)
-        navigator.clipboard.writeText(`https://suhoor-group.web.app/dashboard?groupKey=${group.group_key}`)
+        navigator.clipboard.writeText(`${window.location.origin}/dashboard?groupKey=${group.group_key}`)
         setTimeout(() => {
             setCopied(false)
         }, 2000)
@@ -155,7 +175,7 @@ export default function GroupDetail() {
                 <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-3xl font-bold text-gray-900">
+                            <h1 className="md:text-3xl text-2xl font-bold text-gray-900">
                                 {group?.name}
                             </h1>
                             <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
@@ -202,6 +222,8 @@ export default function GroupDetail() {
             {showInviteModal && (
                 <InviteMemberModal
                     groupId={groupId}
+                    groupName={group?.name}
+                    groupKey={group?.group_key}
                     onClose={() => setShowInviteModal(false)}
                 />
             )}

@@ -14,7 +14,7 @@ export default function Landing() {
       <Features />
       <HowItWorks />
       <Faq />
-      <CtaSection navigate={navigate} />
+      <CtaSection />
     </>
   )
 }

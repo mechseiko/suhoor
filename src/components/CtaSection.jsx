@@ -1,11 +1,9 @@
-import { ArrowRight } from 'lucide-react'
+import LanderCta from "./LanderCta";
 import { useAuth } from "../context/AuthContext";
 
 
-export default function CtaSection({ navigate }) {
-
+export default function CtaSection() {
     const { currentUser } = useAuth();
-
     return (
         <div className="py-20 px-4">
             <div className="max-w-4xl mx-auto">
@@ -20,22 +18,10 @@ export default function CtaSection({ navigate }) {
                         <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
                             {currentUser ? 'Pick up right where you left off' : 'Join Muslims already using Suhoor'}
                         </p>
-
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button
-                                onClick={() => navigate(currentUser ? '/dashboard' : '/signup')}
-                                className="group px-8 py-4 bg-white text-primary rounded-lg font-semibold hover:bg-white/90 transition-all flex items-center justify-center gap-2"
-                            >
-                                {currentUser ? 'Go to Dashboard' : 'Create Account'}
-                                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                            <button
-                                onClick={() => navigate('/books')}
-                                className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition"
-                            >
-                                Explore Resources
-                            </button>
-                        </div>
+                        <LanderCta 
+                            className1="group px-8 py-4 bg-white text-primary rounded-lg font-semibold hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                            className2="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition"
+                        />
                     </div>
                 </div>
             </div>

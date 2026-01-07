@@ -11,11 +11,69 @@ import GroupDetail from './pages/GroupDetail'
 import Books from './pages/Books'
 import Duas from './pages/Duas'
 import Profile from './pages/Profile'
+import FastingTimesPage from './pages/FastingTimesPage'
 import ResetPassword from './pages/ResetPassword'
 import ForgotPassword from './pages/ForgotPassword'
 import VerifyEmail from './pages/VerifyEmail'
 import ScrollToTop from './components/ScrollToTop'
 import PWAManager from './components/PWAManager'
+import About from './pages/About'
+import { useAuth } from './context/AuthContext'
+
+// Extract Routes to a component that is inside AuthProvider
+function AppRoutes() {
+  const { currentUser } = useAuth();
+  return (
+    <Routes>
+      <Route element={<PageLayout />}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/books" element={<Books />} />
+        <Route path="/duas" element={<Duas />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+      </Route>
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/group/:groupId"
+        element={
+          <ProtectedRoute>
+            <GroupDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/fasting"
+        element={
+          <ProtectedRoute>
+            <FastingTimesPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to={currentUser ? '/dashboard' : '/'} />} />
+    </Routes>
+  )
+}
 
 function App() {
   return (
@@ -24,44 +82,7 @@ function App() {
       <ScrollToTop />
       <AuthProvider>
         <SocketProvider>
-          <Routes>
-            <Route element={<PageLayout />}>
-              <Route path="/" element={<Landing />} />
-              <Route path="/books" element={<Books />} />
-              <Route path="/duas" element={<Duas />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/verify-email" element={<VerifyEmail />} />
-            </Route>
-
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/group/:groupId"
-              element={
-                <ProtectedRoute>
-                  <GroupDetail />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
+          <AppRoutes />
         </SocketProvider>
       </AuthProvider>
     </BrowserRouter>

@@ -136,7 +136,7 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                         )}
                     </div>
 
-                    <div className="flex gap-3 pt-2">
+                    <div className="flex gap-3 pt-2 *:cursor-pointer">
                         <button
                             type="button"
                             onClick={iWantToJoin ? () => {setStatus(false); navigate('/dashboard')} : onClose}

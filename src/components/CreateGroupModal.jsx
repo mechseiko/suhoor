@@ -85,7 +85,7 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
                         />
                     </div>
 
-                    <div className="flex gap-3 pt-2">
+                    <div className="flex gap-3 pt-2 *:cursor-pointer">
                         <button
                             type="button"
                             onClick={onClose}

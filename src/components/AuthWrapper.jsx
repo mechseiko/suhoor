@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 
 export default function AuthWrapper({ children, title, subtitle, error, bottomTitle, bottomsubTitle }) {
     return (
-        <div className="min-h-screen pt-24 pb-12 flex items-center justify-center px-6">
+        <div className="md:pt-30 pt-25 md:pb-15 pb-12 flex items-center justify-center">
             <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
                 <div className="flex mb-3 flex-col justify-center items-center ">
                     <Logo />
@@ -26,15 +26,13 @@ export default function AuthWrapper({ children, title, subtitle, error, bottomTi
 
                 <p className="text-center text-gray-600 mt-6">
                     {bottomTitle} {' '}
-                    <Link to={`/${bottomsubTitle.toLowerCase()
+                    <Link to={`/${bottomsubTitle?.toLowerCase()
                         .replace(/\s+/g, '-')
                         .replace(/[^\w-]+/g, '')}`} className="text-blue-600 hover:text-blue-700">
                         {bottomsubTitle}
                     </Link>
                 </p>
-
             </div>
-            
-            </div>
+        </div>
     )
 }

@@ -1,29 +1,27 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { LogOut, Plus, Users, TrendingUp, Award, Menu, X, Clock } from 'lucide-react'
+import {  useLocation, useNavigate } from 'react-router-dom'
+import { Plus, Users, TrendingUp, Award } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer } from 'firebase/firestore'
 import GroupList from '../components/GroupList'
-import CreateGroupModal from '../components/CreateGroupModal'
-import JoinGroupModal from '../components/JoinGroupModal'
-import FastingTimes from '../components/FastingTimes'
 import Loader from '../components/Loader'
 import StatsCard from '../components/StatsCard'
+import CreateGroupModal from '../components/CreateGroupModal'
+import JoinGroupModal from '../components/JoinGroupModal'
 import DailyQuote from '../components/DailyQuote'
-import HydrationTracker from '../components/HydrationTracker'
-import ProTip from '../components/ProTip'
-import MissedFastsTracker from '../components/MissedFastsTracker'
 import DashboardLayout from '../layouts/DashboardLayout'
 
 export default function Dashboard() {
+    const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const linkGroupKey = queryParams.get("groupKey");
-    const { currentUser, logout } = useAuth()
-    const navigate = useNavigate()
-    const [showCreateModal, setShowCreateModal] = useState(false)
-    const [showJoinModal, setShowJoinModal] = useState(false)
+    const from = queryParams.get("from");
+    const { currentUser } = useAuth();
+    const [showCreateModal, setShowCreateModal] = useState(from === 'create' ? true : false)
+    const [showJoinModal, setShowJoinModal] = useState(from === 'join' ? true : false)
+
     const [groups, setGroups] = useState(() => {
         const cached = localStorage.getItem(`suhoor_groups_${currentUser?.uid}`)
         return cached ? JSON.parse(cached) : []
@@ -63,6 +61,27 @@ export default function Dashboard() {
         )
     }
 
+    const Modals = () => {
+        return(
+            <div className="flex gap-3 justify-center *:cursor-pointer">
+                <button
+                    onClick={() => setShowJoinModal(true)}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-sm"
+                >
+                    <Users className="h-4 w-4" />
+                    <span>Join Group</span>
+                </button>
+                <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 font-medium text-sm"
+                >
+                    <Plus className="h-4 w-4" />
+                    <span>Create Group</span>
+                </button>
+            </div>
+        )
+    }
+
     const createOrUpdateProfile = async () => {
         try {
             const userRef = doc(db, 'profiles', currentUser.uid)
@@ -90,12 +109,6 @@ export default function Dashboard() {
             querySnapshot.forEach((doc) => {
                 groupIds.push(doc.data().group_id)
             })
-
-            // if (groupIds.length === 0) {
-            //     setGroups([])
-            //     setLoading(false)
-            //     return
-            // }
 
             const groupsData = []
             for (const groupId of groupIds) {
@@ -146,16 +159,26 @@ export default function Dashboard() {
         )
     }
 
-    const rightSidebar = (
-        <>
-            <div id="fasting-times">
-                <FastingTimes />
-            </div>
-            <ProTip />
-            <HydrationTracker />
-            <MissedFastsTracker />
-        </>
-    )
+    const rightSidebar = null
+
+    const CloseJoinModal = () => {
+        if(from === 'join') {
+            navigate('/dashboard')
+            setShowJoinModal(false) 
+        }
+        else {
+            setShowJoinModal(false)
+        }
+    }
+    const CloseCreateModal = () => {
+        if(from === 'create') {
+            navigate('/dashboard')
+            setShowCreateModal(false) 
+        }
+        else {
+            setShowCreateModal(false)
+        }
+    }
 
     return (
         <DashboardLayout
@@ -164,23 +187,24 @@ export default function Dashboard() {
             rightSidebar={rightSidebar}
         >
             {/* Welcome & Quote Section */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
-                <div className="xl:col-span-2 flex flex-col justify-center">
-                    <h1 className="text-gray-900 text-[20px] mb-2 font-medium">
-                        Welcome back, <span className='text-xl md:text-2xl font-bold'>{(currentUser?.displayName || currentUser?.email?.split('@')[0])?.split(' ')[0]}</span>
-                    </h1>
-                    <p className="text-base text-gray-500 mb-4">
-                        May your fasts be accepted and your prayers answered.
-                    </p>
+            <div className="mb-10">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h1 className="text-gray-900 mb-1">
+                            Welcome back, <span className="text-primary text-lg md:text-xl">{currentUser?.displayName || currentUser?.email?.split('@')[0]}</span>
+                        </h1>
+                        <p className="text-gray-500 font-medium">
+                            May your fasts be accepted and your prayers answered.
+                        </p>
+                    </div>
                     <div className="flex flex-wrap gap-3">
                         <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
                             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                         </div>
                     </div>
                 </div>
-                <div className="xl:col-span-1">
-                    <DailyQuote />
-                </div>
+
+                <DailyQuote />
             </div>
 
             {/* Stats Cards */}
@@ -191,6 +215,7 @@ export default function Dashboard() {
                     value={stats.totalGroups}
                     subtitle="Groups joined"
                     color="blue"
+                    loading={loading}
                 />
                 <StatsCard
                     icon={TrendingUp}
@@ -198,6 +223,7 @@ export default function Dashboard() {
                     value={stats.totalMembers}
                     subtitle="Across all groups"
                     color="green"
+                    loading={loading}
                 />
                 <StatsCard
                     icon={Award}
@@ -205,6 +231,7 @@ export default function Dashboard() {
                     value={stats.activeToday}
                     subtitle="Recent activity"
                     color="purple"
+                    loading={loading}
                 />
             </div>
 
@@ -213,9 +240,13 @@ export default function Dashboard() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
-                        <p className="text-sm text-gray-500">Manage and monitor your circular activities</p>
+                        <p className="text-sm text-gray-500">Manage and monitor your group activities</p>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-4 flex-1 max-w-md">
+                
+
+                    {/* Search and Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        {groups.length > 0 &&  <>
                         <div className="relative flex-1">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Users className="h-4 w-4 text-gray-400" />
@@ -225,23 +256,18 @@ export default function Dashboard() {
                                 placeholder="Search groups..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
+                                className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
                             />
                         </div>
-                        {groups.length > 0 && (
-                            <button
-                                onClick={() => setShowCreateModal(true)}
-                                className="hidden lg:flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:opacity-90 transition-all text-sm font-medium"
-                            >
-                                <Plus className="h-4 w-4" />
-                                <span>Create</span>
-                            </button>
-                        )}
+                        <Modals />
+                        </>
+                        }
                     </div>
                 </div>
 
+
                 {groups.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center">
+                    <div className="bg-white rounded-2xl border border-dashed border-gray-300 px-6 py-8 text-center">
                         <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Users className="h-10 w-10 text-gray-400" />
                         </div>
@@ -249,32 +275,75 @@ export default function Dashboard() {
                         <p className="text-gray-500 mb-8 max-w-sm mx-auto">
                             Create a new group to invite friends or join an existing one to get started.
                         </p>
-                        <div className="flex justify-center gap-4">
-                            <button
-                                onClick={() => setShowJoinModal(true)}
-                                className="px-6 py-2 border border-gray-200 rounded-xl font-medium"
-                            >
-                                Join Group
-                            </button>
-                            <button
-                                onClick={() => setShowCreateModal(true)}
-                                className="px-6 py-2 bg-primary text-white rounded-xl font-medium"
-                            >
-                                Create Group
-                            </button>
-                        </div>
+                        <Modals />
                     </div>
                 ) : (
-                    <GroupList
-                        groups={groups.filter(group =>
+                    <>
+                        {groups.filter(group =>
                             group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             group.group_key.toLowerCase().includes(searchQuery.toLowerCase())
+                        ).length > 0 ? (
+                            <GroupList
+                                groups={groups.filter(group =>
+                                    group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    group.group_key.toLowerCase().includes(searchQuery.toLowerCase())
+                                )}
+                                onUpdate={fetchGroups}
+                            />
+                        ) : (
+                            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                                <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Users className="h-10 w-10 text-gray-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">No groups found</h3>
+                                <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+                                    You are not a member of any groups matching "{searchQuery}"
+                                </p>
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="px-6 py-2 bg-primary text-white rounded-xl hover:opacity-90 transition font-medium"
+                                >
+                                    Clear Search
+                                </button>
+                            </div>
                         )}
-                        onUpdate={fetchGroups}
-                    />
+
+                        {searchQuery && groups.filter(group =>
+                            group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            group.group_key.toLowerCase().includes(searchQuery.toLowerCase())
+                        ).length === 0 && (
+                                <div className="mt-8">
+                                    <h2 className="text-xl font-bold text-gray-900 mb-6">All Groups</h2>
+                                    <GroupList
+                                        groups={groups}
+                                        onUpdate={fetchGroups}
+                                    />
+                                </div>
+                            )}
+                    </>
                 )}
             </div>
+            {/* Modals */}
+            {showCreateModal && (
+                <CreateGroupModal
+                    onClose={CloseCreateModal}
+                    onSuccess={() => {
+                        setShowCreateModal(false)
+                        fetchGroups()
+                    }}
+                />
+            )}
 
+            {showJoinModal && (
+                <JoinGroupModal
+                    onClose={CloseJoinModal}
+                    onSuccess={() => {
+                        setShowJoinModal(false)
+                        fetchGroups()
+                    }}
+                    linkGroupKey={linkGroupKey}
+                />
+            )}
         </DashboardLayout>
     )
 }

@@ -107,7 +107,7 @@ export default function Books() {
   const { currentUser } = useAuth();
 
   const content = (
-    <div className={`${currentUser ? '' : 'max-w-7xl mx-auto py-8 px-4 mt-5'}`}>
+    <div className={`${currentUser ? '' : 'max-w-7xl mx-auto md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
           <Library className="h-8 w-8 text-primary" />
@@ -155,7 +155,7 @@ export default function Books() {
         )}
       </div>
 
-      {searchTerm && filteredBooks.length > 0 && (
+      {searchTerm && (
         <div className="mt-12">
           <h2 className="text-xl font-bold text-gray-900 mb-6">
             Other Books

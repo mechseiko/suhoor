@@ -42,8 +42,8 @@ export default function GroupList({ groups }) {
                           setCopied(false)
                         }, 2000)
                       }}
-                      className="ml-auto p-1.5 hover:bg-white rounded-md text-gray-400 hover:text-primary transition-colors"
-                      title="Copy Invite Link"
+                      className="ml-auto cursor-pointer p-1.5 hover:bg-white rounded-md text-gray-400 hover:text-primary transition-colors"
+                      title="Copy Group Key"
                     >
                       {copied && clicked === group.id ? <div className='flex gap-2 items-center text-xs'><CopyCheck className="h-4 w-4" /><span>Copied</span></div> : <Copy className="h-4 w-4" />}
                     </button>

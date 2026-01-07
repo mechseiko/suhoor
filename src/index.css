@@ -15,10 +15,6 @@
   /* Charcoal – for text and contrast */
 }
 
-button {
-  cursor: pointer;
-}
-
 @theme {
   --animate-navBar: navBar 0.3s ease-out 0s 1;
 
@@ -78,4 +74,19 @@ button {
 
 @utility bg-secondary {
   background-color: var(--color-secondary);
+}
+
+/* Hide scrollbar while maintaining scroll functionality */
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
 }

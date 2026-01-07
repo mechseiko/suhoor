@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import AuthWrapper from '../components/AuthWrapper'
 import { Eye, EyeOff } from 'lucide-react'
 import { db } from '../config/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, setDoc, doc, serverTimestamp } from 'firebase/firestore'
 import emailjs from 'emailjs-com'
 
 export default function Signup() {
@@ -15,7 +15,6 @@ export default function Signup() {
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [success, setSuccess] = useState(false)
     const { signup } = useAuth()
     const navigate = useNavigate()
 
@@ -43,7 +42,7 @@ export default function Signup() {
             const user = userCredential.user
 
             // Create initial profile in Firestore
-            await addDoc(collection(db, 'profiles'), {
+            await setDoc(doc(db, 'profiles', user.uid), {
                 uid: user.uid,
                 email: email,
                 display_name: email.split('@')[0],
@@ -61,7 +60,6 @@ export default function Signup() {
                 createdAt: serverTimestamp(),
                 verified: false
             })
-
             // 3. Send verification email via EmailJS (Unified Template)
             const verificationLink = `${window.location.origin}/verify-email?token=${token}`
             const templateParams = {
@@ -76,36 +74,14 @@ export default function Signup() {
                 user_email: email,
                 link: window.location.origin
             }
-
             await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID)
-
-            setSuccess(true)
+            navigate('/dashboard')
         } catch (err) {
             console.error('Signup Error:', err)
             setError('Failed to create account. Email may already be in use.')
         } finally {
             setLoading(false)
         }
-    }
-
-    if (success) {
-        return (
-            <AuthWrapper
-                title="Verify your email"
-                subtitle={`We've sent a verification link to ${email}. Please check your inbox to activate your account.`}
-                bottomTitle="Didn't get the email?"
-                bottomsubTitle="Sign up again"
-            >
-                <div className="text-center">
-                    <button
-                        onClick={() => setSuccess(false)}
-                        className="inline-block bg-primary text-white px-8 py-3 rounded-lg hover:opacity-90 font-medium transition"
-                    >
-                        Back to Signup
-                    </button>
-                </div>
-            </AuthWrapper>
-        )
     }
 
     return (
@@ -172,7 +148,7 @@ export default function Signup() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 cursor-pointer font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? 'Creating account...' : 'Sign Up'}
                 </button>

@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 import { useLocation, useNavigate, Outlet } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import Container from '../components/Container'
 
 
 export const navBar = [
     { label: 'Home', to: '/' },
     { label: 'Books', to: '/books' },
     { label: 'Duas', to: '/duas' },
+    { label: 'About', to: '/about' },
 ]
 
 
@@ -26,6 +26,7 @@ export default function PageLayout({ children }) {
         ...(currentUser ? [{ label: 'Dashboard', to: '/dashboard' }] : []),
         { label: 'Books', to: '/books' },
         { label: 'Duas', to: '/duas' },
+        { label: 'About', to: '/about' },
     ]
 
     useEffect(() => {
@@ -36,9 +37,14 @@ export default function PageLayout({ children }) {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    const publicPaths = ['/', '/login', '/signup', '/about', '/forgot-password', '/reset-password', '/verify-email']
+
+    if (currentUser && !publicPaths.includes(location.pathname)) {
+        return <div className="min-h-screen flex flex-col">{children ? children : <Outlet />}</div>
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col">
-            {/* <Container> */}
             <Header
                 isScrolled={isScrolled}
                 currentNavItem={currentNavItem}
@@ -48,11 +54,9 @@ export default function PageLayout({ children }) {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-grow w-full">
                 {children ? children : <Outlet />}
             </main>
-            {/* </Container> */}
             <Footer
                 currentNavItem={currentNavItem}
             />
-
         </div>
     )
 }

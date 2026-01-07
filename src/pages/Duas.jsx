@@ -37,7 +37,7 @@ export default function Duas() {
     const { currentUser } = useAuth()
 
     const content = (
-        <div className={`${currentUser ? '' : 'py-8 md:py-12 px-4'}`}>
+    <div className={`${currentUser ? '' : 'md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
             <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full">
                     <Hand className="h-8 w-8 text-primary" />
@@ -48,7 +48,7 @@ export default function Duas() {
                     className="px-4 mb-6"
                 />
             </div>
-            <div className="max-w-4xl mx-auto space-y-2 md:space-y-6 px-1">
+            <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 px-1">
                 {duas.map((dua, idx) => {
                     const Icon = dua.icon
                     return (
