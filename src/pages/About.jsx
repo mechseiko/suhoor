@@ -50,7 +50,7 @@ export default function About() {
                         </div>
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-purple-100 rounded-3xl transform rotate-3 scale-105 opacity-90"></div>
-                            <div className="relative bg-white rounded-3xl p-8 shadow-sm border border-gray-100 grid grid-cols-2 gap-4">
+                            <div className="relative bg-white rounded-3xl p-8 shadow-sm border border-gray-100 grid grid-cols-2 gap-">
                                 <div className="space-y-4">
                                     <div className="bg-blue-50 p-4 rounded-2xl">
                                         <Bell className="h-8 w-8 text-primary mb-2" />
