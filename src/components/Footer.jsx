@@ -9,7 +9,7 @@ export default function Footer({currentNavItem}) {
     <footer className="bg-gray-50 border-t border-gray-100 pt-16 md:pb-6 pb-4 mt-auto">
       <Container>
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:mb-12 mb:10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:mb-12 mb-10">
           <div className="md:col-span-2">
             <Logo />
             <p className="text-gray-500 leading-relaxed max-w-sm mt-3">

@@ -4,7 +4,6 @@ import {
     Users,
     UserPlus,
     Copy,
-    LogOut,
     Crown,
     CopyCheck
 } from 'lucide-react'

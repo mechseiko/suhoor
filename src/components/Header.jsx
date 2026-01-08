@@ -97,11 +97,15 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
 
                                     )
                                 })}
-                                {currentUser ? (
+                                <div className="mt-4">
+                                    <hr className="mb-6"/>
+                                    {currentUser ? (
                                     <UserCta />
                                 ) : (
-                                    <Cta flex='col' />
+                                    <Cta />
                                 )}
+                                </div>
+                                
                             </div> :
                             <></>
                     }

@@ -8,7 +8,7 @@ export default function Features() {
                 <div className="max-w-6xl mx-auto">
                     <div className="col-span-full">
                         <SectionHeader
-                            title="Everything You Need"
+                            title="Everything Suhoor. In one App"
                             subtitle="Designed to help you make the most of your fasting period"
                         />
                 </div>

@@ -17,13 +17,13 @@ export default function About() {
                     title="Waking the Ummah for Suhoor"
                     subtitle="Suhoor is more than just an app, it's a spiritual companion designed to ensure you never miss the blessed meal. Connect with loved ones, wake each other up, and share the blessings of Fasting."
                     />
-                </div>
-
-                {!currentUser && (
-                    <Link to="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-2xl hover:bg-blue-600 transition-all font-semibold shadow-lg shadow-blue-200">
+                </div><div className='text-center'>{!currentUser && (
+                    <Link to="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-2xl hover:opacity/90 transition-all font-semibold shadow-lg shadow-blue-200 md:mb-10 mb-8">
                         Start Your Journey
                     </Link>
-                )}
+                )}</div>
+
+                
             </div>
 
             <div className="bg-white py-10 p-2 rounded-lg md:rounded-b-lg rounded-b-full border-y border-gray-50">

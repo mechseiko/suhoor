@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom"
 
-export default function Cta({flex = 'row'}) {
+export default function Cta() {
     const navigate = useNavigate();
     return (
-        <div className={`flex flex-${flex} md:space-x-3 md:space-y-0 space-y-5 *:cursor-pointer justify-center items-center`}>
+        <div className="flex space-x-5 *:cursor-pointer justify-center items-center">
             <button
                 onClick={() => navigate('/login')}
                 className="w-fit sm:w-auto px-5 py-1.5 bg-primary text-white text-base rounded-lg hover:opacity-90 font-medium transition shadow-lg hover:shadow-xl"

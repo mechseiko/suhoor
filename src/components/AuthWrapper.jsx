@@ -1,4 +1,3 @@
-import Logo from "./Logo"
 import {Link} from 'react-router-dom'
 
 
@@ -6,10 +5,6 @@ export default function AuthWrapper({ children, title, subtitle, error, bottomTi
     return (
         <div className="md:pt-30 pt-25 md:pb-15 pb-12 flex items-center justify-center">
             <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
-                <div className="flex mb-3 flex-col justify-center items-center ">
-                    <Logo />
-                </div>
-                
                 <h2 className="text-2xl font-semibold text-center text-gray-900 mb-2">
                     {title}
                 </h2>

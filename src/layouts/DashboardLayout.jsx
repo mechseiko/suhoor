@@ -138,7 +138,7 @@ export default function DashboardLayout({
                 ))}
             </div>
 
-            <div className="md:hidden pt-4 border-t border-gray-100">
+            <div className="lg:hidden pt-4 border-t border-gray-100">
                 <SidebarLink
                     icon={LogOut}
                     label="Logout"
@@ -154,16 +154,17 @@ export default function DashboardLayout({
             {/* Top Navigation - Mobile Only */}
             <nav className="lg:hidden bg-white border-b border-gray-100 sticky top-0 z-40">
                 <div className="px-4 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                    <Logo />
+                    <div className="flex items-center gap-1">
+                        <ProfileButton currentUser={currentUser} navigate={() => {}}/>
                         <button
                             onClick={() => setShowMobileMenu(!showMobileMenu)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                             {showMobileMenu ? <X className="h-6 w-6 text-gray-600" /> : <Menu className="h-6 w-6 text-gray-600" />}
                         </button>
-                        <Logo />
                     </div>
-                    <ProfileButton currentUser={currentUser} navigate={navigate} />
+                    
                 </div>
 
                 {/* Mobile Menu Overlay */}

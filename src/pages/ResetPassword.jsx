@@ -117,7 +117,7 @@ export default function ResetPassword() {
         <AuthWrapper
             error={error}
             title={success ? "Password Reset Successfully" : "Reset Your Password"}
-            subtitle={success ? "Your password has been updated. Redirecting to login..." : `Enter a new password for ${resetEmail}`}
+            subtitle={success ? "Your password has been updated. Redirecting to login..." : `${resetEmail && `Enter a new password for ${resetEmail}`}`}
             bottomTitle={success ? "" : "Remembered your password?"}
             bottomsubTitle={success ? "" : "Login"}
         >
