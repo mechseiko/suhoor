@@ -3,32 +3,36 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import {
     Users,
     Plus,
-    Clock,
     LogOut,
     Menu,
     X,
     LayoutDashboard,
     UserCircle,
     BookOpen,
-    Hand
+    Hand,
+    Search,
+    Car,
+    Moon
 } from 'lucide-react'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../config/firebase'
 import { useAuth } from '../context/AuthContext'
 import Logo from '../components/Logo'
 import ProfileButton from '../components/ProfileButton'
-import LogoutButton from '../components/LogoutButton'
 import VerificationBanner from '../components/VerificationBanner'
+import SearchModal from '../components/SearchModal'
 
 export default function DashboardLayout({
     children,
     setShowJoinModal,
     setShowCreateModal,
-    rightSidebar,
     pageTitle
 }) {
     const { currentUser, logout } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
     const [showMobileMenu, setShowMobileMenu] = useState(false)
+    const [showSearchModal, setShowSearchModal] = useState(false)
 
     // Determine page title based on route if not provided
     const getPageTitle = () => {
@@ -38,6 +42,7 @@ export default function DashboardLayout({
         if (path === '/fasting') return 'Fasting'
         if (path === '/profile') return 'Profile'
         if (path === '/groups') return 'Groups'
+        if (path === '/settings') return 'Settings'
         if (path === '/books') return ''
         if (path === '/duas') return ''
         if (path.startsWith('/groups/')) return 'Group Details'
@@ -67,7 +72,7 @@ export default function DashboardLayout({
             active: location.pathname === '/groups'
         },
         {
-            icon: Clock,
+            icon: Moon,
             label: 'Fasting',
             onClick: () => navigate('/fasting'),
             active: location.pathname === '/fasting'
@@ -90,6 +95,12 @@ export default function DashboardLayout({
             onClick: () => navigate('/profile'),
             active: location.pathname === '/profile'
         },
+        {
+            icon: Car,
+            label: 'Settings',
+            onClick: () => navigate('/settings'),
+            active: location.pathname === '/settings'
+        },
     ]
 
     const actionItems = [
@@ -97,7 +108,7 @@ export default function DashboardLayout({
             icon: Users,
             label: 'Join Group',
             onClick: () => {
-                navigate('/dashboard?from=join')
+                navigate('/groups?from=join')
                 setShowJoinModal?.(true)
                 setShowMobileMenu(false)
             }
@@ -106,7 +117,7 @@ export default function DashboardLayout({
             icon: Plus,
             label: 'Create Group',
             onClick: () => {
-                navigate('/dashboard?from=create')
+                navigate('/groups?from=create')
                 setShowCreateModal?.(true)
                 setShowMobileMenu(false)
             },
@@ -139,44 +150,52 @@ export default function DashboardLayout({
                 ))}
             </div>
 
-            <div className="space-y-1">
+            <div>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-1">Actions</p>
                 {actionItems.map((item, idx) => (
                     <SidebarLink key={idx} {...item} />
                 ))}
-            </div>
-
-            <div className="lg:hidden pt-4 border-t border-gray-100">
-                <SidebarLink
-                    icon={LogOut}
-                    label="Logout"
-                    onClick={handleLogout}
-                    variant="danger"
-                />
+                <div className="md:pt-0 pt-5 border-t border-gray-100">
+                    <SidebarLink
+                        icon={LogOut}
+                        label="Logout"
+                        onClick={handleLogout}
+                        variant="danger"
+                    />
+                </div>
             </div>
         </div>
     )
 
-    // Check local storage or profile state for verification
-    const [isVerified, setIsVerified] = useState(() => {
-        return localStorage.getItem('isVerified') === 'true'
-    })
+    const [isVerified, setIsVerified] = useState(false)
 
-    // Listen for storage changes in case Profile updates it
     useEffect(() => {
-        const handleStorageChange = () => {
-            setIsVerified(localStorage.getItem('isVerified') === 'true')
-        }
-        window.addEventListener('storage', handleStorageChange)
+        const checkVerification = async () => {
+            if (!currentUser) return
 
-        // Also a custom event for same-window updates
-        window.addEventListener('profile-updated', handleStorageChange)
+            if (currentUser.emailVerified) {
+                setIsVerified(true)
+                return
+            }
 
-        return () => {
-            window.removeEventListener('storage', handleStorageChange)
-            window.removeEventListener('profile-updated', handleStorageChange)
+            try {
+                // Check Firestore profile as fallback
+                const userRef = doc(db, 'profiles', currentUser.uid)
+                const userSnap = await getDoc(userRef)
+
+                if (userSnap.exists() && userSnap.data().isVerified) {
+                    setIsVerified(true)
+                } else {
+                    setIsVerified(false)
+                }
+            } catch (err) {
+                console.error('Error checking verification status:', err)
+                setIsVerified(false)
+            }
         }
-    }, [])
+
+        checkVerification()
+    }, [currentUser])
 
     return (
         <div className="min-h-screen bg-white">
@@ -185,6 +204,9 @@ export default function DashboardLayout({
                 <div className="px-4 py-3 flex items-center justify-between">
                     <Logo />
                     <div className="flex items-center gap-1">
+                        <div className='cursor-pointer text-primary' title="Search" onClick={() => setShowSearchModal(true)}>
+                            <Search size="18" />
+                        </div>
                         <ProfileButton currentUser={currentUser} navigate={() => { }} />
                         <button
                             onClick={() => setShowMobileMenu(!showMobileMenu)}
@@ -223,9 +245,11 @@ export default function DashboardLayout({
                         <div className="sticky top-[61px] lg:top-0 z-30 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200/50">
                             <div className='md:flex items-center justify-between px-4 md:px-8 py-3'>
                                 <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
-                                <div className='hidden md:flex items-center gap-4'>
+                                <div className='hidden md:flex items-center gap-3'>
+                                    <div className='cursor-pointer text-primary' title="Search" onClick={() => setShowSearchModal(true)}>
+                                        <Search size="18" />
+                                    </div>
                                     <ProfileButton currentUser={currentUser} />
-                                    <LogoutButton />
                                 </div>
                             </div>
                             {!isVerified && location.pathname === '/dashboard' && (
@@ -235,25 +259,20 @@ export default function DashboardLayout({
                     }
 
                     {/* Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto no-scrollbar p-4 md:px-6 py-3">
+                    <div className="flex-1 overflow-y-auto no-scrollbar p-4 md:px-6 py-3 pb-10">
                         <div className="flex flex-col xl:flex-row gap-8">
-                            {/* Main Scrollable Area */}
                             <div className="flex-1">
                                 {children ? children : <Outlet />}
                             </div>
-
-                            {/* Right Sidebar - Optional & Narrower */}
-                            {rightSidebar && (
-                                <aside className="w-full xl:w-72 shrink-0">
-                                    <div className="sticky top-8 space-y-6">
-                                        {rightSidebar}
-                                    </div>
-                                </aside>
-                            )}
                         </div>
                     </div>
                 </main>
             </div>
+            {showSearchModal && (
+                <SearchModal
+                    onClose={() => setShowSearchModal(false)}
+                />
+            )}
         </div>
     )
 }

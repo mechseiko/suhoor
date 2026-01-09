@@ -1,3 +1,4 @@
+import Docs from './pages/Docs'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { SocketProvider } from './context/SocketContext'
@@ -18,19 +19,20 @@ import VerifyEmail from './pages/VerifyEmail'
 import ScrollToTop from './components/ScrollToTop'
 import PWAManager from './components/PWAManager'
 import About from './pages/About'
-import Groups from './pages/Groups'
 import { useAuth } from './context/AuthContext'
+import Groups from './pages/Groups'
+import Settings from './pages/Settings'
 
-// Extract Routes to a component that is inside AuthProvider
 function AppRoutes() {
   const { currentUser } = useAuth();
-  return (
+  return(
     <Routes>
       <Route element={<PageLayout />}>
         <Route path="/" element={<Landing />} />
         <Route path="/about" element={<About />} />
         <Route path="/books" element={<Books />} />
         <Route path="/duas" element={<Duas />} />
+        <Route path="/docs" element={<Docs />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/signup" element={<Signup />} />
@@ -71,6 +73,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/fasting"
         element={
           <ProtectedRoute>
@@ -80,7 +90,7 @@ function AppRoutes() {
       />
 
       <Route path="/*" element={<Navigate to={currentUser ? '/dashboard' : '/'} />} />
-    </Routes>
+    </Routes >
   )
 }
 

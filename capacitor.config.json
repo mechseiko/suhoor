@@ -1,0 +1,8 @@
+{
+    "appId": "com.mechseiko.suhoor",
+    "appName": "suhoor",
+    "webDir": "dist",
+    "server": {
+        "androidScheme": "https"
+    }
+}

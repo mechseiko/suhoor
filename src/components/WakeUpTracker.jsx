@@ -1,15 +1,24 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Bell, CheckCircle, Moon, Volume2, VolumeX } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Bell, CheckCircle, Moon, Volume2, VolumeX, MapPin } from 'lucide-react'
+import { Capacitor } from '@capacitor/core'
+import { LocalNotifications } from '@capacitor/local-notifications'
 import { useAuth } from '../context/AuthContext'
 import { useSocket } from '../context/SocketContext'
+import { useFastingTimes } from '../hooks/useFastingTimes'
+import { useLocationTracking } from '../hooks/useLocationTracking'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore'
 
 export default function WakeUpTracker({ groupId, members }) {
     const { currentUser } = useAuth()
     const { isConnected, joinGroup, leaveGroup, emitWakeUp, buzzUser, on, off } = useSocket()
+    const { isWakeUpWindow } = useFastingTimes()
+
+    // Track location if in window and NOT woken up
     const [wakeUpLogs, setWakeUpLogs] = useState([])
     const [hasWokenUp, setHasWokenUp] = useState(false)
+
+    useLocationTracking(groupId, currentUser.uid, isWakeUpWindow && !hasWokenUp)
     const [loading, setLoading] = useState(false)
     const [soundEnabled, setSoundEnabled] = useState(true)
     const [onlineMembers, setOnlineMembers] = useState([])
@@ -51,6 +60,10 @@ export default function WakeUpTracker({ groupId, members }) {
     useEffect(() => {
         fetchTodayLogs()
 
+        if (Capacitor.isNativePlatform()) {
+            LocalNotifications.requestPermissions();
+        }
+
         if (isConnected) {
             const userName = getCurrentUserName()
             joinGroup(groupId, userName)
@@ -85,6 +98,37 @@ export default function WakeUpTracker({ groupId, members }) {
         oscillator.stop(audioContext.currentTime + 0.5)
     }, [soundEnabled])
 
+    const [isBuzzing, setIsBuzzing] = useState(false)
+    const audioRef = useRef(null)
+
+    // Handle persistent buzzing sound
+    useEffect(() => {
+        let interval;
+        if (isBuzzing) {
+            // Play sound immediately
+            playNotificationSound()
+
+            // Loop it every 1 second
+            interval = setInterval(() => {
+                playNotificationSound()
+                if (Capacitor.isNativePlatform()) {
+                    LocalNotifications.schedule({
+                        notifications: [{
+                            title: 'WAKE UP!',
+                            body: 'Someone is trying to wake you up!',
+                            id: new Date().getTime(),
+                            sound: 'beep.wav',
+                            schedule: { at: new Date(Date.now() + 100) },
+                            actionTypeId: "",
+                            extra: null
+                        }]
+                    })
+                }
+            }, 1000)
+        }
+        return () => clearInterval(interval)
+    }, [isBuzzing, playNotificationSound])
+
     // Listen for real-time wake-up events
     useEffect(() => {
         if (!isConnected) return
@@ -115,8 +159,8 @@ export default function WakeUpTracker({ groupId, members }) {
             if (data.userId === currentUser.uid) {
                 setHasWokenUp(true)
             } else {
-                // Play sound for other members waking up
-                playNotificationSound()
+                // Play sound for other members waking up one time
+                if (!isBuzzing) playNotificationSound()
             }
         }
 
@@ -126,21 +170,8 @@ export default function WakeUpTracker({ groupId, members }) {
         }
 
         const handleGotBuzzed = (data) => {
-            console.log('🔔 Buzzed by:', data.fromUserName)
-            if (soundEnabled) {
-                // High pitch notification sound
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)()
-                const oscillator = audioContext.createOscillator()
-                const gainNode = audioContext.createGain()
-                oscillator.connect(gainNode)
-                gainNode.connect(audioContext.destination)
-                oscillator.frequency.value = 1200
-                oscillator.type = 'square'
-                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime)
-                oscillator.start(audioContext.currentTime)
-                oscillator.stop(audioContext.currentTime + 0.3)
-            }
-            alert(`🌅 Wake up! ${data.fromUserName} is buzzing you!`)
+            console.log("GOT BUZZED BY", data.fromUserName)
+            setIsBuzzing(true)
         }
 
         on('member-woke-up', handleMemberWokeUp)
@@ -152,7 +183,7 @@ export default function WakeUpTracker({ groupId, members }) {
             off('group-members-update', handleGroupMembersUpdate)
             off('get-buzzed', handleGotBuzzed)
         }
-    }, [isConnected, on, off, groupId, currentUser.uid, playNotificationSound, soundEnabled])
+    }, [isConnected, on, off, groupId, currentUser.uid, playNotificationSound, isBuzzing])
 
     // Handle wake-up button click
     const handleWakeUp = async () => {
@@ -202,6 +233,12 @@ export default function WakeUpTracker({ groupId, members }) {
                         <span className="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-lg border border-green-200 flex items-center gap-1">
                             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                             Live
+                        </span>
+                    )}
+                    {isWakeUpWindow && !hasWokenUp && (
+                        <span className="px-2 py-1 bg-red-50 text-red-700 text-xs font-medium rounded-lg border border-red-200 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 animate-bounce" />
+                            Sharing Location
                         </span>
                     )}
                 </div>
@@ -303,6 +340,22 @@ export default function WakeUpTracker({ groupId, members }) {
                 </div>
             )}
 
+            {isBuzzing && (
+                <div className="fixed inset-0 z-[100] bg-red-600/95 flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
+                    <div className="text-white text-center space-y-8">
+                        <Bell className="h-32 w-32 animate-bounce mx-auto" />
+                        <h1 className="text-6xl font-black uppercase tracking-tighter">WAKE UP!</h1>
+                        <p className="text-2xl font-medium opacity-90">Your group needs you for Suhoor!</p>
+
+                        <button
+                            onClick={() => setIsBuzzing(false)}
+                            className="w-full max-w-md bg-white text-red-600 px-8 py-6 rounded-3xl text-2xl font-bold shadow-2xl hover:scale-105 active:scale-95 transition-transform"
+                        >
+                            I'M AWAKE!
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

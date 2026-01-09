@@ -21,7 +21,7 @@ export default function Features() {
                     <FeatureCard
                         icon={<Bell className="h-12 w-12 text-primary" />}
                         title="Wake Up Calls"
-                        description="Ensure no one misses the blessed meal. Send and receive real-time notifications to wake your circle."
+                        description="Ensure no one misses the meal. Send and receive real time notifications to wake your group members."
                     />
                     <FeatureCard
                         icon={<Calendar className="h-12 w-12 text-primary" />}

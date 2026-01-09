@@ -274,16 +274,6 @@ export default function Profile() {
         }
     }
 
-
-
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <Loader />
-            </div>
-        )
-    }
-
     return (
         <DashboardLayout>
             <div className="max-w-2xl mx-auto space-y-6">

@@ -1,129 +1,86 @@
 import { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { Plus, Users, TrendingUp, Award } from 'lucide-react'
+import { Users, TrendingUp, Award } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer } from 'firebase/firestore'
-import GroupList from '../components/GroupList'
-import Loader from '../components/Loader'
 import StatsCard from '../components/StatsCard'
-import CreateGroupModal from '../components/CreateGroupModal'
-import JoinGroupModal from '../components/JoinGroupModal'
-import DailyQuote from '../components/DailyQuote'
 import DashboardLayout from '../layouts/DashboardLayout'
 import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
+    Chart as ChartJS,
+    LineElement,
+    PointElement,
+    CategoryScale,
+    LinearScale,
+    Title,
+    Tooltip,
+    Legend,
+    Filler,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
+    LineElement,
+    PointElement,
+    CategoryScale,
+    LinearScale,
+    Title,
+    Tooltip,
+    Legend,
+    Filler,
 );
 
-const chartData = {
-  labels: [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ],
-
-  datasets: [
-        {
-            label: 'Groups',
-            data: [12, 19, 15, 22, 30, 25, 32, 28, 24, 20, 18, 26],
-            borderColor: '#200bc1aa',
-            backgroundColor: 'transparent',
-            borderWidth: 1,
-            tension: 0.5,
-            pointRadius: 5,
-            pointHoverRadius: 6,
-            pointBackgroundColor: '#200bc1ff',
-            pointBorderColor: '#30C10B17',
-        },
-    ],
-};  
-
 const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'bottom',
-      labels: {
-        usePointStyle: true,
-        pointStyle: 'circle',
-        color: '#919BA1',
-        padding: 20,
-        font: {
-          size: 14,
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            position: 'bottom',
+            labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                color: '#919BA1',
+                padding: 20,
+                font: {
+                    size: 14,
+                },
+            },
         },
-      },
+        tooltip: {
+            backgroundColor: '#fff',
+            titleColor: '#69757C',
+            bodyColor: '#2F3437',
+            padding: 10,
+            borderColor: '#fff',
+            borderWidth: 1,
+        },
     },
-    tooltip: {
-      backgroundColor: '#fff',
-      titleColor: '#69757C',
-      bodyColor: '#2F3437',
-      padding: 10,
-      borderColor: '#fff',
-      borderWidth: 1,
+    scales: {
+        x: {
+            ticks: {
+                color: '#919BA1',
+            },
+            grid: {
+                display: false,
+            },
+        },
+        y: {
+            ticks: {
+                color: '#919BA1',
+                stepSize: 1,
+                precision: 0
+            },
+            grid: {
+                color: '#919BA1',
+                borderDash: [4, 4],
+            },
+            beginAtZero: true,
+        },
     },
-  },
-  scales: {
-    x: {
-      ticks: {
-        color: '#919BA1',
-      },
-      grid: {
-        display: false,
-      },
-    },
-    y: {
-      ticks: {
-        color: '#919BA1',
-        stepSize: 8,
-      },
-      grid: {
-        color: '#919BA1',
-        borderDash: [4, 4],
-      },
-    },
-  },
 };
 
 
 export default function Dashboard() {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const linkGroupKey = queryParams.get("groupKey");
-    const from = queryParams.get("from");
     const { currentUser } = useAuth();
-    const [showCreateModal, setShowCreateModal] = useState(from === 'create' ? true : false)
-    const [showJoinModal, setShowJoinModal] = useState(from === 'join' ? true : false)
 
     const [groups, setGroups] = useState(() => {
         const cached = localStorage.getItem(`suhoor_groups_${currentUser?.uid}`)
@@ -134,7 +91,101 @@ export default function Dashboard() {
         const cached = localStorage.getItem(`suhoor_stats_${currentUser?.uid}`)
         return cached ? JSON.parse(cached) : { totalGroups: 0, totalMembers: 0, activeToday: 0 }
     })
-    const [searchQuery, setSearchQuery] = useState('')
+
+    const [chartData, setChartData] = useState({
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+            label: 'Groups Created',
+            data: new Array(12).fill(0),
+            borderColor: '#200bc1aa',
+            backgroundColor: 'transparent',
+            borderWidth: 1,
+            tension: 0.5,
+            pointRadius: 5,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#200bc1ff',
+            pointBorderColor: '#30C10B17',
+        }]
+    })
+
+    const fetchActivity = async () => {
+        try {
+            const logsRef = collection(db, 'wake_up_logs')
+            const q = query(logsRef, where('user_id', '==', currentUser.uid))
+            const querySnapshot = await getDocs(q)
+
+            const logs = []
+            querySnapshot.forEach(doc => {
+                logs.push(doc.data())
+            })
+
+            return logs
+        } catch (err) {
+            console.error("Error fetching activity:", err)
+            return []
+        }
+    }
+
+    const processChartData = async (groupsData) => {
+        const creationCounts = new Array(12).fill(0)
+        const activityCounts = new Array(12).fill(0)
+
+        groupsData.forEach(group => {
+            if (group.created_at) {
+                let date;
+                if (group.created_at.toDate) {
+                    date = group.created_at.toDate();
+                } else {
+                    date = new Date(group.created_at);
+                }
+
+                if (!isNaN(date.getTime())) {
+                    const monthIndex = date.getMonth();
+                    creationCounts[monthIndex]++;
+                }
+            }
+        })
+
+        // Process Activity Logs
+        const logs = await fetchActivity()
+        logs.forEach(log => {
+            if (log.date) {
+                const date = new Date(log.date)
+                if (!isNaN(date.getTime())) {
+                    const monthIndex = date.getMonth()
+                    activityCounts[monthIndex]++
+                }
+            }
+        })
+
+        setChartData(prev => ({
+            ...prev,
+            datasets: [
+                {
+                    ...prev.datasets[0],
+                    data: creationCounts
+                },
+                {
+                    label: 'My Activity',
+                    data: activityCounts,
+                    borderColor: '#10B981', // Emerald 500
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    tension: 0.5,
+                    pointRadius: 5,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#10B981',
+                    pointBorderColor: '#ECFDF5', // Emerald 50
+                }
+            ]
+        }))
+    }
+
+    useEffect(() => {
+        if (groups.length > 0) {
+            processChartData(groups)
+        }
+    }, [groups])
 
     useEffect(() => {
         if (currentUser) {
@@ -142,48 +193,6 @@ export default function Dashboard() {
             fetchGroups()
         }
     }, [currentUser])
-
-    const GroupAction = ({ className }) => {
-        return (
-            <div className={className}>
-                <button
-                    onClick={() => setShowJoinModal(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-blue-300 hover:text-primary transition-all duration-200 font-medium"
-                >
-                    <Users className="h-5 w-5" />
-                    <span>Join Group</span>
-                </button>
-                <button
-                    onClick={() => setShowCreateModal(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 font-medium"
-                >
-                    <Plus className="h-5 w-5" />
-                    <span>Create Group</span>
-                </button>
-            </div>
-        )
-    }
-
-    const Modals = () => {
-        return (
-            <div className="flex gap-3 justify-center *:cursor-pointer">
-                <button
-                    onClick={() => setShowJoinModal(true)}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-sm"
-                >
-                    <Users className="h-4 w-4" />
-                    <span>Join Group</span>
-                </button>
-                <button
-                    onClick={() => setShowCreateModal(true)}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 font-medium text-sm"
-                >
-                    <Plus className="h-4 w-4" />
-                    <span>Create Group</span>
-                </button>
-            </div>
-        )
-    }
 
     const createOrUpdateProfile = async () => {
         try {
@@ -247,45 +256,9 @@ export default function Dashboard() {
             setLoading(false)
         }
     }
-
-    useEffect(() => {
-        if (linkGroupKey) {
-            setShowJoinModal(true);
-        }
-    }, [linkGroupKey]);
-
-
-
-    const rightSidebar = null
-
-    const CloseJoinModal = () => {
-        if (from === 'join') {
-            navigate('/dashboard')
-            setShowJoinModal(false)
-        }
-        else {
-            setShowJoinModal(false)
-        }
-    }
-    const CloseCreateModal = () => {
-        if (from === 'create') {
-            navigate('/dashboard')
-            setShowCreateModal(false)
-        }
-        else {
-            setShowCreateModal(false)
-        }
-    }
-
-    
-
     return (
-        <DashboardLayout
-            setShowJoinModal={setShowJoinModal}
-            setShowCreateModal={setShowCreateModal}
-            rightSidebar={rightSidebar}
-        >
-            <div className="mb-10">
+        <DashboardLayout>
+            <div>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h1 className="text-gray-900 mb-1">
@@ -302,176 +275,51 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-                    <StatsCard
-                        icon={Users}
-                        title="Total Groups"
-                        value={stats.totalGroups}
-                        subtitle="Groups joined"
-                        color="blue"
-                        loading={loading}
-                    />
-                    <StatsCard
-                        icon={TrendingUp}
-                        title="Total Members"
-                        value={stats.totalMembers}
-                        subtitle="Across all groups"
-                        color="green"
-                        loading={loading}
-                    />
-                    <StatsCard
-                        icon={Award}
-                        title="Active Today"
-                        value={stats.activeToday}
-                        subtitle="Recent activity"
-                        color="purple"
-                        loading={loading}
-                    />
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-5">
-                    <div className="flex items-center space-x-2 mb-4">
-                        <Users size="24" color="#2F3437" />
-                        <div>
-                        <h4 className="font-medium text-[#2F3437]">Suhoor Statistics</h4>
-                        <p className="text-[#919BA1] leading-6 text-[14px]">
-                            Monthly overview of your activities
-                        </p>
-                        </div>
+                <div className='flex-col-reverse md:flex-col flex'>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                        <StatsCard
+                            icon={Users}
+                            title="Total Groups"
+                            value={stats.totalGroups}
+                            subtitle="Groups joined"
+                            color="blue"
+                            loading={loading}
+                        />
+                        <StatsCard
+                            icon={TrendingUp}
+                            title="Total Members"
+                            value={stats.totalMembers}
+                            subtitle="Across all groups"
+                            color="green"
+                            loading={loading}
+                        />
+                        <StatsCard
+                            icon={Award}
+                            title="Active Today"
+                            value={stats.activeToday}
+                            subtitle="Recent activity"
+                            color="purple"
+                            loading={loading}
+                        />
                     </div>
 
-                    <div className="h-[320px]">
-                        <Line data={chartData} options={chartOptions} />
-                    </div>
-                </div>
-                <DailyQuote />
-            </div>
-
-
-            {/* Groups Section */}
-            {/*<div className="space-y-6" id="groups-section">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
-                        <p className="text-sm text-gray-500">Manage and monitor your group activities</p>
-                    </div>
-
-
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        {groups.length > 0 && <>
-                            <div className="relative flex-1">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Users className="h-4 w-4 text-gray-400" />
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Search groups..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
-                                />
-                            </div>
-                            <Modals />
-                        </>
-                        }
-                    </div>
-                </div>
-
-
-                {loading && groups.length === 0 ? (
-                    <div className="space-y-4">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center justify-between">
-                                <div className="space-y-3 w-full">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse" />
-                                        <div className="space-y-2 flex-1">
-                                            <div className="h-5 w-48 bg-gray-200 rounded animate-pulse" />
-                                            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : groups.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-dashed border-gray-300 px-6 py-8 text-center">
-                        <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Users className="h-10 w-10 text-gray-400" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">No groups yet</h3>
-                        <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-                            Create a new group to invite friends or join an existing one to get started.
-                        </p>
-                        <Modals />
-                    </div>
-                ) : (
-                    <>
-                        {groups.filter(group =>
-                            group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            group.group_key.toLowerCase().includes(searchQuery.toLowerCase())
-                        ).length > 0 ? (
-                            <GroupList
-                                groups={groups.filter(group =>
-                                    group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                    group.group_key.toLowerCase().includes(searchQuery.toLowerCase())
-                                )}
-                                onUpdate={fetchGroups}
-                            />
-                        ) : (
-                            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                                <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <Users className="h-10 w-10 text-gray-400" />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">No groups found</h3>
-                                <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                                    You are not a member of any groups matching "{searchQuery}"
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-5">
+                        <div className="flex items-center space-x-2 mb-4">
+                            <Users size="24" color="#2F3437" />
+                            <div>
+                                <h4 className="font-medium text-[#2F3437]">Suhoor Statistics</h4>
+                                <p className="text-[#919BA1] leading-6 text-[14px]">
+                                    Monthly overview of your activities
                                 </p>
-                                <button
-                                    onClick={() => setSearchQuery('')}
-                                    className="px-6 py-2 bg-primary text-white rounded-xl hover:opacity-90 transition font-medium"
-                                >
-                                    Clear Search
-                                </button>
                             </div>
-                        )}
+                        </div>
 
-                        {searchQuery && groups.filter(group =>
-                            group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            group.group_key.toLowerCase().includes(searchQuery.toLowerCase())
-                        ).length === 0 && (
-                                <div className="mt-8">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6">All Groups</h2>
-                                    <GroupList
-                                        groups={groups}
-                                        onUpdate={fetchGroups}
-                                    />
-                                </div>
-                            )}
-                    </>
-                )}
-            </div>*/}
-            {/* Modals */}
-            {showCreateModal && (
-                <CreateGroupModal
-                    onClose={CloseCreateModal}
-                    onSuccess={() => {
-                        setShowCreateModal(false)
-                        fetchGroups()
-                    }}
-                />
-            )}
-
-            {showJoinModal && (
-                <JoinGroupModal
-                    onClose={CloseJoinModal}
-                    onSuccess={() => {
-                        setShowJoinModal(false)
-                        fetchGroups()
-                    }}
-                    linkGroupKey={linkGroupKey}
-                />
-            )}
+                        <div className="h-[320px]">
+                            <Line data={chartData} options={chartOptions} />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </DashboardLayout>
     )
 }

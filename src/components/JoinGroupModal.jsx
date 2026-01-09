@@ -96,7 +96,7 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
 
                     <button
                         onClick={onClose}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 cursor-pointer text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
                     >
                         <X className="h-6 w-6" />
                     </button>
@@ -139,7 +139,7 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                     <div className="flex gap-3 pt-2 *:cursor-pointer">
                         <button
                             type="button"
-                            onClick={iWantToJoin ? () => {setStatus(false); navigate('/dashboard')} : onClose}
+                            onClick={iWantToJoin ? () => {setStatus(false); navigate('/groups')} : onClose}
                             className="flex-1 px-4 py-3.5 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-colors"
                         >
                             {iWantToJoin ? 'Reject' : 'Cancel'}

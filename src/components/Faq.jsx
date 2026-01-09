@@ -5,23 +5,19 @@ import SectionHeader from './SectionHeader'
 const faqs = [
     {
         question: "Is Suhoor completely free to use?",
-        answer: "Yes! Suhoor is 100% free for all individuals and groups. Our mission is to help everyone track their fasts and stay connected."
+        answer: "Yes! Suhoor is 100% free for all individuals and groups. Our mission is to help everyone eat suhoor, track their fasts and stay connected."
     },
     {
         question: "How do the groups work?",
-        answer: "You can create a group and invite friends or family using a unique code. Once they join, you can see each other's progress on a shared platform, motivating everyone to keep up with their goals."
-    },
-    {
-        question: "Can I track missed fasts?",
-        answer: "Absolutely. You can log missed fasts and mark them as 'made up' later. We help you keep a precise count so you never lose track of your obligations."
+        answer: "You can create a group and invite friends or family using a unique code. Once they join, you can wake each other up for suhoor, see each other's progress and keep motivating everyone to keep up with their goals."
     },
     {
         question: "Is there a mobile app?",
-        answer: "Suhoor is a Progressive Web App (PWA). This means you can install it directly from your browser to your home screen, and it works just like a native app on both iOS and Android."
+        answer: "Absolutely! Suhoor is a native app. This means you can install it directly to your home screen, and it works on both iOS and Android devices."
     },
     {
         question: "How accurate are the prayer times?",
-        answer: "We use high-precision calculation methods based on your location. You can also adjust the calculation method (e.g., ISNA, MWL) in your settings to match your local mosque."
+        answer: "We use high precision calculation methods based on your location. You can also adjust the calculation method in your settings to match your local mosque."
     }
 ]
 

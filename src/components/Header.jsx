@@ -10,7 +10,6 @@ import Container from "./Container";
 export default function Header({ isScrolled, currentNavItem, navBar, navigate }) {
 
     const { currentUser, logout } = useAuth();
-    const navigation = useNavigate();
 
     const NavBar = ({ style }) => {
         return (

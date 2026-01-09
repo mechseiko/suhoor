@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-    Users,
-    UserPlus,
-    Copy,
     Crown,
-    CopyCheck
+    CopyCheck,
+    MapPin,
+    Navigation,
+    Users,
+    Copy,
+    UserPlus
 } from 'lucide-react'
 import { db } from '../config/firebase'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
@@ -16,6 +18,7 @@ import Loader from '../components/Loader'
 import SkeletonLoader from '../components/SkeletonLoader'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useSocket } from '../context/SocketContext'
+import { useFastingTimes } from '../hooks/useFastingTimes'
 
 export default function GroupDetail() {
     const { groupId } = useParams()
@@ -30,10 +33,13 @@ export default function GroupDetail() {
     })
     const [loading, setLoading] = useState(!group)
     const [copied, setCopied] = useState(false)
+    const [clicked, setClicked] = useState('')
     const [showInviteModal, setShowInviteModal] = useState(false)
     const [toast, setToast] = useState(null)
+    const [userLocations, setUserLocations] = useState({})
 
     const { socket, on, off, isConnected } = useSocket()
+    const { isWakeUpWindow } = useFastingTimes()
 
     // Function to fetch members (hoisted for reuse)
     const fetchMembers = async () => {
@@ -123,18 +129,56 @@ export default function GroupDetail() {
         }
     }, [groupId, on, off, isConnected])
 
-    const copyInviteLink = () => {
-        setCopied(true)
-        navigator.clipboard.writeText(`${window.location.origin}/dashboard?groupKey=${group.group_key}`)
-        setTimeout(() => {
-            setCopied(false)
-        }, 2000)
-    }
+    // Listen for location updates during wake-up window
+    useEffect(() => {
+        if (!isWakeUpWindow) return
+
+        const locationsRef = collection(db, 'groups', groupId, 'locations')
+        // Using onSnapshot for real-time updates
+        import('firebase/firestore').then(({ onSnapshot }) => {
+            const unsubscribe = onSnapshot(locationsRef, (snapshot) => {
+                const locs = {}
+                snapshot.forEach(doc => {
+                    locs[doc.id] = doc.data()
+                })
+                setUserLocations(locs)
+            })
+            return unsubscribe
+        })
+    }, [groupId, isWakeUpWindow])
 
     if (loading) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
                 <Loader />
+            </div>
+        )
+    }
+
+    const GroupActions = () => {
+        return (
+            <div className="flex gap-3 justify-center *:cursor-pointer">
+                <button
+                    onClick={() => {
+                        setCopied(true)
+                        navigator.clipboard.writeText(`${window.location.origin}/groups?groupKey=${group.group_key}`)
+                        setTimeout(() => {
+                            setCopied(false)
+                        }, 2000)
+                    }
+                    }
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-sm"
+                >
+                    <Users className="h-4 w-4" />
+                    <span>Copy Invite Link</span>
+                </button>
+                <button
+                    onClick={() => setShowInviteModal(true)}
+                    className="flex items-center cursor-pointer justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-md hover:shadow-blue-200 transition-all duration-200 font-medium text-sm"
+                >
+                    <UserPlus className="h-5 w-5" />
+                    <span>Invite Member</span>
+                </button>
             </div>
         )
     }
@@ -156,7 +200,7 @@ export default function GroupDetail() {
                 <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
                     {loading && !members.length ? (
                         <div className="p-4 space-y-4">
-                            {[1, 2, 3].map(i => (
+                            {[1, 2, 3, 4, 5, 6].map(i => (
                                 <div key={i} className="flex items-center gap-3">
                                     <SkeletonLoader variant="circle" width="w-8" height="h-8" />
                                     <div className="space-y-1">
@@ -167,29 +211,56 @@ export default function GroupDetail() {
                             ))}
                         </div>
                     ) : (
-                        members.map(member => (
-                            <div
-                                key={member.id}
-                                className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                        {member.profiles.display_name?.charAt(0).toUpperCase() || member.profiles.email?.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <div className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
-                                            {member.profiles.display_name || member.profiles.email.split('@')[0]}
-                                            {member.role === 'admin' && (
-                                                <Crown className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                        members.map(member => {
+                            const location = userLocations[member.profiles.id]
+                            const hasLocation = !!location
+
+                            return (
+                                <div
+                                    key={member.id}
+                                    className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                            {member.profiles.display_name?.charAt(0).toUpperCase() || member.profiles.email?.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <div className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
+                                                {member.profiles.display_name || member.profiles.email.split('@')[0]}
+                                                {member.role === 'admin' && (
+                                                    <Crown className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                                )}
+                                            </div>
+                                            <div className="text-[10px] text-gray-500 truncate max-w-[120px]">
+                                                {member.profiles.email}
+                                            </div>
+                                            {hasLocation && isWakeUpWindow && (
+                                                <a
+                                                    href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="mt-1 flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-800 font-medium"
+                                                >
+                                                    <MapPin className="h-3 w-3" />
+                                                    <span>Live: {new Date(location.timestamp?.toDate ? location.timestamp.toDate() : location.device_timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                </a>
                                             )}
                                         </div>
-                                        <div className="text-[10px] text-gray-500 truncate max-w-[120px]">
-                                            {member.profiles.email}
-                                        </div>
                                     </div>
+                                    {hasLocation && isWakeUpWindow && (
+                                        <a
+                                            href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                            title="Navigate to member"
+                                        >
+                                            <Navigation className="h-4 w-4" />
+                                        </a>
+                                    )}
                                 </div>
-                            </div>
-                        ))
+                            )
+                        })
                     )}
                 </div>
             </div>
@@ -207,9 +278,6 @@ export default function GroupDetail() {
                             <h1 className="md:text-2xl text-xl font-bold text-gray-900">
                                 {group?.name}
                             </h1>
-                            <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
-                                {members.length} {members.length === 1 ? 'Member' : 'Members'}
-                            </span>
                             {isConnected && (
                                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-200 animate-pulse">
                                     <span className="h-2 w-2 rounded-full bg-green-500"></span>
@@ -218,37 +286,37 @@ export default function GroupDetail() {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-3 mt-4">
-                            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
-                                <span className="text-sm text-gray-500">Group Key:</span>
-                                <code className="font-mono font-bold text-gray-900">{group?.group_key}</code>
+                        <div className="flex md:flex-row flex-col w-full items-center justify-between mt-3">
+                            <div className="flex items-center justify-between text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
+                                <div className='flex items-center'>
+                                    <Users className="h-4 w-4 mr-2 text-primary" />
+                                    <div className='flex justify-between items-center gap-3'>
+                                        <span className="font-mono text-gray-700">{group.group_key}</span>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setCopied(true);
+                                                setClicked(group.id)
+                                                navigator.clipboard.writeText(`${group.group_key}`)
+                                                setTimeout(() => {
+                                                    setCopied(false)
+                                                }, 2000)
+                                            }}
+                                            className="ml-auto cursor-pointer p-1.5 hover:bg-white rounded-md text-gray-400 hover:text-primary transition-colors"
+                                            title="Copy Group Key"
+                                        >
+                                            {copied && (clicked === group.id) ? <div className='flex gap-2 items-center text-xs'><CopyCheck className="h-4 w-4" /><span>Copied</span></div> : <Copy className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
+                                    {group.member_count || 0} {group.member_count === 1 ? 'Member' : 'Members'}
+                                </span>
                             </div>
-                            <button
-                                onClick={copyInviteLink}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-primary rounded-xl hover:bg-blue-100 transition-colors font-medium text-sm"
-                            >
-                                {copied ? (
-                                    <>
-                                        <CopyCheck className="h-4 w-4" />
-                                        <span>Copied</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Copy className="h-4 w-4" />
-                                        <span>Copy Key</span>
-                                    </>
-                                )}
-                            </button>
+                            <GroupActions />
                         </div>
                     </div>
-
-                    <button
-                        onClick={() => setShowInviteModal(true)}
-                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 shadow-lg shadow-blue-200 transition-all font-medium"
-                    >
-                        <UserPlus className="h-5 w-5" />
-                        <span>Invite Member</span>
-                    </button>
                 </div>
             </div>
 
@@ -269,7 +337,7 @@ export default function GroupDetail() {
                     <div className={`px-4 py-3 rounded-xl shadow-lg border flex items-center gap-3 ${toast.type === 'success' ? 'bg-white border-green-100 text-green-800' : 'bg-white border-blue-100 text-blue-800'
                         }`}>
                         <div className={`w-2 h-2 rounded-full ${toast.type === 'success' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
-                        <span className="text-sm font-mediu">{toast.message}</span>
+                        <span className="text-sm font-medium">{toast.message}</span>
                     </div>
                 </div>
             )}

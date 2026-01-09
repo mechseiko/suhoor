@@ -4,6 +4,8 @@ import Features from '../components/Features'
 import HowItWorks from '../components/HowItWorks'
 import CtaSection from '../components/CtaSection'
 import Faq from '../components/Faq'
+import AppShowcase from '../components/AppShowcase'
+import DownloadApp from '../components/DownloadApp'
 
 export default function Landing() {
   const navigate = useNavigate()
@@ -12,8 +14,10 @@ export default function Landing() {
     <>
       <Hero navigate={navigate} />
       <Features />
+      <AppShowcase />
       <HowItWorks />
       <Faq />
+      <DownloadApp />
       <CtaSection />
     </>
   )

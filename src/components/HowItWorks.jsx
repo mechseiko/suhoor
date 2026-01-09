@@ -37,7 +37,7 @@ export default function HowItWorks() {
             <div className="max-w-6xl mx-auto">
                 <SectionHeader
                     title="How It Works"
-                    subtitle="Get started in minutes and you'll never miss Suhoor again if Allah wishes."
+                    subtitle="Get started in minutes and you'll never miss Suhoor again. If Allah wishes."
                 />
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock, Sun, Moon, Calendar, RefreshCw } from 'lucide-react'
+import { Clock, Sun, Moon, RefreshCw } from 'lucide-react'
 import Loader from './Loader';
 
 export default function FastingTimes() {
@@ -133,7 +133,7 @@ export default function FastingTimes() {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden md:p-6 p-3">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
-          <Calendar className="h-6 w-6 text-blue-600" />
+          <Moon className="h-6 w-6 text-blue-600" />
           <h3 className="text-lg font-semibold text-gray-800">Today's Fasting Times</h3>
         </div>
         <button

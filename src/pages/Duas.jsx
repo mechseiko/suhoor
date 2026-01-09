@@ -3,8 +3,7 @@ import SectionHeader from '../components/SectionHeader'
 import { useAuth } from '../context/AuthContext'
 import DashboardLayout from '../layouts/DashboardLayout'
 
-export default function Duas() {
-    const duas = [
+export const duas = [
         {
             title: "Intention for Suhoor",
             arabic: "وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ",
@@ -34,8 +33,8 @@ export default function Duas() {
         }
     ]
 
+export default function Duas() {
     const { currentUser } = useAuth()
-
     const content = (
     <div className={`${currentUser ? '' : 'md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
             <div className="text-center mb-8">

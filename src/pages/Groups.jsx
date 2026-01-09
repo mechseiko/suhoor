@@ -1,22 +1,23 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Plus, Users, TrendingUp, Award } from 'lucide-react'
+import { Plus, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer } from 'firebase/firestore'
 import GroupList from '../components/GroupList'
-import Loader from '../components/Loader'
-import StatsCard from '../components/StatsCard'
-import DailyQuote from '../components/DailyQuote'
+import CreateGroupModal from '../components/CreateGroupModal'
+import JoinGroupModal from '../components/JoinGroupModal'
 import DashboardLayout from '../layouts/DashboardLayout'
 
-export default function groupsData() {
+export default function Groups() {
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const linkGroupKey = queryParams.get("groupKey");
     const from = queryParams.get("from");
     const { currentUser } = useAuth();
+    const [showJoinModal, setShowJoinModal] = useState(from === 'join' ? true : false);
+    const [showCreateModal, setShowCreateModal] = useState(from === 'create' ? true : false);
 
     const [groups, setGroups] = useState(() => {
         const cached = localStorage.getItem(`suhoor_groups_${currentUser?.uid}`)
@@ -36,27 +37,6 @@ export default function groupsData() {
         }
     }, [currentUser])
 
-    const GroupAction = ({ className }) => {
-        return (
-            <div className={className}>
-                <button
-                    onClick={() => setShowJoinModal(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-blue-300 hover:text-primary transition-all duration-200 font-medium"
-                >
-                    <Users className="h-5 w-5" />
-                    <span>Join Group</span>
-                </button>
-                <button
-                    onClick={() => setShowCreateModal(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 font-medium"
-                >
-                    <Plus className="h-5 w-5" />
-                    <span>Create Group</span>
-                </button>
-            </div>
-        )
-    }
-
     const Modals = () => {
         return (
             <div className="flex gap-3 justify-center *:cursor-pointer">
@@ -69,7 +49,7 @@ export default function groupsData() {
                 </button>
                 <button
                     onClick={() => setShowCreateModal(true)}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 font-medium text-sm"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-md hover:shadow-blue-200 transition-all duration-200 font-medium text-sm"
                 >
                     <Plus className="h-4 w-4" />
                     <span>Create Group</span>
@@ -147,13 +127,11 @@ export default function groupsData() {
         }
     }, [linkGroupKey]);
 
-
-
     const rightSidebar = null
 
     const CloseJoinModal = () => {
         if (from === 'join') {
-            navigate('/dashboard')
+            navigate('/groups')
             setShowJoinModal(false)
         }
         else {
@@ -162,7 +140,7 @@ export default function groupsData() {
     }
     const CloseCreateModal = () => {
         if (from === 'create') {
-            navigate('/dashboard')
+            navigate('/groups')
             setShowCreateModal(false)
         }
         else {
@@ -170,40 +148,45 @@ export default function groupsData() {
         }
     }
 
+    const GroupResponse = ({title, subtitle}) => {
+        return(
+            <div>
+                <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Users className="h-10 w-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
+                <p className="text-gray-500 mb-8 max-w-lg mx-auto">
+                    {subtitle}
+                </p>
+            </div>
+        )
+    }
+
     return (
         <DashboardLayout
-            // setShowJoinModal={setShowJoinModal}
-            // setShowCreateModal={setShowCreateModal}
+            setShowJoinModal={setShowJoinModal}
+            setShowCreateModal={setShowCreateModal}
             rightSidebar={rightSidebar}
         >
             {/* Groups Section */}
             <div className="space-y-6" id="groups-section">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
-                        <p className="text-sm text-gray-500">Manage and monitor your group activities</p>
-                    </div>
-
-
-                    {/* Search and Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        {groups.length > 0 && <>
-                            <div className="relative flex-1">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Users className="h-4 w-4 text-gray-400" />
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Search groups..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
-                                />
+                <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
+                    {groups.length > 0 && <>
+                        <div className="relative flex-1">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Users className="h-4 w-4 text-gray-400" />
                             </div>
-                            <Modals />
-                        </>
-                        }
-                    </div>
+                            <input
+                                type="text"
+                                placeholder="Search groups..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
+                            />
+                        </div>
+                        <Modals />
+                    </>
+                    }
                 </div>
 
 
@@ -225,13 +208,7 @@ export default function groupsData() {
                     </div>
                 ) : groups.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-dashed border-gray-300 px-6 py-8 text-center">
-                        <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Users className="h-10 w-10 text-gray-400" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">No groups yet</h3>
-                        <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-                            Create a new group to invite friends or join an existing one to get started.
-                        </p>
+                        <GroupResponse title="No groups yet" subtitle="Create a new group to invite friends or join an existing one to get started."/> 
                         <Modals />
                     </div>
                 ) : (
@@ -249,16 +226,11 @@ export default function groupsData() {
                             />
                         ) : (
                             <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                                <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <Users className="h-10 w-10 text-gray-400" />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">No groups found</h3>
-                                <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                                    You are not a member of any groups matching "{searchQuery}"
-                                </p>
+                                <GroupResponse title='No groups found' subtitle={`You are not a member of any groups matching "${searchQuery}"`}/>
+
                                 <button
                                     onClick={() => setSearchQuery('')}
-                                    className="px-6 py-2 bg-primary text-white rounded-xl hover:opacity-90 transition font-medium"
+                                    className="px-6 py-2 cursor-pointer bg-primary text-white rounded-xl hover:opacity-90 transition font-medium"
                                 >
                                     Clear Search
                                 </button>
@@ -280,6 +252,27 @@ export default function groupsData() {
                     </>
                 )}
             </div>
+            {/* Modals */}
+            {showCreateModal && (
+                <CreateGroupModal
+                    onClose={CloseCreateModal}
+                    onSuccess={() => {
+                        setShowCreateModal(false)
+                        fetchGroups()
+                    }}
+                />
+            )}
+
+            {showJoinModal && (
+                <JoinGroupModal
+                    onClose={CloseJoinModal}
+                    onSuccess={() => {
+                        setShowJoinModal(false)
+                        fetchGroups()
+                    }}
+                    linkGroupKey={linkGroupKey}
+                />
+            )}
         </DashboardLayout>
     )
 }
