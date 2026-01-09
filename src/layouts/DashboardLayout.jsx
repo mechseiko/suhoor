@@ -28,6 +28,7 @@ export default function DashboardLayout({
     const navigate = useNavigate()
     const location = useLocation()
     const [showMobileMenu, setShowMobileMenu] = useState(false)
+    const isVerified = localStorage.getItem('isVerified')
 
     // Determine page title based on route if not provided
     const getPageTitle = () => {
@@ -191,12 +192,22 @@ export default function DashboardLayout({
                 <main className="flex-1 min-w-0 bg-gray-50/30 flex flex-col">
                     {/* Page Header - Sticky */}
                     {getPageTitle() !== '' && 
-                        <div className="sticky md:flex items-center justify-between top-[61px] lg:top-0 z-30 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200/50 px-4 md:px-8 py-3">
-                            <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
-                            <div className='hidden md:flex items-center gap-4'>
-                                <ProfileButton currentUser={currentUser} />
-                                <LogoutButton />
+                        <div className="sticky top-[61px] lg:top-0 z-30 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200/50">
+                            <div className='md:flex items-center justify-between px-4 md:px-8 py-3'>
+                                <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
+                                <div className='hidden md:flex items-center gap-4'>
+                                    <ProfileButton currentUser={currentUser} />
+                                    <LogoutButton />
+                                </div>
                             </div>
+                            {!isVerified && location.pathname === '/dashboard' &&
+                                <div className='text-bold flex justify-between items-center bg-red-300 w-full p-2'>
+                                    <span>
+                                        Your account is not verified!
+                                    </span>
+                                    <button className='underline cursor-pointer' onClick={() => navigate('/profile')}>Verify Account</button>
+                                </div>
+                            }
                         </div>
                     }
 
