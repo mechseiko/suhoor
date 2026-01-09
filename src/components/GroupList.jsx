@@ -14,7 +14,7 @@ export default function GroupList({ groups }) {
         return (
           <div
             key={group.id}
-            onClick={() => navigate(`/group/${group.id}`)}
+            onClick={() => navigate(`/groups/${group.id}`)}
             className="group bg-white rounded-2xl shadow-xs border border-gray-50 p-4 hover:shadow-sm hover:border-primary/20 transition-all duration-200 relative overflow-hidden cursor-pointer"
           >
             <div className="flex flex-col h-full justify-between">

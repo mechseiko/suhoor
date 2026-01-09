@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { Menu, X } from "lucide-react";
-import Cta from "./Cta";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import ProfileButton from "../components/ProfileButton"
@@ -11,6 +10,7 @@ import Container from "./Container";
 export default function Header({ isScrolled, currentNavItem, navBar, navigate }) {
 
     const { currentUser, logout } = useAuth();
+    const navigation = useNavigate();
 
     const NavBar = ({ style }) => {
         return (
@@ -30,6 +30,26 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                     );
                 })}
             </>
+        )
+    }
+
+
+    const Cta = () => {
+        return (
+            <div className="flex space-x-5 *:cursor-pointer justify-center items-center">
+                <button
+                    onClick={() => {setIsMenuOpen(false); navigate('/login')}}
+                    className="w-fit sm:w-auto px-5 py-1.5 bg-primary text-white text-base rounded-lg hover:opacity-90 font-medium transition shadow-lg hover:shadow-xl"
+                >
+                    Login
+                </button>
+                <button
+                    onClick={() => {setIsMenuOpen(false); navigate('/signup')}}
+                    className="w-fit sm:w-auto px-5 py-1.5 bg-white border-2 border-primary text-primary text-base rounded-lg hover:bg-primary/10 font-medium transition"
+                >
+                    Sign Up
+                </button>
+            </div>
         )
     }
 
@@ -94,7 +114,6 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                                         >
                                             {navItem.label}
                                         </Link>
-
                                     )
                                 })}
                                 <div className="mt-4">

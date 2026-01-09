@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import {
     Users,
@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext'
 import Logo from '../components/Logo'
 import ProfileButton from '../components/ProfileButton'
 import LogoutButton from '../components/LogoutButton'
+import VerificationBanner from '../components/VerificationBanner'
 
 export default function DashboardLayout({
     children,
@@ -28,7 +29,6 @@ export default function DashboardLayout({
     const navigate = useNavigate()
     const location = useLocation()
     const [showMobileMenu, setShowMobileMenu] = useState(false)
-    const isVerified = localStorage.getItem('isVerified')
 
     // Determine page title based on route if not provided
     const getPageTitle = () => {
@@ -37,9 +37,10 @@ export default function DashboardLayout({
         if (path === '/dashboard') return 'Dashboard'
         if (path === '/fasting') return 'Fasting'
         if (path === '/profile') return 'Profile'
+        if (path === '/groups') return 'Groups'
         if (path === '/books') return ''
         if (path === '/duas') return ''
-        if (path.startsWith('/group/')) return 'Group Details'
+        if (path.startsWith('/groups/')) return 'Group Details'
         return 'Dashboard'
     }
 
@@ -60,16 +61,16 @@ export default function DashboardLayout({
             active: location.pathname === '/dashboard'
         },
         {
+            icon: Users,
+            label: 'Groups',
+            onClick: () => navigate('/groups'),
+            active: location.pathname === '/groups'
+        },
+        {
             icon: Clock,
             label: 'Fasting',
             onClick: () => navigate('/fasting'),
             active: location.pathname === '/fasting'
-        },
-        {
-            icon: UserCircle,
-            label: 'Profile',
-            onClick: () => navigate('/profile'),
-            active: location.pathname === '/profile'
         },
         {
             icon: BookOpen,
@@ -82,6 +83,12 @@ export default function DashboardLayout({
             label: 'Duas',
             onClick: () => navigate('/duas'),
             active: location.pathname === '/duas'
+        },
+        {
+            icon: UserCircle,
+            label: 'Profile',
+            onClick: () => navigate('/profile'),
+            active: location.pathname === '/profile'
         },
     ]
 
@@ -150,6 +157,27 @@ export default function DashboardLayout({
         </div>
     )
 
+    // Check local storage or profile state for verification
+    const [isVerified, setIsVerified] = useState(() => {
+        return localStorage.getItem('isVerified') === 'true'
+    })
+
+    // Listen for storage changes in case Profile updates it
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setIsVerified(localStorage.getItem('isVerified') === 'true')
+        }
+        window.addEventListener('storage', handleStorageChange)
+
+        // Also a custom event for same-window updates
+        window.addEventListener('profile-updated', handleStorageChange)
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange)
+            window.removeEventListener('profile-updated', handleStorageChange)
+        }
+    }, [])
+
     return (
         <div className="min-h-screen bg-white">
             {/* Top Navigation - Mobile Only */}
@@ -157,7 +185,7 @@ export default function DashboardLayout({
                 <div className="px-4 py-3 flex items-center justify-between">
                     <Logo />
                     <div className="flex items-center gap-1">
-                        <ProfileButton currentUser={currentUser} navigate={() => {}}/>
+                        <ProfileButton currentUser={currentUser} navigate={() => { }} />
                         <button
                             onClick={() => setShowMobileMenu(!showMobileMenu)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -165,7 +193,7 @@ export default function DashboardLayout({
                             {showMobileMenu ? <X className="h-6 w-6 text-gray-600" /> : <Menu className="h-6 w-6 text-gray-600" />}
                         </button>
                     </div>
-                    
+
                 </div>
 
                 {/* Mobile Menu Overlay */}
@@ -191,7 +219,7 @@ export default function DashboardLayout({
                 {/* Main Content Area */}
                 <main className="flex-1 min-w-0 bg-gray-50/30 flex flex-col">
                     {/* Page Header - Sticky */}
-                    {getPageTitle() !== '' && 
+                    {getPageTitle() !== '' &&
                         <div className="sticky top-[61px] lg:top-0 z-30 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200/50">
                             <div className='md:flex items-center justify-between px-4 md:px-8 py-3'>
                                 <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
@@ -200,19 +228,14 @@ export default function DashboardLayout({
                                     <LogoutButton />
                                 </div>
                             </div>
-                            {!isVerified && location.pathname === '/dashboard' &&
-                                <div className='text-bold flex justify-between items-center bg-red-300 w-full p-2'>
-                                    <span>
-                                        Your account is not verified!
-                                    </span>
-                                    <button className='underline cursor-pointer' onClick={() => navigate('/profile')}>Verify Account</button>
-                                </div>
-                            }
+                            {!isVerified && location.pathname === '/dashboard' && (
+                                <VerificationBanner />
+                            )}
                         </div>
                     }
 
                     {/* Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto no-scrollbar p-4 md:p-8">
+                    <div className="flex-1 overflow-y-auto no-scrollbar p-4 md:px-6 py-3">
                         <div className="flex flex-col xl:flex-row gap-8">
                             {/* Main Scrollable Area */}
                             <div className="flex-1">

@@ -97,9 +97,11 @@ export default function Profile() {
                                     isVerified: data.isVerified || currentUser.emailVerified
                                 })
                                 localStorage.setItem('isVerified', data.isVerified || currentUser.emailVerified)
+                                window.dispatchEvent(new Event('profile-updated'))
                             } else {
                                 // Default state
                                 localStorage.setItem('isVerified', currentUser.emailVerified || false)
+                                window.dispatchEvent(new Event('profile-updated'))
                                 setProfile({
                                     display_name: currentUser.displayName || '',
                                     email: currentUser.email,

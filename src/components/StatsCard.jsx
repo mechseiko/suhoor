@@ -10,10 +10,10 @@ export default function StatsCard({ icon: Icon, title, value, subtitle, color = 
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 md:p-6 p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div className="flex items-center justify-between mb-3">
                 <div className={`p-3 rounded-xl ${colorStyles[color]}`}>
-                    <Icon className="md:h-6 md:w-6 h-4 w-4" />
+                    <Icon className="h-4 w-4" />
                 </div>
             </div>
 
@@ -24,13 +24,8 @@ export default function StatsCard({ icon: Icon, title, value, subtitle, color = 
                 </>
             ) : (
                 <>
-                    <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{value}</h3>
+                    <h3 className="text-3xl font-bold text-gray-900 ">{value}</h3>
                     <p className="text-sm font-medium text-gray-500">{title}</p>
-                    {subtitle && (
-                        <div className="mt-2 pt-2 border-t border-gray-50">
-                            <p className="text-xs text-gray-400">{subtitle}</p>
-                        </div>
-                    )}
                 </>
             )}
         </div>

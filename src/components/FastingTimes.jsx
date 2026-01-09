@@ -139,7 +139,7 @@ export default function FastingTimes() {
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+          className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors disabled:opacity-50"
           title="Refresh fasting times"
         >
           <RefreshCw className={`h-5 w-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />

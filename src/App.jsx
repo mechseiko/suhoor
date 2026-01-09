@@ -18,6 +18,7 @@ import VerifyEmail from './pages/VerifyEmail'
 import ScrollToTop from './components/ScrollToTop'
 import PWAManager from './components/PWAManager'
 import About from './pages/About'
+import Groups from './pages/Groups'
 import { useAuth } from './context/AuthContext'
 
 // Extract Routes to a component that is inside AuthProvider
@@ -46,7 +47,15 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/group/:groupId"
+        path="/groups"
+        element={
+          <ProtectedRoute>
+            <Groups />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/groups/:groupId"
         element={
           <ProtectedRoute>
             <GroupDetail />
@@ -70,7 +79,7 @@ function AppRoutes() {
         }
       />
 
-      <Route path="*" element={<Navigate to={currentUser ? '/dashboard' : '/'} />} />
+      <Route path="/*" element={<Navigate to={currentUser ? '/dashboard' : '/'} />} />
     </Routes>
   )
 }

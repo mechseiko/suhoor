@@ -7,123 +7,16 @@ import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromSer
 import GroupList from '../components/GroupList'
 import Loader from '../components/Loader'
 import StatsCard from '../components/StatsCard'
-import CreateGroupModal from '../components/CreateGroupModal'
-import JoinGroupModal from '../components/JoinGroupModal'
 import DailyQuote from '../components/DailyQuote'
 import DashboardLayout from '../layouts/DashboardLayout'
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
 
-ChartJS.register(
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-);
-
-const chartData = {
-  labels: [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ],
-
-  datasets: [
-        {
-            label: 'Groups',
-            data: [12, 19, 15, 22, 30, 25, 32, 28, 24, 20, 18, 26],
-            borderColor: '#200bc1aa',
-            backgroundColor: 'transparent',
-            borderWidth: 1,
-            tension: 0.5,
-            pointRadius: 5,
-            pointHoverRadius: 6,
-            pointBackgroundColor: '#200bc1ff',
-            pointBorderColor: '#30C10B17',
-        },
-    ],
-};  
-
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'bottom',
-      labels: {
-        usePointStyle: true,
-        pointStyle: 'circle',
-        color: '#919BA1',
-        padding: 20,
-        font: {
-          size: 14,
-        },
-      },
-    },
-    tooltip: {
-      backgroundColor: '#fff',
-      titleColor: '#69757C',
-      bodyColor: '#2F3437',
-      padding: 10,
-      borderColor: '#fff',
-      borderWidth: 1,
-    },
-  },
-  scales: {
-    x: {
-      ticks: {
-        color: '#919BA1',
-      },
-      grid: {
-        display: false,
-      },
-    },
-    y: {
-      ticks: {
-        color: '#919BA1',
-        stepSize: 8,
-      },
-      grid: {
-        color: '#919BA1',
-        borderDash: [4, 4],
-      },
-    },
-  },
-};
-
-
-export default function Dashboard() {
+export default function groupsData() {
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const linkGroupKey = queryParams.get("groupKey");
     const from = queryParams.get("from");
     const { currentUser } = useAuth();
-    const [showCreateModal, setShowCreateModal] = useState(from === 'create' ? true : false)
-    const [showJoinModal, setShowJoinModal] = useState(from === 'join' ? true : false)
 
     const [groups, setGroups] = useState(() => {
         const cached = localStorage.getItem(`suhoor_groups_${currentUser?.uid}`)
@@ -277,79 +170,14 @@ export default function Dashboard() {
         }
     }
 
-    
-
     return (
         <DashboardLayout
-            setShowJoinModal={setShowJoinModal}
-            setShowCreateModal={setShowCreateModal}
+            // setShowJoinModal={setShowJoinModal}
+            // setShowCreateModal={setShowCreateModal}
             rightSidebar={rightSidebar}
         >
-            <div className="mb-10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h1 className="text-gray-900 mb-1">
-                            Welcome back, <span className="text-primary text-lg md:text-xl">{currentUser?.displayName || currentUser?.email?.split('@')[0]}</span>
-                        </h1>
-                        <p className="text-gray-500 font-medium">
-                            May your fasts be accepted and your prayers answered.
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap gap-3">
-                        <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
-                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-                    <StatsCard
-                        icon={Users}
-                        title="Total Groups"
-                        value={stats.totalGroups}
-                        subtitle="Groups joined"
-                        color="blue"
-                        loading={loading}
-                    />
-                    <StatsCard
-                        icon={TrendingUp}
-                        title="Total Members"
-                        value={stats.totalMembers}
-                        subtitle="Across all groups"
-                        color="green"
-                        loading={loading}
-                    />
-                    <StatsCard
-                        icon={Award}
-                        title="Active Today"
-                        value={stats.activeToday}
-                        subtitle="Recent activity"
-                        color="purple"
-                        loading={loading}
-                    />
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-5">
-                    <div className="flex items-center space-x-2 mb-4">
-                        <Users size="24" color="#2F3437" />
-                        <div>
-                        <h4 className="font-medium text-[#2F3437]">Suhoor Statistics</h4>
-                        <p className="text-[#919BA1] leading-6 text-[14px]">
-                            Monthly overview of your activities
-                        </p>
-                        </div>
-                    </div>
-
-                    <div className="h-[320px]">
-                        <Line data={chartData} options={chartOptions} />
-                    </div>
-                </div>
-                <DailyQuote />
-            </div>
-
-
             {/* Groups Section */}
-            {/*<div className="space-y-6" id="groups-section">
+            <div className="space-y-6" id="groups-section">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Your Groups</h2>
@@ -357,6 +185,7 @@ export default function Dashboard() {
                     </div>
 
 
+                    {/* Search and Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3">
                         {groups.length > 0 && <>
                             <div className="relative flex-1">
@@ -450,28 +279,7 @@ export default function Dashboard() {
                             )}
                     </>
                 )}
-            </div>*/}
-            {/* Modals */}
-            {showCreateModal && (
-                <CreateGroupModal
-                    onClose={CloseCreateModal}
-                    onSuccess={() => {
-                        setShowCreateModal(false)
-                        fetchGroups()
-                    }}
-                />
-            )}
-
-            {showJoinModal && (
-                <JoinGroupModal
-                    onClose={CloseJoinModal}
-                    onSuccess={() => {
-                        setShowJoinModal(false)
-                        fetchGroups()
-                    }}
-                    linkGroupKey={linkGroupKey}
-                />
-            )}
+            </div>
         </DashboardLayout>
     )
 }
