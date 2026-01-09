@@ -269,7 +269,7 @@ export default function GroupDetail() {
                     <div className={`px-4 py-3 rounded-xl shadow-lg border flex items-center gap-3 ${toast.type === 'success' ? 'bg-white border-green-100 text-green-800' : 'bg-white border-blue-100 text-blue-800'
                         }`}>
                         <div className={`w-2 h-2 rounded-full ${toast.type === 'success' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
-                        <span className="text-sm font-medium">{toast.message}</span>
+                        <span className="text-sm font-mediu">{toast.message}</span>
                     </div>
                 </div>
             )}
