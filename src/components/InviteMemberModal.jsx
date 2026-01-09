@@ -24,13 +24,11 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
         setLoading(true)
 
         try {
-            const inviteCode = generateInviteCode()
 
             // 1. Create DB record
             await addDoc(collection(db, 'group_invites'), {
                 group_id: groupId,
                 invited_by: currentUser.uid,
-                invite_code: inviteCode,
                 email: email,
                 status: 'pending',
                 created_at: serverTimestamp(),
