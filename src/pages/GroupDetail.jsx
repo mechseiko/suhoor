@@ -7,7 +7,8 @@ import {
     Navigation,
     Users,
     Copy,
-    UserPlus
+    UserPlus,
+    Edit
 } from 'lucide-react'
 import { db } from '../config/firebase'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
@@ -32,7 +33,8 @@ export default function GroupDetail() {
         return cached ? JSON.parse(cached) : []
     })
     const [loading, setLoading] = useState(!group)
-    const [copied, setCopied] = useState(false)
+    const [copied, setCopied] = useState(false);
+    const [copyInvite, setCopyInvite] = useState(false);
     const [clicked, setClicked] = useState('')
     const [showInviteModal, setShowInviteModal] = useState(false)
     const [toast, setToast] = useState(null)
@@ -157,20 +159,21 @@ export default function GroupDetail() {
 
     const GroupActions = () => {
         return (
-            <div className="flex gap-3 justify-center *:cursor-pointer">
+            <div className="flex gap-3 justify-between *:cursor-pointer">
                 <button
-                    onClick={() => {
-                        setCopied(true)
-                        navigator.clipboard.writeText(`${window.location.origin}/groups?groupKey=${group.group_key}`)
-                        setTimeout(() => {
-                            setCopied(false)
-                        }, 2000)
-                    }
+                    onClick={
+                        () => {
+                            setCopyInvite(true)
+                            navigator.clipboard.writeText(`${window.location.origin}/groups?groupKey=${group.group_key}`)
+                            setTimeout(() => {
+                                setCopyInvite(false)
+                            }, 2000)
+                        }
                     }
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-sm"
                 >
-                    <Users className="h-4 w-4" />
-                    <span>Copy Invite Link</span>
+                    {copyInvite ? <CopyCheck className="h-4 w-4"/>: <Copy className="h-4 w-4"/>}
+                    <span>{copyInvite ? 'Invite Link Copied': 'Copy Invite Link'}</span>
                 </button>
                 <button
                     onClick={() => setShowInviteModal(true)}
@@ -269,28 +272,31 @@ export default function GroupDetail() {
 
     return (
         <DashboardLayout rightSidebar={rightSidebar}>
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8 relative overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-4 px-4 md:px-6 mb-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50"></div>
 
-                <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6">
+                <div className="relative z-10">
                     <div>
                         <div className="flex md:flex-row flex-col md:items-center gap-3 mb-2">
-                            <h1 className="md:text-2xl text-xl font-bold text-gray-900">
-                                {group?.name}
+                            <h1 className="md:text-2xl text-xl flex font-bold text-gray-900">
+                                <span>{group?.name}</span>
+                                <span onClick={() => setShowInviteModal(true)} className="text-primary cursor-pointer" title="Edit Group Name">
+                                    <Edit size='12'/>
+                                </span>
                             </h1>
                             {isConnected && (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-200 animate-pulse">
+                                <span className="inline-flex w-fit items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-200 animate-pulse">
                                     <span className="h-2 w-2 rounded-full bg-green-500"></span>
                                     Live
                                 </span>
                             )}
                         </div>
 
-                        <div className="flex md:flex-row flex-col w-full items-center justify-between mt-3">
-                            <div className="flex items-center justify-between text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
+                        <div className="flex md:flex-row flex-col md:space-y-0 space-y-3 w-full justify-between mt-3">
+                            <div className="flex items-center justify-between gap-3 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
                                 <div className='flex items-center'>
                                     <Users className="h-4 w-4 mr-2 text-primary" />
-                                    <div className='flex justify-between items-center gap-3'>
+                                    <div className='flex justify-between items-center gap-1'>
                                         <span className="font-mono text-gray-700">{group.group_key}</span>
                                         <button
                                             onClick={(e) => {
@@ -310,7 +316,7 @@ export default function GroupDetail() {
                                     </div>
                                 </div>
 
-                                <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
+                                <span className="px-3 py-1 w-fit bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
                                     {group.member_count || 0} {group.member_count === 1 ? 'Member' : 'Members'}
                                 </span>
                             </div>
