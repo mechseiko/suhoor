@@ -18,10 +18,6 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
     const TEMPLATE_ID = 'template_vhylt41'
     const USER_ID = 'JKRA71R40HTU6vo6W'
 
-    const generateInviteCode = () => {
-        return Math.random().toString(36).substring(2, 10).toUpperCase()
-    }
-
     const handleSubmit = async e => {
         e.preventDefault()
         setError('')
@@ -41,14 +37,14 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
             })
 
             // 2. Send Email
-            const inviteLink = `${window.location.origin}/dashboard?groupKey=${groupKey}`
+            const inviteLink = `${window.location.origin}/groups?groupKey=${groupKey}`
 
             const templateParams = {
                 subject: 'Join my group on Suhoor',
                 name: 'Suhoor',
                 company_name: 'Suhoor',
                 title: 'You\'ve been invited!',
-                body_intro: `${currentUser.displayName || currentUser.email} has invited you to join their Suhoor group "${groupName}".`,
+                body_intro: `${currentUser.displayName || currentUser.email} has invited you to join their Suhoor group: "${groupName}".`,
                 button_text: 'Join Group',
                 action_link: inviteLink,
                 accent_note: `Group Key: ${groupKey}`,
@@ -77,7 +73,7 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
                     <h3 className="text-2xl font-bold text-dark">Invite Member</h3>
                     <button
                         onClick={onClose}
-                        className="text-dark/40 hover:text-dark/60"
+                        className="text-dark/40 cursor-pointer hover:text-dark/60"
                     >
                         <X className="h-6 w-6" />
                     </button>
@@ -92,7 +88,7 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
                             Invite Sent!
                         </h4>
                         <p className="text-dark/70">
-                            An invitation has been recorded for {email}
+                            An invitation has been sent to {email}
                         </p>
                     </div>
                 ) : (
