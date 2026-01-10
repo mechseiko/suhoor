@@ -11,7 +11,7 @@ import {
     BookOpen,
     Hand,
     Search,
-    Car,
+    Settings,
     Moon
 } from 'lucide-react'
 import { doc, getDoc } from 'firebase/firestore'
@@ -96,7 +96,7 @@ export default function DashboardLayout({
             active: location.pathname === '/profile'
         },
         {
-            icon: Car,
+            icon: Settings,
             label: 'Settings',
             onClick: () => navigate('/settings'),
             active: location.pathname === '/settings'
