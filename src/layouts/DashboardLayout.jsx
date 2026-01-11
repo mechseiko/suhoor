@@ -34,6 +34,17 @@ export default function DashboardLayout({
     const [showMobileMenu, setShowMobileMenu] = useState(false)
     const [showSearchModal, setShowSearchModal] = useState(false)
 
+    useEffect(() => {
+        const handleCtrlK = (event) => {
+            if (event.ctrlKey && event.key === 'k') {
+                event.preventDefault();
+                setShowSearchModal(true);
+            }
+        };
+        document.addEventListener('keydown', handleCtrlK);
+        return () => document.removeEventListener('keydown', handleCtrlK);
+    }, []);
+
     // Determine page title based on route if not provided
     const getPageTitle = () => {
         if (pageTitle) return pageTitle
@@ -246,8 +257,9 @@ export default function DashboardLayout({
                             <div className='md:flex items-center justify-between px-4 md:px-8 py-3'>
                                 <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
                                 <div className='hidden md:flex items-center gap-3'>
-                                    <div className='cursor-pointer text-primary' title="Search" onClick={() => setShowSearchModal(true)}>
+                                    <div className='cursor-pointer flex items-center bg-gray-50 hover:bg-gray-100 rounded-full px-2 py-1 text-primary' title="Search" onClick={() => setShowSearchModal(true)}>
                                         <Search size="18" />
+                                        <p className="text-xs font-semibold text-gray-400 tracking-widest px-2">Ctrl + K</p>
                                     </div>
                                     <ProfileButton currentUser={currentUser} />
                                 </div>

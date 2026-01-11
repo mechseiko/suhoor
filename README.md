@@ -1,16 +1,41 @@
-# React + Vite
+# 🌙 Suhoor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Waking the Ummah for Suhoor
 
-Currently, two official plugins are available:
+Suhoor is a spiritual companion app designed to help Muslims wake up for Suhoor together. By reviving the Sunnah of communal waking, Suhoor strengthens bonds between friends, families, and communities.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Mission
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Waking up alone is hard — alarms are easy to snooze. Suhoor transforms Suhoor into a shared act of worship by allowing groups to wake and support one another, ensuring no one misses the meal.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Features
+
+- 🔔 Smart group wakeup alerts
+- 👥 Community & accountability groups
+- 🤲 Duas and spiritual reminders
+- 🌍 Accurate global Suhoor & prayer times
+
+---
+
+## 🧱 Tech Stack
+
+- React + Tailwind CSS  
+- Capacitor (Android & iOS)  
+- Node.js (v24 LTS)
+
+---
+
+## 📱 Mobile Ready
+
+Built with Capacitor to run seamlessly on both web and mobile from a single codebase.
+
+---
+
+## 🤍 Inspiration
+
+> *“Take Suhoor, for indeed there is blessing in Suhoor.”*  
+> — Prophet Muhammad ﷺ
