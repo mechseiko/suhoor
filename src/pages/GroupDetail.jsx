@@ -173,7 +173,7 @@ export default function GroupDetail() {
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-sm"
                 >
                     {copyInvite ? <CopyCheck className="h-4 w-4"/>: <Copy className="h-4 w-4"/>}
-                    <span>{copyInvite ? 'Invite Link Copied': 'Copy Invite Link'}</span>
+                    <span>{copyInvite ? 'Link Copied': 'Copy Invite Link'}</span>
                 </button>
                 <button
                     onClick={() => setShowInviteModal(true)}
