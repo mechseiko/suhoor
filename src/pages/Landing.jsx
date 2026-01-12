@@ -16,8 +16,8 @@ export default function Landing() {
       <Features />
       <AppShowcase />
       <HowItWorks />
-      <Faq />
       <DownloadApp />
+      <Faq />
       <CtaSection />
     </>
   )

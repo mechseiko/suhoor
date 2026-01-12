@@ -7,23 +7,26 @@ export default function DownloadApp() {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const handler = (e) => {
+        const beforeInstallHandler = (e) => {
             e.preventDefault();
             setDeferredPrompt(e);
             setIsVisible(true);
-        }
+        };
 
-        window.addEventListener('beforeinstallprompt', handler);
-        window.addEventListener('appinstalled', () => {
+        const installedHandler = () => {
             console.log('PWA installed');
             setIsVisible(false);
-        });
+        };
+
+        window.addEventListener('beforeinstallprompt', beforeInstallHandler);
+        window.addEventListener('appinstalled', installedHandler);
 
         return () => {
-            window.removeEventListener('beforeinstallprompt', handler);
-            window.removeEventListener('appinstalled', handler);
-        }
-    }, [])
+            window.removeEventListener('beforeinstallprompt', beforeInstallHandler);
+            window.removeEventListener('appinstalled', installedHandler);
+        };
+    }, []);
+
 
     const installApp = async (e) => {
         e.preventDefault();
