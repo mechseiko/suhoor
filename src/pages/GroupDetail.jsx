@@ -172,8 +172,8 @@ export default function GroupDetail() {
                     }
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-sm"
                 >
-                    {copyInvite ? <CopyCheck className="h-4 w-4"/>: <Copy className="h-4 w-4"/>}
-                    <span>{copyInvite ? 'Link Copied': 'Copy Invite Link'}</span>
+                    {copyInvite ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    <span>{copyInvite ? 'Link Copied' : 'Copy Invite Link'}</span>
                 </button>
                 <button
                     onClick={() => setShowInviteModal(true)}
@@ -281,7 +281,7 @@ export default function GroupDetail() {
                             <h1 className="md:text-2xl text-xl flex font-bold text-gray-900">
                                 <span>{group?.name}</span>
                                 <span onClick={() => setShowInviteModal(true)} className="text-primary cursor-pointer" title="Edit Group Name">
-                                    <Edit size='12'/>
+                                    <Edit size='12' />
                                 </span>
                             </h1>
                             {isConnected && (
@@ -337,7 +337,6 @@ export default function GroupDetail() {
                 />
             )}
 
-            {/* Toast Notification */}
             {toast && (
                 <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
                     <div className={`px-4 py-3 rounded-xl shadow-lg border flex items-center gap-3 ${toast.type === 'success' ? 'bg-white border-green-100 text-green-800' : 'bg-white border-blue-100 text-blue-800'

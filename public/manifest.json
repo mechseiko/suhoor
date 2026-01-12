@@ -1,0 +1,25 @@
+{
+  "short_name": "Suhoor",
+  "name": "Suhoor",
+  "icons": [
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "24x24",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#3D1F94",
+  "background_color": "#ffffff"
+}

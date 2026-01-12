@@ -11,7 +11,6 @@ import {
     BookOpen,
     Hand,
     Search,
-    Settings,
     Moon
 } from 'lucide-react'
 import { doc, getDoc } from 'firebase/firestore'
@@ -53,7 +52,6 @@ export default function DashboardLayout({
         if (path === '/fasting') return 'Fasting'
         if (path === '/profile') return 'Profile'
         if (path === '/groups') return 'Groups'
-        if (path === '/settings') return 'Settings'
         if (path === '/books') return ''
         if (path === '/duas') return ''
         if (path.startsWith('/groups/')) return 'Group Details'
@@ -105,12 +103,6 @@ export default function DashboardLayout({
             label: 'Profile',
             onClick: () => navigate('/profile'),
             active: location.pathname === '/profile'
-        },
-        {
-            icon: Settings,
-            label: 'Settings',
-            onClick: () => navigate('/settings'),
-            active: location.pathname === '/settings'
         },
     ]
 

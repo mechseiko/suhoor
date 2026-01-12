@@ -1,9 +1,8 @@
 import { motion } from 'framer-motion'
 import { Smartphone, Monitor } from 'lucide-react'
-import { useState } from 'react'
+import suhoorLive from '../../public/suhoor-live.mp4'
 
 export default function AppShowcase() {
-    const [playVideo, setPlayVideo] = useState(false);
     return (
         <section className="py-24 max-w-6xl mx-auto bg-white rounded-lg overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -59,26 +58,20 @@ export default function AppShowcase() {
                             className="relative"
                         >
                             <div className="relative rounded-3xl bg-gray-900 p-2 shadow-2xl border-4 border-gray-800 aspect-video flex items-center justify-center overflow-hidden">
-                                {!playVideo ?
-                                    <div>
-                                        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center text-center p-8">
-                                            <div onClick={() => setPlayVideo(true)} className="w-16 cursor-pointer h-16 bg-white/10 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
-                                                <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[18px] border-l-white border-b-[10px] border-b-transparent ml-1"></div>
-                                            </div>
-                                            <p className="text-white font-medium tracking-wide upppercase text-sm">Watch the Demo</p>
-                                            <p className="text-gray-500 text-xs mt-2">Web & Mobile Sync in Action</p>
-                                        </div>
-
-                                        {/* Decorative Elements */}
-                                        <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl"></div>
-                                        <div className="absolute -top-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
+                                <div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center text-center p-8">
+                                        <video
+                                            autoPlay
+                                            muted
+                                            loop
+                                            playsInline
+                                            className="rounded-md w-full z-10"
+                                        >
+                                            <source src={suhoorLive} type="video/mp4" />
+                                            Your browser does not support video
+                                        </video>
                                     </div>
-
-                                    :
-                                    <div className='text-white'>
-                                        Video in play
-                                    </div>
-                                }
+                                </div>
                             </div>
                         </motion.div>
                     </div>

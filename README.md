@@ -35,7 +35,7 @@ Built with Capacitor to run seamlessly on both web and mobile from a single code
 
 ---
 
-## 🤍 Inspiration
+## 🎁 Pitch Deck Links
 
-> *“Take Suhoor, for indeed there is blessing in Suhoor.”*  
-> — Prophet Muhammad ﷺ
+- (https://www.figma.com/design/jHOi76DStwx9x3UuJpfRNG/Startup-Pitch-Deck-Template--Community-?node-id=710-33802&p=f&t=BA5X80mO7ErPu2CT-0)  
+- (https://www.figma.com/design/RFzJoiwIx0xZk4gW2QFJ5t/Pitch-Deck-Template--Free---Community-?node-id=3-479&p=f&t=7XpsyxQ7u5cenkyF-0)

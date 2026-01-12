@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
           name: 'Suhoor',
           short_name: 'Suhoor',
           description: 'Wake up for Suhoor in groups',
-          theme_color: '#3b82f6',
+          theme_color: '#3D1F94',
           icons: [
             {
               src: 'pwa-192x192.png',

@@ -1,7 +1,48 @@
 import { Download } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react';
 
 export default function DownloadApp() {
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        const handler = (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+            setIsVisible(true);
+        }
+
+        window.addEventListener('beforeinstallprompt', handler);
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed');
+            setIsVisible(false);
+        });
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handler);
+            window.removeEventListener('appinstalled', handler);
+        }
+    }, [])
+
+    const installApp = async (e) => {
+        e.preventDefault();
+        if (!deferredPrompt) return;
+
+        const { outcome } = await
+            deferredPrompt.prompt();
+
+        if (outcome === 'accepted') {
+            console.log('PWA installed!');
+            setIsVisible(false)
+        } else {
+            console.log('Installation dismissed')
+        }
+        setDeferredPrompt(null)
+    }
+
+    if (!isVisible) return null;
+
     return (
         <section className="bg-gradient-to-r from-primary to-primary/90 rounded-lg md:py-18 py-16 relative overflow-hidden">
             {/* Background Pattern */}
@@ -16,17 +57,17 @@ export default function DownloadApp() {
                     className="max-w-3xl mx-auto"
                 >
                     <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-                        Never Miss Suhoor Again
+                        Download the App
                     </h2>
                     <p className="md:text-xl text-lg text-blue-100 mb-10 leading-relaxed">
-                        Download the official Android app to enable <span className="font-bold text-white">Smart Alarms</span>.
+                        Download the Android app to enable <span className="font-bold text-white">Smart Alarms</span>.
                         We'll wake you up 15 minutes before Suhoor, even if your phone is on silent or the app is closed.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <button
-                            className="w-full cursor-pointer sm:w-auto px-6 py-3 bg-white text-primary rounded-xl font-bold text-lg hover:shadow-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-3 group"
-                            onClick={() => alert('Download Started')}
+                            className="w-fit cursor-pointer sm:w-auto px-6 py-3 bg-white text-primary rounded-xl font-bold text-lg hover:shadow-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-3 group"
+                            onClick={installApp}
                         >
                             <Download className="h-6 w-6 group-hover:-translate-y-1 transition-transform" />
                             <span>Download Apk</span>
