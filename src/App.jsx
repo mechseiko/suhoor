@@ -21,11 +21,10 @@ import PWAManager from './components/PWAManager'
 import About from './pages/About'
 import { useAuth } from './context/AuthContext'
 import Groups from './pages/Groups'
-import Settings from './pages/Settings'
 
 function AppRoutes() {
   const { currentUser } = useAuth();
-  return(
+  return (
     <Routes>
       <Route element={<PageLayout />}>
         <Route path="/" element={<Landing />} />
@@ -69,14 +68,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Profile />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <ProtectedRoute>
-            <Settings />
           </ProtectedRoute>
         }
       />

@@ -11,7 +11,7 @@ import {
     Edit
 } from 'lucide-react'
 import { db } from '../config/firebase'
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
+import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore'
 import WakeUpTracker from '../components/WakeUpTracker'
 import InviteMemberModal from '../components/InviteMemberModal'
 import GroupAnalytics from '../components/GroupAnalytics'
@@ -32,6 +32,9 @@ export default function GroupDetail() {
         const cached = localStorage.getItem(`suhoor_members_${groupId}`)
         return cached ? JSON.parse(cached) : []
     })
+    const [isEditingName, setIsEditingName] = useState(false)
+    const [newGroupName, setNewGroupName] = useState(group?.name || '')
+    const [savingName, setSavingName] = useState(false)
     const [loading, setLoading] = useState(!group)
     const [copied, setCopied] = useState(false);
     const [copyInvite, setCopyInvite] = useState(false);
@@ -270,6 +273,28 @@ export default function GroupDetail() {
         </div>
     )
 
+    const handleSaveGroupName = async () => {
+        if (!groupId || !newGroupName.trim()) return
+        try {
+            setSavingName(true)
+            const groupRef = doc(db, 'groups', groupId)
+            await updateDoc(groupRef, { name: newGroupName.trim() }) // [web:29]
+
+            const updated = { ...group, name: newGroupName.trim() }
+            setGroup(updated)
+            localStorage.setItem(`suhoor_group_${groupId}`, JSON.stringify(updated))
+
+            setIsEditingName(false)
+            setToast({ type: 'success', message: 'Group name updated.' })
+        } catch (err) {
+            console.error('Error updating group name:', err)
+            setToast({ type: 'info', message: 'Failed to update group name.' })
+        } finally {
+            setSavingName(false)
+        }
+    }
+
+
     return (
         <DashboardLayout rightSidebar={rightSidebar}>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-4 px-4 md:px-6 mb-8 relative overflow-hidden">
@@ -278,12 +303,58 @@ export default function GroupDetail() {
                 <div className="relative z-10">
                     <div>
                         <div className="flex md:flex-row flex-col md:items-center gap-3 mb-2">
-                            <h1 className="md:text-2xl text-xl flex font-bold text-gray-900">
-                                <span>{group?.name}</span>
-                                <span onClick={() => setShowInviteModal(true)} className="text-primary cursor-pointer" title="Edit Group Name">
-                                    <Edit size='12' />
-                                </span>
+                            <h1 className="md:text-2xl text-xl flex items-center gap-2 font-bold text-gray-900">
+                                {isEditingName ? (
+                                    <>
+                                    <input
+                                        autoFocus
+                                        value={newGroupName}
+                                        onChange={(e) => setNewGroupName(e.target.value)}
+                                        onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleSaveGroupName()
+                                        if (e.key === 'Escape') {
+                                            setIsEditingName(false)
+                                            setNewGroupName(group?.name || '')
+                                        }
+                                        }}
+                                        className="border border-gray-300 rounded px-2 py-1 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-primary"
+                                    />
+                                    <button
+                                        disabled={savingName}
+                                        onClick={handleSaveGroupName}
+                                        className="text-xs px-2 py-1 cursor-pointer rounded bg-primary text-white hover:opacity-90 disabled:opacity-60"
+                                    >
+                                        {savingName ? 'Saving...' : 'Save'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                        setIsEditingName(false)
+                                        setNewGroupName(group?.name || '')
+                                        }}
+                                        className="text-xs px-2 py-1 cursor-pointer rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                    >
+                                        Cancel
+                                    </button>
+                                    </>
+                                ) : (
+                                    <>
+                                    <span>{group?.name}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                        setIsEditingName(true)
+                                        setNewGroupName(group?.name || '')
+                                        }}
+                                        className="text-primary cursor-pointer mb-3"
+                                        title="Edit Group Name"
+                                    >
+                                        <Edit size={12} />
+                                    </button>
+                                    </>
+                                )}
                             </h1>
+
                             {isConnected && (
                                 <span className="inline-flex w-fit items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-200 animate-pulse">
                                     <span className="h-2 w-2 rounded-full bg-green-500"></span>

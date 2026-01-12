@@ -14,7 +14,7 @@ export default function HowItWorks() {
         },
         {
             icon: Clock,
-            title: "Set Wake Times",
+            title: "Wake Times",
             desc: "Everyone gets notified when it's time for Suhoor",
             color: "green"
         },
@@ -39,7 +39,6 @@ export default function HowItWorks() {
                     title="How It Works"
                     subtitle="Get started in minutes and you'll never miss Suhoor again. If Allah wishes."
                 />
-
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {steps.map((step, idx) => {
                         const Icon = step.icon

@@ -59,17 +59,17 @@ export default function DownloadApp() {
                     transition={{ duration: 0.6 }}
                     className="max-w-3xl mx-auto"
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
                         Download the App
                     </h2>
-                    <p className="md:text-xl text-lg text-blue-100 mb-10 leading-relaxed">
-                        Download the Android app to enable <span className="font-bold text-white">Smart Alarms</span>.
-                        We'll wake you up 15 minutes before Suhoor, even if your phone is on silent or the app is closed.
+                    <p className="text-lg text-blue-100 mb-10 leading-relaxed">
+                        Download the app, enable <span className="font-bold text-white">Smart Alarms</span>.
+                        We'll wake you up, even if the app is closed, or your phone is dead.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <button
-                            className="w-fit cursor-pointer sm:w-auto px-6 py-3 bg-white text-primary rounded-xl font-bold text-lg hover:shadow-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-3 group"
+                            className="w-fit cursor-pointer sm:w-auto px-4 py-2 bg-white text-primary rounded-xl font-bold text-lg hover:shadow-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-3 group"
                             onClick={installApp}
                         >
                             <Download className="h-6 w-6 group-hover:-translate-y-1 transition-transform" />
