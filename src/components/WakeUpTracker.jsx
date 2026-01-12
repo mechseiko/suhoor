@@ -227,7 +227,7 @@ export default function WakeUpTracker({ groupId, members }) {
                 <div className="flex items-center gap-3">
                     <h3 className="md:text-xl text-lg font-bold text-dark flex items-center space-x-2">
                         <Moon className="h-6 w-6 text-primary" />
-                        <span>Today's Wake Up Tracker</span>
+                        <span>Wake Up Tracker</span>
                     </h3>
                     {isConnected && (
                         <span className="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-lg border border-green-200 flex items-center gap-1">
@@ -245,7 +245,7 @@ export default function WakeUpTracker({ groupId, members }) {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => setSoundEnabled(!soundEnabled)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 cursor-pointer hover:bg-gray-100 rounded-lg transition-colors"
                         title={soundEnabled ? 'Mute notifications' : 'Enable notifications'}
                     >
                         {soundEnabled ? (
@@ -258,7 +258,7 @@ export default function WakeUpTracker({ groupId, members }) {
                         <button
                             onClick={handleWakeUp}
                             disabled={loading || !isConnected}
-                            className="flex items-center md:space-x-2 space-x-1 w-full px-2 md:px-4 md:py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center cursor-pointer md:space-x-2 space-x-1 w-full px-2 md:px-4 md:py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Bell className="h-5 w-5" />
                             <span>{loading ? 'Logging...' : "I'm Awake!"}</span>
