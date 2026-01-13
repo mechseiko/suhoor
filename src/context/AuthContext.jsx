@@ -25,9 +25,14 @@ export function AuthProvider({ children }) {
         return signInWithEmailAndPassword(auth, email, password)
     }
 
-    const logout = () => {
-        return signOut(auth)
-    }
+    // const logout = () => {
+    //     return signOut(auth)
+    // }
+    
+    const logout = async () => {
+        setCurrentUser(null);  // Optimistic update to skip protected routes
+        await signOut(auth);
+    };  
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, user => {

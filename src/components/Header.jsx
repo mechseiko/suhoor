@@ -54,7 +54,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
 
     const UserCta = () => {
         return(
-            <div className="flex md:flex-row flex-col items-center gap-4 mt-2">
+            <div className="flex md:flex-row flex-col items-center gap-4">
                 <div className="scale-110">
                     <ProfileButton currentUser={currentUser} />
                 </div>
@@ -67,7 +67,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                             console.error("Logout failed", error);
                         }
                     }}
-                    className="text-red-500 cursor-pointer font-medium py-2 px-4 hover:bg-red-50 rounded-lg w-full text-center"
+                    className="text-red-500 cursor-pointer font-medium py-2 px-3 hover:bg-red-50 rounded-lg w-full text-center"
                 >
                     Logout
                 </button>

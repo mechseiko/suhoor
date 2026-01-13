@@ -21,13 +21,15 @@ import PWAManager from './components/PWAManager'
 import About from './pages/About'
 import { useAuth } from './context/AuthContext'
 import Groups from './pages/Groups'
+import { Capacitor } from '@capacitor/core'
 
 function AppRoutes() {
+  const nativePlatform = Capacitor.isNativePlatform();
   const { currentUser } = useAuth();
   return (
     <Routes>
       <Route element={<PageLayout />}>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={nativePlatform ? <Login /> : <Landing />} />
         <Route path="/about" element={<About />} />
         <Route path="/books" element={<Books />} />
         <Route path="/duas" element={<Duas />} />

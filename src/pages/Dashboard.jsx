@@ -146,7 +146,6 @@ export default function Dashboard() {
             }
         })
 
-        // Process Activity Logs
         const logs = await fetchActivity()
         logs.forEach(log => {
             if (log.date) {
@@ -168,14 +167,14 @@ export default function Dashboard() {
                 {
                     label: 'My Activity',
                     data: activityCounts,
-                    borderColor: '#10B981', // Emerald 500
+                    borderColor: '#10B981',
                     backgroundColor: 'transparent',
                     borderWidth: 1,
                     tension: 0.5,
                     pointRadius: 5,
                     pointHoverRadius: 6,
                     pointBackgroundColor: '#10B981',
-                    pointBorderColor: '#ECFDF5', // Emerald 50
+                    pointBorderColor: '#ECFDF5',
                 }
             ]
         }))
@@ -227,7 +226,6 @@ export default function Dashboard() {
                 const groupRef = doc(db, 'groups', groupId)
                 const groupSnap = await getDoc(groupRef)
                 if (groupSnap.exists()) {
-                    // Fetch member count
                     const membersRef = collection(db, 'group_members')
                     const memberCountQuery = query(membersRef, where('group_id', '==', groupId))
                     const memberCountSnap = await getCountFromServer(memberCountQuery)
@@ -307,7 +305,7 @@ export default function Dashboard() {
                         <div className="flex items-center space-x-2 mb-4">
                             <Users size="24" color="#2F3437" />
                             <div>
-                                <h4 className="font-medium text-[#2F3437]">Suhoor Statistics</h4>
+                                <h4 className="font-medium text-[#2F3437]">Stats</h4>
                                 <p className="text-[#919BA1] leading-6 text-[14px]">
                                     Monthly overview of your activities
                                 </p>

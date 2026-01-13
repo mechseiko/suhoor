@@ -51,7 +51,7 @@ export default function AppShowcase() {
                         transition={{ duration: 0.6, delay: 0.2 }}
                         className="md:w-1/2"
                     >
-                        <div className="relative rounded bg-gray-900 shadow-2xl border-4 border-gray-800 aspect-video flex items-center justify-center overflow-hidden">
+                        <div className="relative rounded bg-gray-900 shadow-2xl border-4 border-gray-800 aspect-video overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center p-3">
                                 <video
                                     autoPlay

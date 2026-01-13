@@ -28,6 +28,34 @@ export default function DashboardLayout({
     pageTitle
 }) {
     const { currentUser, logout } = useAuth()
+    const [isVerified, setIsVerified] = useState(false)
+    useEffect(() => {
+        const checkVerification = async () => {
+            if (!currentUser) return
+
+            if (currentUser.emailVerified) {
+                setIsVerified(true)
+                return
+            }
+
+            try {
+                const userRef = doc(db, 'profiles', currentUser.uid)
+                const userSnap = await getDoc(userRef)
+
+                if (userSnap.exists() && userSnap.data().isVerified) {
+                    setIsVerified(true)
+                } else {
+                    setIsVerified(false)
+                }
+            } catch (err) {
+                console.error('Error checking verification status:', err)
+                setIsVerified(false)
+            }
+        }
+
+        checkVerification()
+    }, [currentUser])
+
     const navigate = useNavigate()
     const location = useLocation()
     const [showMobileMenu, setShowMobileMenu] = useState(false)
@@ -44,7 +72,6 @@ export default function DashboardLayout({
         return () => document.removeEventListener('keydown', handleCtrlK);
     }, []);
 
-    // Determine page title based on route if not provided
     const getPageTitle = () => {
         if (pageTitle) return pageTitle
         const path = location.pathname
@@ -61,7 +88,7 @@ export default function DashboardLayout({
     const handleLogout = async () => {
         try {
             await logout()
-            navigate('/')
+            navigate('/login')
         } catch (err) {
             console.error('Logout failed:', err)
         }
@@ -169,36 +196,6 @@ export default function DashboardLayout({
             </div>
         </div>
     )
-
-    const [isVerified, setIsVerified] = useState(false)
-
-    useEffect(() => {
-        const checkVerification = async () => {
-            if (!currentUser) return
-
-            if (currentUser.emailVerified) {
-                setIsVerified(true)
-                return
-            }
-
-            try {
-                // Check Firestore profile as fallback
-                const userRef = doc(db, 'profiles', currentUser.uid)
-                const userSnap = await getDoc(userRef)
-
-                if (userSnap.exists() && userSnap.data().isVerified) {
-                    setIsVerified(true)
-                } else {
-                    setIsVerified(false)
-                }
-            } catch (err) {
-                console.error('Error checking verification status:', err)
-                setIsVerified(false)
-            }
-        }
-
-        checkVerification()
-    }, [currentUser])
 
     return (
         <div className="min-h-screen bg-white">

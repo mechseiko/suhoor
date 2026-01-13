@@ -53,17 +53,17 @@ export default function Duas() {
                     return (
                         <div key={idx} className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
                             <div className="p-4 md:p-6">
-                                <div className="flex items-center gap-3 md:gap-4 mb-3">
+                                <div className="flex items-center gap-3 mb-3">
                                     <div className={`p-2 md:p-3 rounded-xl md:rounded-2xl ${dua.bg}`}>
                                         <Icon className={`h-5 w-5 md:h-6 md:w-6 ${dua.color}`} />
                                     </div>
-                                    <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                                    <h2 className="text-xl font-bold text-gray-900">
                                         {dua.title}
                                     </h2>
                                 </div>
 
                                 <div className="space-y-3 text-center">
-                                    <p className="text-3xl md:text-4xl leading-relaxed font-serif text-gray-800" dir="rtl">
+                                    <p className="text-2xl md:text-3xl leading-relaxed font-serif text-gray-800" dir="rtl">
                                         {dua.arabic}
                                     </p>
 

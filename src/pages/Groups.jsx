@@ -192,7 +192,7 @@ export default function Groups() {
 
                 {loading && groups.length === 0 ? (
                     <div className="space-y-4">
-                        {[1, 2, 3].map(i => (
+                        {[1, 2, 3, 4, 5].map(i => (
                             <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center justify-between">
                                 <div className="space-y-3 w-full">
                                     <div className="flex items-center gap-4">

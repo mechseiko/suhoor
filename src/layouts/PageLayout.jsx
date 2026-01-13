@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useLocation, useNavigate, Outlet } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-
+import { Capacitor } from '@capacitor/core'
 
 export const navBar = [
     { label: 'Home', to: '/' },
@@ -11,10 +11,10 @@ export const navBar = [
     { label: 'About', to: '/about' },
 ]
 
-
 import { useAuth } from '../context/AuthContext'
 
 export default function PageLayout({ children }) {
+    const nativePlatform = Capacitor.isNativePlatform();
     const { currentUser } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
@@ -37,9 +37,11 @@ export default function PageLayout({ children }) {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    const publicPaths = ['/', '/login', '/signup', '/about', '/forgot-password', '/reset-password', '/verify-email']
+    const publicPaths = ['/', '/about', '/login', '/signup', '/forgot-password', '/reset-password', '/verify-email']
 
-    if (currentUser && !publicPaths.includes(location.pathname)) {
+    if ((currentUser && !publicPaths.includes(location.pathname)
+        ||
+        (!currentUser && nativePlatform))) {
         return <div className="min-h-screen flex flex-col">{children ? children : <Outlet />}</div>
     }
 

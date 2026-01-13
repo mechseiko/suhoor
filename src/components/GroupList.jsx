@@ -56,19 +56,6 @@ export default function GroupList({ groups }) {
                       {group.member_count || 0} {group.member_count === 1 ? 'Member' : 'Members'}
                     </span>
                   </div>
-
-                  {/* <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                      <span>
-                        Created {group.created_at ?
-                          (group.created_at.toDate ? group.created_at.toDate() : new Date(group.created_at))
-                            .toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
-                          : 'Just now'
-                        }
-                      </span>
-                    </div>
-                  </div> */}
                 </div>
               </div>
             </div>
