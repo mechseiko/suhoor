@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useLocation, useNavigate, Outlet } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { Capacitor } from '@capacitor/core'
 
 export const navBar = [
     { label: 'Home', to: '/' },
@@ -10,11 +9,12 @@ export const navBar = [
     { label: 'Duas', to: '/duas' },
     { label: 'About', to: '/about' },
 ]
-
 import { useAuth } from '../context/AuthContext'
-
 export default function PageLayout({ children }) {
     const nativePlatform = Capacitor.isNativePlatform();
+    const isPWA = window.matchMedia('display-mode: standalone').matches || window.navigator.standalone === true;
+    const isNative = nativePlatform || isPWA;
+
     const { currentUser } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
@@ -41,7 +41,7 @@ export default function PageLayout({ children }) {
 
     if ((currentUser && !publicPaths.includes(location.pathname)
         ||
-        (!currentUser && nativePlatform))) {
+        (!currentUser && isNative))) {
         return <div className="min-h-screen flex flex-col">{children ? children : <Outlet />}</div>
     }
 

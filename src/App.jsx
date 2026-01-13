@@ -23,13 +23,16 @@ import { useAuth } from './context/AuthContext'
 import Groups from './pages/Groups'
 import { Capacitor } from '@capacitor/core'
 
+
 function AppRoutes() {
   const nativePlatform = Capacitor.isNativePlatform();
+  const isPWA = window.matchMedia('display-mode: standalone').matches || window.navigator.standalone === true;
   const { currentUser } = useAuth();
+  const isNative = nativePlatform || isPWA;
   return (
     <Routes>
       <Route element={<PageLayout />}>
-        <Route path="/" element={nativePlatform ? <Login /> : <Landing />} />
+        <Route path="/" element={isNative ? <Login /> : <Landing />} />
         <Route path="/about" element={<About />} />
         <Route path="/books" element={<Books />} />
         <Route path="/duas" element={<Duas />} />

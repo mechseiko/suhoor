@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
-import { Capacitor } from '@capacitor/core'
 
 export default function AuthWrapper({ children, title, subtitle, error, bottomTitle, bottomsubTitle }) {
-    const nativePlatform = (Capacitor.isNativePlatform());
+
+    const nativePlatform = Capacitor.isNativePlatform();
+    const isPWA = window.matchMedia('display-mode: standalone').matches || window.navigator.standalone === true;
+    const isNative = nativePlatform || isPWA;
 
     const Logo = () => {
         return (
@@ -13,16 +15,16 @@ export default function AuthWrapper({ children, title, subtitle, error, bottomTi
         )
     }
     return (
-        <div className={`${nativePlatform ? 'sm:pt-30 md:pb-15' : 'md:pt-30 pt-25 md:pb-15 pb-12'} flex items-center justify-center`}>
+        <div className={`${isNative ? 'sm:pt-30 md:pb-15' : 'md:pt-30 pt-25 md:pb-15 pb-12'} flex items-center justify-center`}>
             <div className="max-w-md w-full">
-                {nativePlatform &&
+                {isNative &&
                     <div
                         className={`sm:hidden mt-[30%] flex justify-center items-center`}
                     >
                         <Logo />
                     </div>
                 }
-                <div className={`${nativePlatform ? 'md:rounded-b-2xl w-full rounded-t-2xl sm:relative fixed bottom-0 left-0 right-0' : 'rounded-2xl'} max-w-xl bg-white p-8 shadow-xl`}>
+                <div className={`${isNative ? 'md:rounded-b-2xl w-full rounded-t-2xl sm:relative fixed bottom-0 left-0 right-0' : 'rounded-2xl'} max-w-xl bg-white p-8 shadow-xl`}>
                     <h2 className="text-2xl font-semibold text-center text-gray-900 mb-2">
                         {title}
                     </h2>
