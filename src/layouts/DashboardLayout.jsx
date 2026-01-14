@@ -11,7 +11,8 @@ import {
     BookOpen,
     Hand,
     Search,
-    Moon
+    Moon,
+    ArrowLeft
 } from 'lucide-react'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../config/firebase'
@@ -210,7 +211,7 @@ export default function DashboardLayout({
                         <ProfileButton currentUser={currentUser} navigate={() => { }} />
                         <button
                             onClick={() => setShowMobileMenu(!showMobileMenu)}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="md:p-2 md:hover:bg-gray-100 rounded-lg transition-colors"
                         >
                             {showMobileMenu ? <X className="h-6 w-6 text-gray-600" /> : <Menu className="h-6 w-6 text-gray-600" />}
                         </button>
@@ -242,9 +243,12 @@ export default function DashboardLayout({
                 <main className="flex-1 min-w-0 bg-gray-50/30 flex flex-col">
                     {/* Page Header - Sticky */}
                     {getPageTitle() !== '' &&
-                        <div className="sticky top-[61px] lg:top-0 z-30 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200/50">
+                        <div className="sticky top-[58px] lg:top-0 z-30 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200/50">
                             <div className='md:flex items-center justify-between px-4 md:px-8 py-3'>
-                                <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
+                                <div className='flex gap-1 items-center'>
+                                    <ArrowLeft className={`${!['/dashboard'].includes(location.pathname) ? '' : 'hidden'} cursor-pointer pl-2 size-6 text-gray-400`} title="Go Back" onClick={() => navigate(-1)} />
+                                    <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
+                                </div>
                                 <div className='hidden md:flex items-center gap-3'>
                                     <div className='cursor-pointer flex items-center bg-gray-50 hover:bg-gray-100 rounded-full px-2 py-1 text-primary' title="Search" onClick={() => setShowSearchModal(true)}>
                                         <Search size="18" />

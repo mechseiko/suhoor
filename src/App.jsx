@@ -21,14 +21,12 @@ import PWAManager from './components/PWAManager'
 import About from './pages/About'
 import { useAuth } from './context/AuthContext'
 import Groups from './pages/Groups'
-import { Capacitor } from '@capacitor/core'
+import { useNative } from './hooks/useNative'
 
 
 function AppRoutes() {
-  const nativePlatform = Capacitor.isNativePlatform();
-  const isPWA = window.matchMedia('display-mode: standalone').matches || window.navigator.standalone === true;
-  const { currentUser } = useAuth();
-  const isNative = nativePlatform || isPWA;
+  const {currentUser} = useAuth()
+  const isNative = useNative()
   return (
     <Routes>
       <Route element={<PageLayout />}>
