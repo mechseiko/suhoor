@@ -42,7 +42,7 @@ export default function Footer({currentNavItem}) {
             <ul className="space-y-3">
               <li>
                 <a href="https://devseiko.vercel.app/contact?from=suhoor" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-primary transition-colors">
-                  Feedback
+                  Contact
                 </a>
               </li>
               <li>

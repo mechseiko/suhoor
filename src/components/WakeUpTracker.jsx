@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Bell, CheckCircle, Moon, Volume2, VolumeX, MapPin } from 'lucide-react'
+import { Bell, CheckCircle, Volume2, VolumeX, MapPin } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { useAuth } from '../context/AuthContext'
@@ -8,11 +8,15 @@ import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useLocationTracking } from '../hooks/useLocationTracking'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore'
+import GroupAnalytics from './GroupAnalytics'
+import { Users, Crown } from 'lucide-react'
 
 export default function WakeUpTracker({ groupId, members }) {
     const { currentUser } = useAuth()
     const { isConnected, joinGroup, leaveGroup, emitWakeUp, buzzUser, on, off } = useSocket()
-    const { isWakeUpWindow } = useFastingTimes()
+    const { isWakeUpWindow } = useFastingTimes();
+    const [userLocations, setUserLocations] = useState({})
+
 
     // Track location if in window and NOT woken up
     const [wakeUpLogs, setWakeUpLogs] = useState([])
@@ -75,6 +79,24 @@ export default function WakeUpTracker({ groupId, members }) {
             }
         }
     }, [groupId, isConnected, joinGroup, leaveGroup, getCurrentUserName, fetchTodayLogs])
+
+    // Listen for location updates during wake-up window
+    useEffect(() => {
+        if (!isWakeUpWindow) return
+
+        const locationsRef = collection(db, 'groups', groupId, 'locations')
+        // Using onSnapshot for real-time updates
+        import('firebase/firestore').then(({ onSnapshot }) => {
+            const unsubscribe = onSnapshot(locationsRef, (snapshot) => {
+                const locs = {}
+                snapshot.forEach(doc => {
+                    locs[doc.id] = doc.data()
+                })
+                setUserLocations(locs)
+            })
+            return unsubscribe
+        })
+    }, [groupId, isWakeUpWindow])
 
     // Play notification sound
     const playNotificationSound = useCallback(() => {
@@ -221,14 +243,99 @@ export default function WakeUpTracker({ groupId, members }) {
         return onlineMembers.includes(userId)
     }
 
+    const RightSidebar = () => {
+        return(        
+        <div className="space-y-6 mb-5">
+            <GroupAnalytics groupId={groupId} memberCount={members.length} />
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-4 border-b border-gray-50 flex items-center justify-between">
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                        <Users className="h-4 w-4 text-primary" />
+                        Members
+                    </h3>
+                    <span className="text-[10px] font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                        {members.length}
+                    </span>
+                </div>
+                <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
+                    {loading && !members.length ? (
+                        <div className="p-4 space-y-4">
+                            {[1, 2, 3, 4, 5, 6].map(i => (
+                                <div key={i} className="flex items-center gap-3">
+                                    <SkeletonLoader variant="circle" width="w-8" height="h-8" />
+                                    <div className="space-y-1">
+                                        <SkeletonLoader width="w-24" height="h-3" />
+                                        <SkeletonLoader width="w-32" height="h-2" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        members.map(member => {
+                            const location = userLocations[member.profiles.id]
+                            const hasLocation = !!location
+
+                            return (
+                                <div
+                                    key={member.id}
+                                    className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                            {member.profiles.display_name?.charAt(0).toUpperCase() || member.profiles.email?.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <div className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
+                                                {member.profiles.display_name || member.profiles.email.split('@')[0]}
+                                                {member.role === 'admin' && (
+                                                    <Crown className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                                )}
+                                            </div>
+                                            <div className="text-[10px] text-gray-500 truncate max-w-[120px]">
+                                                {member.profiles.email}
+                                            </div>
+                                            {hasLocation && isWakeUpWindow && (
+                                                <a
+                                                    href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="mt-1 flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-800 font-medium"
+                                                >
+                                                    <MapPin className="h-3 w-3" />
+                                                    <span>Live: {new Date(location.timestamp?.toDate ? location.timestamp.toDate() : location.device_timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                </a>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {hasLocation && isWakeUpWindow && (
+                                        <a
+                                            href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                            title="Navigate to member"
+                                        >
+                                            <Navigation className="h-4 w-4" />
+                                        </a>
+                                    )}
+                                </div>
+                            )
+                        })
+                    )}
+                </div>
+            </div>
+        </div>
+    )}
+
     return (
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                    <h3 className="md:text-xl text-lg font-bold text-dark flex items-center space-x-2">
-                        <Moon className="h-6 w-6 text-primary" />
+                    <h3 className="md:text-xl font-bold text-dark">
                         <span>Wake Up Tracker</span>
                     </h3>
+                    
                     {isConnected && (
                         <span className="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-lg border border-green-200 flex items-center gap-1">
                             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
@@ -271,6 +378,8 @@ export default function WakeUpTracker({ groupId, members }) {
                     )}
                 </div>
             </div>
+
+            <RightSidebar />
 
             <div className="space-y-3">
                 {members.map(member => {

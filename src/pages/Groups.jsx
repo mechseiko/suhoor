@@ -227,7 +227,6 @@ export default function Groups() {
                         ) : (
                             <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                                 <GroupResponse title='No groups found' subtitle={`You are not a member of any groups matching "${searchQuery}"`}/>
-
                                 <button
                                     onClick={() => setSearchQuery('')}
                                     className="px-6 py-2 cursor-pointer bg-primary text-white rounded-xl hover:opacity-90 transition font-medium"

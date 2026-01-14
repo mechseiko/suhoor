@@ -1,0 +1,66 @@
+1.  Wake up flow for suhoor:
+
+    A day before, a person is propmted on the group pageeeee if they would like to fast tomorrow or not
+    if yes: it will show to all group memebers that this person wants to fast tomorrowIf not: it will show to all group memebersbers of  agroup
+    that this person does not want to fast tomorrow
+    If a person doesn't say anything about this, i.e say if they want to fast tomorrow or not(it will automatically
+    set to true on the database, subsequently, all this fasts that theya re fasting will bw stored on the db,
+    and used for
+    1. rendering on the chart in the dashboard
+    2. Used for future purooses ike suhoor wrapped e.t.C
+    3. 'this value renew in the database of course, everyday
+    example for today if i say that iwant to fast:
+    it will be true, and once it's 15 minutes to the time for suhoor, gotten from the fecth fatsimg times api ()
+    the app will wake them upthis 15 minutes is a default value of course, it can be changed by the group admin.
+    The group admin of any group can change the time notice of wakeing up for suhoor each day.
+    now as for the waking up, each user will:
+    after being buzzed of course, will click on the im awake button
+    note that this feature can only work in the capacitor android app of course, we need to integrate alarm that can work 
+    from the capacitor appand actually ring put of the phone
+    when they wake up, this value and the date of course is all sent to the database(the database must take a lot of values
+    of course)
+    and each group members can see those that have woken up and those that havent
+    now in each group
+    the user can leave a specific location
+    incase the person's phoen is switched off
+
+    note that this capacitor app must work without an internet connection.
+
+    Also note that this buzz alarm cant be snoozeed and will comeagain 5 minutes after the person is awake just to check if the personson is 
+    truely awake.
+
+
+2. As for the mobile app, when i installed the app from the chrome website
+
+    I think it instaleled a pwa even to my android phoneso that means that we need to remove the pwa feature completely and 
+    and make the capacitor app work on both android and ios
+
+3. Proceed with this plan
+    keeping in mind you afre to go on with thius changes alone
+    not any major chanmge elewhere in my app
+    nbote what i said about a lot of information in my db
+    use taht to 
+    1. add another graph line to my dashboard
+    2. create me a settings page, different setting for this kind of app(you'll see how i created fssting dua and other pages)
+    3. Update the features section(texts only
+    4. and how it works section(text only) in my landing page to match the new way that suhoor works
+
+    just add or remove some texts in the about page too
+    tecxts only please
+    texts only
+
+
+4. User should't be able to create an account with a 'fake ' email:
+    i.e an email taht doesnot exist
+    currently user is able to do this and is being navigated to the dashboard
+
+
+5. The group name in wake-up tracker can be edited to be an empty string after creation
+    this shouldnt be so
+
+
+6. Find a partner and register for the hackathon
+
+7. The Figma Pitch deck presentation files
+
+8. Use the app to wake up for suhoor together with Alfa fawaz.

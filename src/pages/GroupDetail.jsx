@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-    Crown,
     CopyCheck,
-    MapPin,
-    Navigation,
     Users,
     Copy,
     UserPlus,
@@ -14,9 +11,7 @@ import { db } from '../config/firebase'
 import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore'
 import WakeUpTracker from '../components/WakeUpTracker'
 import InviteMemberModal from '../components/InviteMemberModal'
-import GroupAnalytics from '../components/GroupAnalytics'
 import Loader from '../components/Loader'
-import SkeletonLoader from '../components/SkeletonLoader'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useSocket } from '../context/SocketContext'
 import { useFastingTimes } from '../hooks/useFastingTimes'
@@ -173,14 +168,14 @@ export default function GroupDetail() {
                             }, 2000)
                         }
                     }
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-sm"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-[13px]"
                 >
                     {copyInvite ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     <span>{copyInvite ? 'Link Copied' : 'Copy Invite Link'}</span>
                 </button>
                 <button
                     onClick={() => setShowInviteModal(true)}
-                    className="flex items-center cursor-pointer justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-md hover:shadow-blue-200 transition-all duration-200 font-medium text-sm"
+                    className="flex items-center cursor-pointer justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-md hover:shadow-blue-200 transition-all duration-200 font-medium text-[13px]"
                 >
                     <UserPlus className="h-5 w-5" />
                     <span>Invite Member</span>
@@ -188,90 +183,6 @@ export default function GroupDetail() {
             </div>
         )
     }
-
-    const rightSidebar = (
-        <div className="space-y-6">
-            <GroupAnalytics groupId={groupId} memberCount={members.length} />
-
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-4 border-b border-gray-50 flex items-center justify-between">
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                        <Users className="h-4 w-4 text-primary" />
-                        Members
-                    </h3>
-                    <span className="text-[10px] font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                        {members.length}
-                    </span>
-                </div>
-                <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
-                    {loading && !members.length ? (
-                        <div className="p-4 space-y-4">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
-                                <div key={i} className="flex items-center gap-3">
-                                    <SkeletonLoader variant="circle" width="w-8" height="h-8" />
-                                    <div className="space-y-1">
-                                        <SkeletonLoader width="w-24" height="h-3" />
-                                        <SkeletonLoader width="w-32" height="h-2" />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        members.map(member => {
-                            const location = userLocations[member.profiles.id]
-                            const hasLocation = !!location
-
-                            return (
-                                <div
-                                    key={member.id}
-                                    className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                            {member.profiles.display_name?.charAt(0).toUpperCase() || member.profiles.email?.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <div className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
-                                                {member.profiles.display_name || member.profiles.email.split('@')[0]}
-                                                {member.role === 'admin' && (
-                                                    <Crown className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                                                )}
-                                            </div>
-                                            <div className="text-[10px] text-gray-500 truncate max-w-[120px]">
-                                                {member.profiles.email}
-                                            </div>
-                                            {hasLocation && isWakeUpWindow && (
-                                                <a
-                                                    href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="mt-1 flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-800 font-medium"
-                                                >
-                                                    <MapPin className="h-3 w-3" />
-                                                    <span>Live: {new Date(location.timestamp?.toDate ? location.timestamp.toDate() : location.device_timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
-                                    {hasLocation && isWakeUpWindow && (
-                                        <a
-                                            href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                                            title="Navigate to member"
-                                        >
-                                            <Navigation className="h-4 w-4" />
-                                        </a>
-                                    )}
-                                </div>
-                            )
-                        })
-                    )}
-                </div>
-            </div>
-        </div>
-    )
 
     const handleSaveGroupName = async () => {
         if (!groupId || !newGroupName.trim()) return
@@ -296,10 +207,9 @@ export default function GroupDetail() {
 
 
     return (
-        <DashboardLayout rightSidebar={rightSidebar}>
+        <DashboardLayout>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-4 px-4 md:px-6 mb-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50"></div>
-
                 <div className="relative z-10">
                     <div>
                         <div className="flex md:flex-row flex-col md:items-center gap-3 mb-2">
@@ -388,7 +298,7 @@ export default function GroupDetail() {
                                 </div>
 
                                 <span className="px-3 py-1 w-fit bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
-                                    {group.member_count || 0} {group.member_count === 1 ? 'Member' : 'Members'}
+                                    {members.length} {members.length === 1 ? 'Member' : 'Members'}
                                 </span>
                             </div>
                             <GroupActions />
