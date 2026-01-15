@@ -14,7 +14,7 @@ export default function VerifyEmail() {
     const [message, setMessage] = useState('')
     const navigate = useNavigate()
 
-    const { currentUser } = useAuth() // Get current user
+    const { currentUser, logout } = useAuth() // Get current user and logout function
 
     useEffect(() => {
         if (token) {
@@ -94,12 +94,13 @@ export default function VerifyEmail() {
         <AuthWrapper
             title={status === 'success' ? "Verification Successful" : status === 'error' ? "Verification Failed" : "Verifying Email"}
             subtitle={message || "Please wait while we verify your account..."}
+            bottomTitle="Need help?"
+            bottomsubTitle="Login"
         >
             <div className="text-center">
                 {status === 'verifying' && (
                     <div className="flex flex-col items-center">
                         <Loader2 className="w-16 h-16 text-primary animate-spin mb-4" />
-                        <p className="text-gray-600">Verifying your token...</p>
                     </div>
                 )}
 
@@ -108,10 +109,21 @@ export default function VerifyEmail() {
                         <div className="bg-primary/10 p-4 rounded-full mb-4">
                             <Loader2 className="w-12 h-12 text-primary animate-pulse" />
                         </div>
-                        <p className="text-gray-600 text-center max-w-sm mb-6">{message}</p>
 
-                        <div className="text-sm text-gray-400">
-                            Didn't receive it? Check your spam folder.
+                        <div className="flex flex-col gap-4 w-full">
+                            <div className="text-sm text-gray-400">
+                                Didn't receive it? Check your spam folder.
+                            </div>
+
+                            <button
+                                onClick={() => {
+                                    logout()
+                                    navigate('/signup')
+                                }}
+                                className="text-primary hover:underline font-medium cursor-pointer"
+                            >
+                                Sign out and use a different email
+                            </button>
                         </div>
                     </div>
                 )}
@@ -119,11 +131,12 @@ export default function VerifyEmail() {
                 {status === 'success' && (
                     <div className="flex flex-col items-center">
                         <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+                        <p className="text-gray-600 mb-6">You will be redirected shortly...</p>
                         <button
-                            className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition"
                             onClick={() => navigate('/login')}
                         >
-                            Login
+                            Login Now
                         </button>
                     </div>
                 )}
@@ -132,10 +145,10 @@ export default function VerifyEmail() {
                     <div className="flex flex-col items-center">
                         <XCircle className="w-16 h-16 text-red-500 mb-4" />
                         <button
-                            className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition"
                             onClick={() => navigate('/login')}
                         >
-                            Login
+                            Back to Login
                         </button>
                     </div>
                 )}

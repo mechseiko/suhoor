@@ -35,6 +35,11 @@ export default function Signup() {
             return setError('Password must be at least 6 characters')
         }
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return setError('Please enter a valid email address')
+        }
+
         setLoading(true)
 
         try {
@@ -55,6 +60,7 @@ export default function Signup() {
 
             // 2. Store verification record in Firestore
             await addDoc(collection(db, 'email_verifications'), {
+                uid: user.uid,
                 email: email,
                 token: token,
                 createdAt: serverTimestamp(),
@@ -75,7 +81,7 @@ export default function Signup() {
                 link: window.location.origin
             }
             await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID)
-            navigate('/dashboard')
+            navigate('/verify-email')
         } catch (err) {
             console.error('Signup Error:', err)
             setError('Failed to create account. Email may already be in use.')

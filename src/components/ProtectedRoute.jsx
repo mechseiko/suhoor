@@ -17,8 +17,10 @@ export default function ProtectedRoute({ children }) {
         return <Navigate to="/login" />
     }
 
-    // If logged in but not verified, we no longer enforce redirect.
-    // The VerificationBanner in DashboardLayout will handle user notification.
+    // Strictly block unverified users from accessing the dashboard/protected routes
+    if (userProfile && !userProfile.isVerified) {
+        return <Navigate to="/verify-email" />
+    }
 
     return children;
 }

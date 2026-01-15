@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Capacitor } from '@capacitor/core';
 import { useNative } from '../hooks/useNative';
 
 export default function AuthWrapper({ children, title, subtitle, error, bottomTitle, bottomsubTitle }) {

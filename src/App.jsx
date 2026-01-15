@@ -18,7 +18,6 @@ import ResetPassword from './pages/ResetPassword'
 import ForgotPassword from './pages/ForgotPassword'
 import VerifyEmail from './pages/VerifyEmail'
 import ScrollToTop from './components/ScrollToTop'
-
 import About from './pages/About'
 import { useAuth } from './context/AuthContext'
 import Groups from './pages/Groups'
