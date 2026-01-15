@@ -24,6 +24,7 @@
     "@ionic/utils-subprocess": "^3.0.1",
     "chart.js": "^4.5.1",
     "cors": "^2.8.5",
+    "cross-spawn": "^7.0.6",
     "dotenv": "^17.2.3",
     "emailjs-com": "^3.2.0",
     "express": "^5.2.1",

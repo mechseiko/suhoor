@@ -8,7 +8,6 @@ export default function DownloadApp() {
     const isNative = useNative()
     const isCapacitor = Capacitor.isNativePlatform()
     const [isMobile, setIsMobile] = useState(false)
-
     const [isDownloading, setIsDownloading] = useState(false)
 
     useEffect(() => {
@@ -64,7 +63,7 @@ export default function DownloadApp() {
                     </div>
 
                     <p className="mt-8 text-sm text-blue-200/80">
-                        *Requires Android 8.0 or higher. Installation instructions included.
+                        *Works on Android & iOS. No store download required.
                     </p>
                 </motion.div>
             </div>
