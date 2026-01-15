@@ -1,51 +1,7 @@
 import { Download } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react';
 
 export default function DownloadApp() {
-    const [deferredPrompt, setDeferredPrompt] = useState(null);
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        const beforeInstallHandler = (e) => {
-            e.preventDefault();
-            setDeferredPrompt(e);
-            setIsVisible(true);
-        };
-
-        const installedHandler = () => {
-            console.log('PWA installed');
-            setIsVisible(false);
-        };
-
-        window.addEventListener('beforeinstallprompt', beforeInstallHandler);
-        window.addEventListener('appinstalled', installedHandler);
-
-        return () => {
-            window.removeEventListener('beforeinstallprompt', beforeInstallHandler);
-            window.removeEventListener('appinstalled', installedHandler);
-        };
-    }, []);
-
-
-    const installApp = async (e) => {
-        e.preventDefault();
-        if (!deferredPrompt) return;
-
-        const { outcome } = await
-            deferredPrompt.prompt();
-
-        if (outcome === 'accepted') {
-            console.log('PWA installed!');
-            setIsVisible(false)
-        } else {
-            console.log('Installation dismissed')
-        }
-        setDeferredPrompt(null)
-    }
-
-    if (!isVisible) return null;
-
     return (
         <section className="bg-gradient-to-r from-primary to-primary/90 rounded-lg md:py-18 py-16 relative overflow-hidden">
             {/* Background Pattern */}
@@ -63,22 +19,23 @@ export default function DownloadApp() {
                         Download the App
                     </h2>
                     <p className="text-lg text-blue-100 mb-10 leading-relaxed">
-                        Download the app, enable <span className="font-bold text-white">Smart Alarms</span>.
+                        Download the Suhoor app for Android to enable <span className="font-bold text-white">Smart Alarms</span>.
                         We'll wake you up, even if the app is closed, or your phone is dead.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button
+                        <a
+                            href="/suhoor.apk"
+                            download="Suhoor.apk"
                             className="w-fit cursor-pointer sm:w-auto px-4 py-2 bg-white text-primary rounded-xl font-bold text-lg hover:shadow-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-3 group"
-                            onClick={installApp}
                         >
                             <Download className="h-6 w-6 group-hover:-translate-y-1 transition-transform" />
-                            <span>Download Apk</span>
-                        </button>
+                            <span>Download APK</span>
+                        </a>
 
                         <div className="flex items-center gap-2 text-blue-100 text-sm px-4">
                             <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse"></div>
-                            <span>v1.0.0 (Direct Download)</span>
+                            <span>v1.0.0 (Latest Build)</span>
                         </div>
                     </div>
 

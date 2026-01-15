@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import AuthWrapper from '../components/AuthWrapper'
+import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore'
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
@@ -13,14 +14,20 @@ export default function VerifyEmail() {
     const [message, setMessage] = useState('')
     const navigate = useNavigate()
 
+    const { currentUser } = useAuth() // Get current user
+
     useEffect(() => {
         if (token) {
             verifyToken()
+        } else if (currentUser) {
+            // User just signed up or was redirected here because they are not verified
+            setStatus('sent')
+            setMessage(`We've sent a verification link to ${currentUser.email}. Please check your inbox and click the link to verify your account.`)
         } else {
             setStatus('error')
             setMessage('Invalid verification link.')
         }
-    }, [token])
+    }, [token, currentUser])
 
     const verifyToken = async () => {
         try {
@@ -93,6 +100,19 @@ export default function VerifyEmail() {
                     <div className="flex flex-col items-center">
                         <Loader2 className="w-16 h-16 text-primary animate-spin mb-4" />
                         <p className="text-gray-600">Verifying your token...</p>
+                    </div>
+                )}
+
+                {status === 'sent' && (
+                    <div className="flex flex-col items-center">
+                        <div className="bg-primary/10 p-4 rounded-full mb-4">
+                            <Loader2 className="w-12 h-12 text-primary animate-pulse" />
+                        </div>
+                        <p className="text-gray-600 text-center max-w-sm mb-6">{message}</p>
+
+                        <div className="text-sm text-gray-400">
+                            Didn't receive it? Check your spam folder.
+                        </div>
                     </div>
                 )}
 

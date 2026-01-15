@@ -6,16 +6,16 @@ import SectionHeader from '../components/SectionHeader'
 export default function About() {
     const { currentUser } = useAuth()
 
-    return(
-         <div className="max-w-7xl mx-auto md:pt-15 pt-12 pb-8 md:px-4 px-2 mt-5">
+    return (
+        <div className="max-w-7xl mx-auto md:pt-15 pt-12 pb-8 md:px-4 px-2 mt-5">
             <div>
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
                         <Moon className="h-8 w-8 text-primary" />
                     </div>
                     <SectionHeader
-                    title="Waking the Ummah for Suhoor"
-                    subtitle="Suhoor is more than just an app, it's a spiritual companion designed to ensure you never miss the blessed meal. Connect with loved ones, wake each other up, and share the blessings of Fasting."
+                        title="Waking the Ummah for Suhoor"
+                        subtitle="Suhoor is more than just an app, it's a spiritual companion designed to ensure you never miss the blessed meal. Connect with loved ones, wake each other up, and share the blessings of Fasting."
                     />
                 </div><div className='text-center'>{!currentUser && (
                     <Link to="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-2xl hover:opacity/90 transition-all font-semibold shadow-lg shadow-blue-200 md:mb-10 mb-8">
@@ -23,7 +23,7 @@ export default function About() {
                     </Link>
                 )}</div>
 
-                
+
             </div>
 
             <div className="bg-white py-10 p-2 rounded-lg md:rounded-b-lg rounded-b-full border-y border-gray-50">
@@ -31,9 +31,8 @@ export default function About() {
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6">
                             <h2 className="text-3xl font-bold text-gray-900">The Mission</h2>
-                            <p className="text-gray-600 leading-loose">
-                                We realized that waking up for Suhoor alone can be difficult, and traditional alarms are easy to snooze. Suhoor revives the Sunnah of communal waking, allowing groups of friends and families to hold each other accountable.
-                            </p>
+                            We realized that waking up for Suhoor alone can be difficult, and traditional alarms are easy to snooze. Suhoor revives the Sunnah of communal waking, allowing groups of friends and families to hold each other accountable with persistent, looping alarms that ensure everyone is awake.
+
                             <p className="text-gray-600 leading-loose">
                                 Our goal is to leverage technology to strengthen spiritual bonds, ensuring that every Muslim can maximize the blessings of their fasting days starting with a nourishing Suhoor.
                             </p>

@@ -1,42 +1,60 @@
-import { Moon, Sun, Heart, Hand } from 'lucide-react'
+import { Moon, Sun, Heart, Hand, Sparkles, Users } from 'lucide-react'
 import SectionHeader from '../components/SectionHeader'
 import { useAuth } from '../context/AuthContext'
 import DashboardLayout from '../layouts/DashboardLayout'
 
 export const duas = [
-        {
-            title: "Intention for Suhoor",
-            arabic: "وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ",
-            transliteration: "Wa bisawmi ghadin nawaiytu min shahri Ramadan",
-            translation: "I intend to keep the fast for tomorrow in the month of Ramadan.",
-            icon: Moon,
-            color: "text-blue-600",
-            bg: "bg-blue-50"
-        },
-        {
-            title: "Dua for Breaking Fast",
-            arabic: "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ",
-            transliteration: "Dhahaba adh-dhama'u wabtallatil 'urooqu wa thabatal ajru in sha Allah",
-            translation: "The thirst is gone, the veins are moistened, and the reward is confirmed, if Allah wills.",
-            icon: Sun,
-            color: "text-orange-600",
-            bg: "bg-orange-50"
-        },
-        {
-            title: "Dua for Lailatul Qadr",
-            arabic: "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
-            transliteration: "Allahumma innaka 'afuwwun tuhibbul 'afwa fa'fu 'anni",
-            translation: "O Allah, You are Forgiving and love forgiveness, so forgive me.",
-            icon: Heart,
-            color: "text-purple-600",
-            bg: "bg-purple-50"
-        }
-    ]
+    {
+        title: "Intention for Suhoor",
+        arabic: "وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ",
+        transliteration: "Wa bisawmi ghadin nawaiytu min shahri Ramadan",
+        translation: "I intend to keep the fast for tomorrow in the month of Ramadan.",
+        icon: Moon,
+        color: "text-blue-600",
+        bg: "bg-blue-50"
+    },
+    {
+        title: "Dua for Breaking Fast",
+        arabic: "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ",
+        transliteration: "Dhahaba adh-dhama'u wabtallatil 'urooqu wa thabatal ajru in sha Allah",
+        translation: "The thirst is gone, the veins are moistened, and the reward is confirmed, if Allah wills.",
+        icon: Sun,
+        color: "text-orange-600",
+        bg: "bg-orange-50"
+    },
+    {
+        title: "Dua for Lailatul Qadr",
+        arabic: "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
+        transliteration: "Allahumma innaka 'afuwwun tuhibbul 'afwa fa'fu 'anni",
+        translation: "O Allah, You are Forgiving and love forgiveness, so forgive me.",
+        icon: Heart,
+        color: "text-purple-600",
+        bg: "bg-purple-50"
+    },
+    {
+        title: "Dua for Goodness",
+        arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+        transliteration: "Rabbana atina fid-dunya hasanatan wa fil 'akhirati hasanatan waqina 'adhaban-nar",
+        translation: "Our Lord! Give us in this world that which is good and in the Hereafter that which is good, and save us from the torment of the Fire.",
+        icon: Sparkles,
+        color: "text-indigo-600",
+        bg: "bg-indigo-50"
+    },
+    {
+        title: "Dua for Parents",
+        arabic: "رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
+        transliteration: "Rabbi irhamhuma kama rabbayani saghira",
+        translation: "My Lord, have mercy upon them as they brought me up [when I was] small.",
+        icon: Users,
+        color: "text-teal-600",
+        bg: "bg-teal-50"
+    }
+]
 
 export default function Duas() {
     const { currentUser } = useAuth()
     const content = (
-    <div className={`${currentUser ? '' : 'md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
+        <div className={`${currentUser ? '' : 'md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
             <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full">
                     <Hand className="h-8 w-8 text-primary" />

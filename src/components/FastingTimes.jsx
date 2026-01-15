@@ -18,7 +18,6 @@ export default function FastingTimes() {
       const parsed = JSON.parse(cached)
       const today = new Date().toISOString().split('T')[0]
 
-      // Invalidate cache if it's from a different day
       if (parsed.date !== today) {
         localStorage.removeItem('suhoor_fasting_times')
         return null
@@ -83,7 +82,6 @@ export default function FastingTimes() {
 
         setFastingData(fastingData);
 
-        // Cache with timestamp and date
         localStorage.setItem('suhoor_fasting_times', JSON.stringify({
           data: fastingData,
           date: today,
@@ -101,7 +99,7 @@ export default function FastingTimes() {
   useEffect(() => {
     if (!location.loaded) return;
     if (!location.coordinates.lat || !location.coordinates.lng) return;
-    if (fastingData) return; // Don't fetch if we have valid cached data
+    if (fastingData) return;
 
     fetchFastingTimes();
   }, [location.loaded, location.coordinates.lat, location.coordinates.lng]);
@@ -132,10 +130,7 @@ export default function FastingTimes() {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden md:p-6 p-3">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-2">
-          <Moon className="h-6 w-6 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Today's Fasting Times</h3>
-        </div>
+        <h3 className="text-lg font-semibold text-gray-800">Today's Fasting Times</h3>
         <button
           onClick={handleRefresh}
           disabled={refreshing}

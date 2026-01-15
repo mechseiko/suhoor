@@ -48,6 +48,14 @@ export default function Books() {
     const [mainTitle, subTitle] = book.title.split(' - ');
     const tags = [subTitle].filter(Boolean);
 
+    const openBook = async (url) => {
+      import('@capacitor/browser').then(async ({ Browser }) => {
+        await Browser.open({ url });
+      }).catch(() => {
+        window.open(url, '_blank');
+      });
+    };
+
     return (
       <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-5 border border-gray-100 flex flex-col h-full">
         <div className="flex items-start gap-4 mb-4">
@@ -81,15 +89,13 @@ export default function Books() {
             <p className="text-xs text-gray-500 mb-3">{book.pages} pages</p>
           )}
           <div className="flex gap-2">
-            <a
-              href={book.file}
-              className="flex-1 text-sm px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => openBook(book.file)}
+              className="flex-1 text-sm px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <BookOpen size={16} />
               Read
-            </a>
+            </button>
             <a
               href={book.file}
               download

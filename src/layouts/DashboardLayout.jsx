@@ -12,7 +12,8 @@ import {
     Hand,
     Search,
     Moon,
-    ArrowLeft
+    ArrowLeft,
+    Settings as SettingsIcon
 } from 'lucide-react'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../config/firebase'
@@ -28,34 +29,8 @@ export default function DashboardLayout({
     setShowCreateModal,
     pageTitle
 }) {
-    const { currentUser, logout } = useAuth()
-    const [isVerified, setIsVerified] = useState(false)
-    useEffect(() => {
-        const checkVerification = async () => {
-            if (!currentUser) return
-
-            if (currentUser.emailVerified) {
-                setIsVerified(true)
-                return
-            }
-
-            try {
-                const userRef = doc(db, 'profiles', currentUser.uid)
-                const userSnap = await getDoc(userRef)
-
-                if (userSnap.exists() && userSnap.data().isVerified) {
-                    setIsVerified(true)
-                } else {
-                    setIsVerified(false)
-                }
-            } catch (err) {
-                console.error('Error checking verification status:', err)
-                setIsVerified(false)
-            }
-        }
-
-        checkVerification()
-    }, [currentUser])
+    const { currentUser, logout, userProfile } = useAuth()
+    const isVerified = userProfile?.isVerified || false;
 
     const navigate = useNavigate()
     const location = useLocation()
@@ -131,6 +106,12 @@ export default function DashboardLayout({
             label: 'Profile',
             onClick: () => navigate('/profile'),
             active: location.pathname === '/profile'
+        },
+        {
+            icon: SettingsIcon,
+            label: 'Settings',
+            onClick: () => navigate('/settings'),
+            active: location.pathname === '/settings'
         },
     ]
 
@@ -245,8 +226,8 @@ export default function DashboardLayout({
                     {getPageTitle() !== '' &&
                         <div className="sticky top-[58px] lg:top-0 z-30 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200/50">
                             <div className='md:flex items-center justify-between px-4 md:px-8 py-3'>
-                                <div className='flex gap-1 items-center'>
-                                    <ArrowLeft className={`${!['/dashboard'].includes(location.pathname) ? '' : 'hidden'} cursor-pointer pl-2 size-6 text-gray-400`} title="Go Back" onClick={() => navigate(-1)} />
+                                <div className='flex gap-2 items-center'>
+                                    <ArrowLeft className={`${!['/dashboard'].includes(location.pathname) ? '' : 'hidden'} cursor-pointer pl-2 size-6 text-gray-500`} title="Back" onClick={() => navigate(-1)} />
                                     <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
                                 </div>
                                 <div className='hidden md:flex items-center gap-3'>

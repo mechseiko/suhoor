@@ -95,16 +95,39 @@ export default function Dashboard() {
     const [chartData, setChartData] = useState({
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         datasets: [{
+            label: 'Fasting Days',
+            data: new Array(12).fill(0),
+            borderColor: '#10B981', // Green
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#10B981',
+            pointBorderColor: '#fff',
+        }, {
+            label: 'My Activity',
+            data: new Array(12).fill(0),
+            borderColor: '#8B5CF6', // Purple
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#8B5CF6',
+            pointBorderColor: '#fff',
+            hidden: true
+        }, {
             label: 'Groups Created',
             data: new Array(12).fill(0),
-            borderColor: '#200bc1aa',
+            borderColor: '#3B82F6', // Blue
             backgroundColor: 'transparent',
-            borderWidth: 1,
-            tension: 0.5,
-            pointRadius: 5,
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
             pointHoverRadius: 6,
-            pointBackgroundColor: '#200bc1ff',
-            pointBorderColor: '#30C10B17',
+            pointBackgroundColor: '#3B82F6',
+            pointBorderColor: '#fff',
         }]
     })
 
@@ -162,19 +185,24 @@ export default function Dashboard() {
             datasets: [
                 {
                     ...prev.datasets[0],
-                    data: creationCounts
+                    // Preserve existing fasting data
                 },
                 {
-                    label: 'My Activity',
-                    data: activityCounts,
-                    borderColor: '#10B981',
+                    ...prev.datasets[1],
+                    data: activityCounts, // My Activity (Purple)
+                    hidden: false
+                },
+                {
+                    label: 'Groups Created',
+                    data: creationCounts,
+                    borderColor: '#3B82F6', // Blue
                     backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    tension: 0.5,
-                    pointRadius: 5,
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 4,
                     pointHoverRadius: 6,
-                    pointBackgroundColor: '#10B981',
-                    pointBorderColor: '#ECFDF5',
+                    pointBackgroundColor: '#3B82F6',
+                    pointBorderColor: '#fff',
                 }
             ]
         }))
@@ -210,6 +238,105 @@ export default function Dashboard() {
         }
     }
 
+    const fetchFastingStats = async () => {
+        try {
+            const fastingRef = collection(db, 'daily_fasting_status')
+            const q = query(fastingRef, where('userId', '==', currentUser.uid))
+            const querySnapshot = await getDocs(q)
+
+            const fastingLogs = []
+            querySnapshot.forEach((doc) => {
+                fastingLogs.push(doc.data())
+            })
+
+            // Calculate active streak
+            // Sort by date descending
+            fastingLogs.sort((a, b) => new Date(b.date) - new Date(a.date))
+
+            let streak = 0
+            const today = new Date().toISOString().split('T')[0]
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+
+            // Check if fasted today or yesterday to start streak
+            // Simple logic: consecutive days where wantsToFast is true
+            // If they haven't answered for today yet, streak continues from yesterday?
+            // Let's count consecutive "true" entries from top.
+
+            // Re-sort ascending to build calendar or descending for streak?
+            // Descending is easier for "current" streak.
+
+            // Filter only true values? No, a 'false' breaks streak.
+
+            // This is complex because dates might be missing.
+            // Simplified: Count most recent consecutive block of dates.
+
+            let currentCheckDate = new Date()
+            let streakCount = 0
+            let keepChecking = true
+
+            // Map dates to status
+            const dateMap = {}
+            fastingLogs.forEach(log => {
+                dateMap[log.date] = log.wantsToFast
+            })
+
+            while (keepChecking) {
+                const dateStr = currentCheckDate.toISOString().split('T')[0]
+                if (dateMap[dateStr] === true) {
+                    streakCount++
+                    currentCheckDate.setDate(currentCheckDate.getDate() - 1)
+                } else if (dateMap[dateStr] === false) {
+                    keepChecking = false
+                } else {
+                    // Entry missing.
+                    // If it's TODAY and missing, we check YESTERDAY.
+                    // If it's older than today and missing, streak breaks.
+                    if (dateStr === today) {
+                        currentCheckDate.setDate(currentCheckDate.getDate() - 1)
+                    } else {
+                        keepChecking = false
+                    }
+                }
+            }
+
+            // Update Graph Data (Monthly Fasting Count)
+            const fastingCounts = new Array(12).fill(0)
+            fastingLogs.forEach(log => {
+                if (log.wantsToFast) {
+                    const date = new Date(log.date)
+                    if (!isNaN(date.getTime())) {
+                        fastingCounts[date.getMonth()]++
+                    }
+                }
+            })
+
+            setChartData(prev => ({
+                ...prev,
+                datasets: [
+                    {
+                        ...prev.datasets[0],
+                        label: 'Fasting Days',
+                        data: fastingCounts,
+                        borderColor: '#10B981',
+                        pointBackgroundColor: '#10B981',
+                    },
+                    {
+                        ...prev.datasets[1]
+                    },
+                    {
+                        ...prev.datasets[2]
+                    }
+                ]
+            }))
+
+            return streakCount
+
+        } catch (err) {
+            console.error("Error fetching fasting stats:", err)
+            return 0
+        }
+    }
+
     const fetchGroups = async () => {
         try {
             const membersRef = collection(db, 'group_members')
@@ -241,10 +368,14 @@ export default function Dashboard() {
             localStorage.setItem(`suhoor_groups_${currentUser.uid}`, JSON.stringify(groupsData))
 
             const totalMembers = groupsData.reduce((sum, group) => sum + (group.member_count || 0), 0)
+
+            // Integrate Fasting Stats
+            const streak = await fetchFastingStats()
+
             const newStats = {
                 totalGroups: groupsData.length,
                 totalMembers: totalMembers,
-                activeToday: groupsData.filter(g => g.last_activity === new Date().toISOString().split('T')[0]).length
+                activeToday: streak // Re-purposing this field name or mapping it in UI
             }
             setStats(newStats)
             localStorage.setItem(`suhoor_stats_${currentUser.uid}`, JSON.stringify(newStats))
@@ -293,9 +424,9 @@ export default function Dashboard() {
                         />
                         <StatsCard
                             icon={Award}
-                            title="Active Today"
+                            title="Fasting Streak"
                             value={stats.activeToday}
-                            subtitle="Recent activity"
+                            subtitle="Consecutive Days"
                             color="purple"
                             loading={loading}
                         />
@@ -305,9 +436,9 @@ export default function Dashboard() {
                         <div className="flex items-center space-x-2 mb-4">
                             <Users size="24" color="#2F3437" />
                             <div>
-                                <h4 className="font-medium text-[#2F3437]">Stats</h4>
+                                <h4 className="font-medium text-[#2F3437]">Fasting History</h4>
                                 <p className="text-[#919BA1] leading-6 text-[14px]">
-                                    Monthly overview of your activities
+                                    Your fasting consistency over the year
                                 </p>
                             </div>
                         </div>

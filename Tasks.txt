@@ -29,11 +29,20 @@
     Also note that this buzz alarm cant be snoozeed and will comeagain 5 minutes after the person is awake just to check if the personson is 
     truely awake.
 
+    so basically , the flexibility of the capacitor app in mobile is that 
+    it can sound alarms, give notifications, i mean real notifications
+    suhorr want to have access to run in thr background e.t.c
+    and buzz alarms, when your friends in the group are trying to wake you up
+    in the end, the group details page is propaply going to be a bit more complex than that
+    maybe in pwa of maybe in desktop too
+
+
 
 2. As for the mobile app, when i installed the app from the chrome website
 
     I think it instaleled a pwa even to my android phoneso that means that we need to remove the pwa feature completely and 
     and make the capacitor app work on both android and ios
+    leave the useNative.js file as it is.
 
 3. Proceed with this plan
     keeping in mind you afre to go on with thius changes alone
@@ -64,3 +73,16 @@
 7. The Figma Pitch deck presentation files
 
 8. Use the app to wake up for suhoor together with Alfa fawaz.
+
+9. The downloadapp section in my lander shows clealry that i'm trying to install a pwa
+it shows if its not already installed
+and dispappers if the person already has the app
+this shouldnt be the case it
+should instead do like tyhat for my capacitor app
+
+
+10. The activity box in the dashboard should immediately adapt to this changes if required
+
+11. On going to the dashboard(if a  users account is already verified, it firsly load the verificationbanner for about half a second)
+the same is for the peofile page , it firstly brings 'not verifired' then verified, if the user was actually verified
+same thing is for the lander of the app in app.jsx, for  anative app, it firstly brings the landing page for about 0.5s

@@ -15,8 +15,104 @@ import Loader from '../components/Loader'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useSocket } from '../context/SocketContext'
 import { useFastingTimes } from '../hooks/useFastingTimes'
+import { useAuth } from '../context/AuthContext'
+import { setDoc, serverTimestamp } from 'firebase/firestore' // Add these imports
+
+const FastingPrompt = ({ groupId, currentUser }) => {
+    const [status, setStatus] = useState(null) // null, 'yes', 'no'
+    const [loading, setLoading] = useState(true)
+
+    // Calculate "Tomorrow" date string YYYY-MM-DD
+    // "A day before" logic: If it's after 12 PM today, we are asking about tomorrow?
+    // User requested: "A day before... prompt... if yes: it will show to all group members"
+    // Let's assume we prompt for the *upcoming* Suhoor.
+    // If it's 8 PM, upcoming Suhoor is tomorrow morning.
+    // If it's 2 AM, upcoming Suhoor is ... today morning? No, user says "fast tomorrow".
+    // Let's settle on: We always ask for the NEXT Fajr date.
+
+    // For simplicity, let's just use local date + 1 day if it's PM, or today if it's AM (before Fajr).
+    // Actually, safest is to just ask "Are you fasting for [Date]?"
+
+    // Let's perform a check for existing entry for "tomorrow".
+
+    const getTomorrowDate = () => {
+        const d = new Date()
+        d.setDate(d.getDate() + 1)
+        return d.toISOString().split('T')[0]
+    }
+
+    const targetDate = getTomorrowDate()
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            try {
+                const docRef = doc(db, 'daily_fasting_status', `${groupId}_${currentUser.uid}_${targetDate}`)
+                const docSnap = await getDoc(docRef)
+
+                if (docSnap.exists()) {
+                    setStatus(docSnap.data().wantsToFast ? 'yes' : 'no')
+                }
+            } catch (e) {
+                console.error("Error checking fasting status", e)
+            } finally {
+                setLoading(false)
+            }
+        }
+        checkStatus()
+    }, [groupId, currentUser, targetDate])
+
+    const handleResponse = async (response) => { // response: boolean
+        try {
+            setStatus(response ? 'yes' : 'no')
+            const docRef = doc(db, 'daily_fasting_status', `${groupId}_${currentUser.uid}_${targetDate}`)
+            await setDoc(docRef, {
+                userId: currentUser.uid,
+                groupId,
+                date: targetDate, // Store as string YYYY-MM-DD
+                wantsToFast: response,
+                updatedAt: serverTimestamp()
+            })
+            // Default assumes true if no response, but here we explicitly set it.
+        } catch (e) {
+            console.error("Error saving fasting status", e)
+        }
+    }
+
+    if (loading) return null
+    if (status !== null) return null // Already answered
+
+    return (
+        <div className="mb-6 bg-gradient-to-r from-indigo-50 to-blue-50 border border-blue-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4">
+            <div className="flex items-center gap-3">
+                <div className="p-2 bg-white rounded-full shadow-sm text-indigo-600">
+                    <span className="text-xl">🌙</span>
+                </div>
+                <div>
+                    <h3 className="font-bold text-gray-900">Suhoor for Tomorrow?</h3>
+                    <p className="text-sm text-gray-600">Are you planning to fast on <span className="font-semibold">{targetDate}</span>?</p>
+                </div>
+            </div>
+
+            <div className="flex md:gap-3 gap-5 justify-between">
+                <button
+                    onClick={() => handleResponse(false)}
+                    className="px-4 py-2 bg-white text-gray-600 font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                    No, I'm not
+                </button>
+                <button
+                    onClick={() => handleResponse(true)}
+                    className="px-4 py-2 bg-primary text-white font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                    Yes, Insha'Allah
+                </button>
+            </div>
+        </div>
+    )
+}
 
 export default function GroupDetail() {
+    const { currentUser } = useAuth()
     const { groupId } = useParams()
     const navigate = useNavigate()
     const [group, setGroup] = useState(() => {
@@ -211,56 +307,57 @@ export default function GroupDetail() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-4 px-4 md:px-6 mb-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50"></div>
                 <div className="relative z-10">
+                    <FastingPrompt groupId={groupId} currentUser={currentUser} />
                     <div>
                         <div className="flex md:flex-row flex-col md:items-center gap-3 mb-2">
                             <h1 className="md:text-2xl text-xl flex items-center gap-2 font-bold text-gray-900">
                                 {isEditingName ? (
                                     <>
-                                    <input
-                                        autoFocus
-                                        value={newGroupName}
-                                        onChange={(e) => setNewGroupName(e.target.value)}
-                                        onKeyDown={(e) => {
-                                        if (e.key === 'Enter') handleSaveGroupName()
-                                        if (e.key === 'Escape') {
-                                            setIsEditingName(false)
-                                            setNewGroupName(group?.name || '')
-                                        }
-                                        }}
-                                        className="border border-gray-300 rounded px-2 py-1 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-primary"
-                                    />
-                                    <button
-                                        disabled={savingName}
-                                        onClick={handleSaveGroupName}
-                                        className="text-xs px-2 py-1 cursor-pointer rounded bg-primary text-white hover:opacity-90 disabled:opacity-60"
-                                    >
-                                        {savingName ? 'Saving...' : 'Save'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                        setIsEditingName(false)
-                                        setNewGroupName(group?.name || '')
-                                        }}
-                                        className="text-xs px-2 py-1 cursor-pointer rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                    >
-                                        Cancel
-                                    </button>
+                                        <input
+                                            autoFocus
+                                            value={newGroupName}
+                                            onChange={(e) => setNewGroupName(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleSaveGroupName()
+                                                if (e.key === 'Escape') {
+                                                    setIsEditingName(false)
+                                                    setNewGroupName(group?.name || '')
+                                                }
+                                            }}
+                                            className="border border-gray-300 rounded px-2 py-1 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                        <button
+                                            disabled={savingName}
+                                            onClick={handleSaveGroupName}
+                                            className="text-xs px-2 py-1 cursor-pointer rounded bg-primary text-white hover:opacity-90 disabled:opacity-60"
+                                        >
+                                            {savingName ? 'Saving...' : 'Save'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsEditingName(false)
+                                                setNewGroupName(group?.name || '')
+                                            }}
+                                            className="text-xs px-2 py-1 cursor-pointer rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                        >
+                                            Cancel
+                                        </button>
                                     </>
                                 ) : (
                                     <>
-                                    <span>{group?.name}</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                        setIsEditingName(true)
-                                        setNewGroupName(group?.name || '')
-                                        }}
-                                        className="text-primary cursor-pointer mb-3"
-                                        title="Edit Group Name"
-                                    >
-                                        <Edit size={12} />
-                                    </button>
+                                        <span>{group?.name}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsEditingName(true)
+                                                setNewGroupName(group?.name || '')
+                                            }}
+                                            className="text-primary cursor-pointer mb-3"
+                                            title="Edit Group Name"
+                                        >
+                                            <Edit size={12} />
+                                        </button>
                                     </>
                                 )}
                             </h1>
