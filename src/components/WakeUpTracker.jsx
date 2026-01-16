@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Bell, CheckCircle, Volume2, VolumeX, MapPin } from 'lucide-react'
+import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2 } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { useAuth } from '../context/AuthContext'
@@ -7,11 +7,11 @@ import { useSocket } from '../context/SocketContext'
 import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useLocationTracking } from '../hooks/useLocationTracking'
 import { db } from '../config/firebase'
-import { collection, query, where, getDocs, addDoc, doc, getDoc } from 'firebase/firestore'
+import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } from 'firebase/firestore'
 // GroupAnalytics removed
 import { Users, Crown } from 'lucide-react'
 
-export default function WakeUpTracker({ groupId, members }) {
+export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
     // Create a map to store unique members, prioritizing admins
     const uniqueMembersMap = new Map();
     members.forEach(member => {
@@ -55,8 +55,8 @@ export default function WakeUpTracker({ groupId, members }) {
             try {
                 // Try to find status for today's Suhoor date (or tomorrow's if late)
                 // Simplification: Check for the date in todayData
-                const targetDate = todayData.date
-                const docRef = doc(db, 'daily_fasting_status', `${groupId}_${currentUser.uid}_${targetDate}`)
+                const targetDate = todayData.date // This should already be local date string if useFastingTimes is updated
+                const docRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${targetDate}`)
                 const docSnap = await getDoc(docRef)
                 if (docSnap.exists()) {
                     setWantsToFast(docSnap.data().wantsToFast)
@@ -121,7 +121,7 @@ export default function WakeUpTracker({ groupId, members }) {
     // Fetch today's wake-up logs from Firestore
     const fetchTodayLogs = useCallback(async () => {
         try {
-            const today = new Date().toISOString().split('T')[0]
+            const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
 
             const logsRef = collection(db, 'wake_up_logs')
             const q = query(
@@ -293,7 +293,7 @@ export default function WakeUpTracker({ groupId, members }) {
     const handleWakeUp = async () => {
         setLoading(true)
         try {
-            const today = new Date().toISOString().split('T')[0]
+            const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
             const wakeUpTime = new Date().toISOString()
 
             setIsBuzzing(false) // Stop current buzzing
@@ -370,6 +370,20 @@ export default function WakeUpTracker({ groupId, members }) {
             setLoading(false)
         }
     }
+
+    const handleRemoveMember = async (memberId, memberName) => {
+        if (!window.confirm(`Are you sure you want to remove ${memberName} from the group?`)) return
+
+        try {
+            await deleteDoc(doc(db, 'group_members', memberId))
+            onMemberRemoved?.()
+        } catch (err) {
+            console.error('Error removing member:', err)
+            alert('Failed to remove member')
+        }
+    }
+
+    const isCurrentUserAdmin = members.find(m => m.profiles.id === currentUser.uid)?.role === 'admin'
 
     const getWakeUpStatus = userId => {
         return wakeUpLogs.some(log => log.user_id === userId)
@@ -480,6 +494,15 @@ export default function WakeUpTracker({ groupId, members }) {
                                                 >
                                                     <MapPin className="h-4 w-4" />
                                                 </a>
+                                            )}
+                                            {isCurrentUserAdmin && member.profiles.id !== currentUser.uid && (
+                                                <button
+                                                    onClick={() => handleRemoveMember(member.id, member.profiles.display_name || member.profiles.email)}
+                                                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                                    title="Remove Member"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
                                             )}
                                         </div>
                                     </div>

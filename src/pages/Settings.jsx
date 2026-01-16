@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Shield, Moon, ChevronRight, AlertCircle, Mail, Globe, TrendingUp } from 'lucide-react'
+import { Bell, Shield, ChevronRight, Mail, Globe, TrendingUp } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
 
@@ -111,11 +111,11 @@ export default function Settings() {
                 </Section>
 
                 <Section title="Support">
-                    <a href="mailto:suhoor@gmail.com" className="block">
+                    <a href="mailto:suhoorapp@gmail.com" className="block">
                         <SettingItem
                             icon={Mail}
                             label="Contact Support"
-                            description="suhoor@gmail.com"
+                            description="suhoorapp@gmail.com"
                             action={<ChevronRight className="h-5 w-5 text-gray-400" />}
                         />
                     </a>

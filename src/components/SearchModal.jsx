@@ -15,8 +15,7 @@ export default function SearchModal({ onClose }) {
             'Resources': '/books',
             'Duas': '/duas',
             'Profile': '/profile',
-            'Settings': '/settings',
-            'Insights': '/admin'
+            'Settings': '/settings'
         }
         navigate(routes[page] || '/dashboard')
         onClose()

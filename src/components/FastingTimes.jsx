@@ -16,7 +16,7 @@ export default function FastingTimes() {
 
     try {
       const parsed = JSON.parse(cached)
-      const today = new Date().toISOString().split('T')[0]
+      const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
 
       if (parsed.date !== today) {
         localStorage.removeItem('suhoor_fasting_times')
@@ -77,7 +77,7 @@ export default function FastingTimes() {
       const data = await response.json();
 
       if (data.code === 200 && data.data.fasting) {
-        const today = new Date().toISOString().split('T')[0]
+        const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
         const fastingData = { fasting: data.data.fasting }
 
         setFastingData(fastingData);

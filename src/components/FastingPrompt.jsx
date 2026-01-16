@@ -3,7 +3,7 @@ import { Calendar, Check, X, Bell, Loader2, AlertCircle } from 'lucide-react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { db } from '../config/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 
 export default function FastingPrompt() {
@@ -16,7 +16,7 @@ export default function FastingPrompt() {
     useEffect(() => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        const dateStr = tomorrow.toISOString().split('T')[0];
+        const dateStr = tomorrow.toLocaleDateString('en-CA'); // YYYY-MM-DD
         setTomorrowDate(dateStr);
         setTomorrowDisplay(tomorrow.toLocaleDateString('en-US', {
             weekday: 'long',
@@ -73,12 +73,14 @@ export default function FastingPrompt() {
                 });
             }
 
-            // 4. Log to Firebase (Optional, for streak tracking later)
-            await addDoc(collection(db, 'fasting_intentions'), {
-                user_id: currentUser.uid,
+            // 4. Log to Firebase
+            // Using a predictable ID: userId_date
+            const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${tomorrowDate}`);
+            await setDoc(statusRef, {
+                userId: currentUser.uid,
                 date: tomorrowDate,
-                intends_to_fast: true,
-                created_at: serverTimestamp()
+                wantsToFast: true,
+                updatedAt: serverTimestamp()
             });
 
             // 5. Save locally and finish
@@ -96,9 +98,21 @@ export default function FastingPrompt() {
         }
     };
 
-    const handleNo = () => {
-        localStorage.setItem(`suhoor_intent_${tomorrowDate}`, 'no');
-        setStatus('hidden');
+    const handleNo = async () => {
+        try {
+            const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${tomorrowDate}`);
+            await setDoc(statusRef, {
+                userId: currentUser.uid,
+                date: tomorrowDate,
+                wantsToFast: false,
+                updatedAt: serverTimestamp()
+            });
+            localStorage.setItem(`suhoor_intent_${tomorrowDate}`, 'no');
+            setStatus('hidden');
+        } catch (error) {
+            console.error("Error dismissing fasting:", error);
+            setStatus('hidden');
+        }
     };
 
     if (status === 'hidden') return null;
@@ -124,13 +138,13 @@ export default function FastingPrompt() {
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setStatus('confirming_no')}
-                                    className="flex-1 md:flex-none px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl font-bold transition-all border border-white/20 cursor-pointer"
+                                    className="flex-1 md:flex-none px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-lg font-bold transition-all border border-white/20 cursor-pointer"
                                 >
-                                    Not Tomorrow
+                                    No
                                 </button>
                                 <button
                                     onClick={() => setStatus('confirming_yes')}
-                                    className="flex-1 md:flex-none px-8 py-2.5 bg-white text-primary hover:bg-blue-50 rounded-xl font-bold transition-all shadow-lg cursor-pointer"
+                                    className="flex-1 md:flex-none px-4 py-2.5 bg-white text-primary hover:bg-blue-50 rounded-lg font-bold transition-all shadow-lg cursor-pointer"
                                 >
                                     Yes, Insha Allah
                                 </button>

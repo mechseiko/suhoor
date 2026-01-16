@@ -47,10 +47,10 @@ export default function DownloadApp() {
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <a
-                            href={isDownloading ? '#' : '/Suhoor.apk'}
+                            href='/Suhoor.apk'
                             onClick={handleDownload}
-                            download={!isDownloading && "Suhoor.apk"}
-                            className={`w-fit sm:w-auto px-6 py-3 bg-white text-primary rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 group ${isDownloading ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer hover:shadow-xl hover:bg-gray-50'}`}
+                            download="Suhoor.apk"
+                            className={`w-fit sm:w-auto px-6 py-3 bg-white text-primary rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 group ${isDownloading ? 'opacity-50' : 'cursor-pointer hover:shadow-xl hover:bg-gray-50'}`}
                         >
                             <Download className={`h-6 w-6 ${isDownloading ? 'animate-bounce' : 'group-hover:-translate-y-1 transition-transform'}`} />
                             <span>{isDownloading ? 'Downloading...' : 'Download APK'}</span>

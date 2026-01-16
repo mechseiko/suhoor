@@ -110,7 +110,7 @@ export default function Groups() {
             const newStats = {
                 totalGroups: groupsData.length,
                 totalMembers: totalMembers,
-                activeToday: groupsData.filter(g => g.last_activity === new Date().toISOString().split('T')[0]).length
+                activeToday: groupsData.filter(g => g.last_activity === new Date().toLocaleDateString('en-CA')).length
             }
             setStats(newStats)
             localStorage.setItem(`suhoor_stats_${currentUser.uid}`, JSON.stringify(newStats))
@@ -148,8 +148,8 @@ export default function Groups() {
         }
     }
 
-    const GroupResponse = ({title, subtitle}) => {
-        return(
+    const GroupResponse = ({ title, subtitle }) => {
+        return (
             <div>
                 <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Users className="h-10 w-10 text-gray-400" />
@@ -208,7 +208,7 @@ export default function Groups() {
                     </div>
                 ) : groups.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-dashed border-gray-300 px-6 py-8 text-center">
-                        <GroupResponse title="No groups yet" subtitle="Create a new group to invite friends or join an existing one to get started."/> 
+                        <GroupResponse title="No groups yet" subtitle="Create a new group to invite friends or join an existing one to get started." />
                         <Modals />
                     </div>
                 ) : (
@@ -226,7 +226,7 @@ export default function Groups() {
                             />
                         ) : (
                             <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                                <GroupResponse title='No groups found' subtitle={`You are not a member of any groups matching "${searchQuery}"`}/>
+                                <GroupResponse title='No groups found' subtitle={`You are not a member of any groups matching "${searchQuery}"`} />
                                 <button
                                     onClick={() => setSearchQuery('')}
                                     className="px-6 py-2 cursor-pointer bg-primary text-white rounded-xl hover:opacity-90 transition font-medium"

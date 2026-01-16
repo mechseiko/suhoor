@@ -38,7 +38,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                 for (let i = 6; i >= 0; i--) {
                     const d = new Date()
                     d.setDate(today.getDate() - i)
-                    last7Days.push(d.toISOString().split('T')[0])
+                    last7Days.push(d.toLocaleDateString('en-CA')) // YYYY-MM-DD
                 }
 
                 const logsRef = collection(db, 'wake_up_logs')

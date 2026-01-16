@@ -13,7 +13,7 @@ export function useFastingTimes() {
 
         try {
             const parsed = JSON.parse(cached)
-            const today = new Date().toISOString().split('T')[0]
+            const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
 
             // Invalidate cache if it's from a different day
             if (parsed.date !== today) {
@@ -78,7 +78,7 @@ export function useFastingTimes() {
                 const data = await response.json();
 
                 if (data.code === 200 && data.data.fasting) {
-                    const today = new Date().toISOString().split('T')[0]
+                    const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
                     const newFastingData = { fasting: data.data.fasting }
 
                     setFastingData(newFastingData);

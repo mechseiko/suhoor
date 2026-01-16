@@ -1,3 +1,21 @@
+1. The insights asdmin page should be removed completely, the details ablout the consistentcy of eacxg group should be shown when i enter  agroup whether to virew oyur details, memebers or to wake someone up
+
+2. I shouldnnt set if ill fast romorrow in any groups page, the one in the dashboard is okay, make sure that one works anyways
+
+3. Members, after joining should be able to leave the group after joining
+
+4. THE ADMIN OF THE GROUP SHOULD HAVE AN OPtion to remove a memeber from a group
+
+5. i think because of our local stroage cahcing
+my fasting times isnt changing on the next day, check that
+
+
+6. i think aalso wheni deploy , the changes sont shw until i delete my browing data, maybe bevause of caching also
+
+7. when i click on install apk in my lander i only get directed to the top of my lander
+
+//Implemented
+
 1.  Wake up flow for suhoor:
 
     A day before, a person is propmted on the group pageeeee if they would like to fast tomorrow or not

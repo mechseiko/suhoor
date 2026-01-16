@@ -13,5 +13,4 @@ export const searchData = [
     { page: 'Duas', queries: [...duaTitles, 'Adhkar', 'Duas', 'Duas & Adhkar', 'Supplications', 'Prayers'] },
     { page: 'Profile', queries: ['Password', 'Confirm Password', 'Account Information', 'Profile', 'Account', 'Email', 'Name', 'Security', 'Personal', 'Verify Email', 'Verification', 'Update Profile'] },
     { page: 'Settings', queries: ['Settings', 'Preferences', 'Notifications', 'Alarm Settings', 'Sound', 'Volume', 'Streak Notifications', 'Community Updates', 'Theme', 'App Info'] },
-    { page: 'Insights', queries: ['Insights', 'Admin', 'Growth', 'User Trends', 'Registration', 'Global Data', 'Application Statistics', 'Active Groups'] },
 ]

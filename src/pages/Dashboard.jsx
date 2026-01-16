@@ -245,6 +245,8 @@ export default function Dashboard() {
         }
     }
 
+    const todayDateLocal = new Date().toLocaleDateString('en-CA')
+
     const fetchFastingStats = async () => {
         try {
             const fastingRef = collection(db, 'daily_fasting_status')
@@ -261,8 +263,8 @@ export default function Dashboard() {
             fastingLogs.sort((a, b) => new Date(b.date) - new Date(a.date))
 
             let streak = 0
-            const today = new Date().toISOString().split('T')[0]
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+            const today = new Date().toLocaleDateString('en-CA')
+            const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('en-CA')
 
             // Check if fasted today or yesterday to start streak
             // Simple logic: consecutive days where wantsToFast is true
@@ -288,7 +290,7 @@ export default function Dashboard() {
             })
 
             while (keepChecking) {
-                const dateStr = currentCheckDate.toISOString().split('T')[0]
+                const dateStr = currentCheckDate.toLocaleDateString('en-CA')
                 if (dateMap[dateStr] === true) {
                     streakCount++
                     currentCheckDate.setDate(currentCheckDate.getDate() - 1)

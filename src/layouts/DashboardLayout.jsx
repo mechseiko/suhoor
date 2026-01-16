@@ -112,12 +112,6 @@ export default function DashboardLayout({
             onClick: () => navigate('/settings'),
             active: location.pathname === '/settings'
         },
-        {
-            icon: Globe,
-            label: 'Insights',
-            onClick: () => navigate('/admin'),
-            active: location.pathname === '/admin'
-        },
     ]
 
     const actionItems = [

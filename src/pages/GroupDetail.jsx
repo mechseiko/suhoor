@@ -8,8 +8,10 @@ import {
     Edit
 } from 'lucide-react'
 import { db } from '../config/firebase'
-import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from 'firebase/firestore'
+import { LogOut, Trash2 } from 'lucide-react'
 import WakeUpTracker from '../components/WakeUpTracker'
+import GroupAnalytics from '../components/GroupAnalytics'
 import InviteMemberModal from '../components/InviteMemberModal'
 import Loader from '../components/Loader'
 import DashboardLayout from '../layouts/DashboardLayout'
@@ -18,98 +20,7 @@ import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useAuth } from '../context/AuthContext'
 import { setDoc, serverTimestamp } from 'firebase/firestore' // Add these imports
 
-const FastingPrompt = ({ groupId, currentUser }) => {
-    const [status, setStatus] = useState(null) // null, 'yes', 'no'
-    const [loading, setLoading] = useState(true)
-
-    // Calculate "Tomorrow" date string YYYY-MM-DD
-    // "A day before" logic: If it's after 12 PM today, we are asking about tomorrow?
-    // User requested: "A day before... prompt... if yes: it will show to all group members"
-    // Let's assume we prompt for the *upcoming* Suhoor.
-    // If it's 8 PM, upcoming Suhoor is tomorrow morning.
-    // If it's 2 AM, upcoming Suhoor is ... today morning? No, user says "fast tomorrow".
-    // Let's settle on: We always ask for the NEXT Fajr date.
-
-    // For simplicity, let's just use local date + 1 day if it's PM, or today if it's AM (before Fajr).
-    // Actually, safest is to just ask "Are you fasting for [Date]?"
-
-    // Let's perform a check for existing entry for "tomorrow".
-
-    const getTomorrowDate = () => {
-        const d = new Date()
-        d.setDate(d.getDate() + 1)
-        return d.toISOString().split('T')[0]
-    }
-
-    const targetDate = getTomorrowDate()
-
-    useEffect(() => {
-        const checkStatus = async () => {
-            try {
-                const docRef = doc(db, 'daily_fasting_status', `${groupId}_${currentUser.uid}_${targetDate}`)
-                const docSnap = await getDoc(docRef)
-
-                if (docSnap.exists()) {
-                    setStatus(docSnap.data().wantsToFast ? 'yes' : 'no')
-                }
-            } catch (e) {
-                console.error("Error checking fasting status", e)
-            } finally {
-                setLoading(false)
-            }
-        }
-        checkStatus()
-    }, [groupId, currentUser, targetDate])
-
-    const handleResponse = async (response) => { // response: boolean
-        try {
-            setStatus(response ? 'yes' : 'no')
-            const docRef = doc(db, 'daily_fasting_status', `${groupId}_${currentUser.uid}_${targetDate}`)
-            await setDoc(docRef, {
-                userId: currentUser.uid,
-                groupId,
-                date: targetDate, // Store as string YYYY-MM-DD
-                wantsToFast: response,
-                updatedAt: serverTimestamp()
-            })
-            // Default assumes true if no response, but here we explicitly set it.
-        } catch (e) {
-            console.error("Error saving fasting status", e)
-        }
-    }
-
-    if (loading) return null
-    if (status !== null) return null // Already answered
-
-    return (
-        <div className="mb-6 bg-gradient-to-r from-indigo-50 to-blue-50 border border-blue-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4">
-            <div className="flex items-center gap-3">
-                <div className="p-2 bg-white rounded-full shadow-sm text-indigo-600">
-                    <span className="text-xl">🌙</span>
-                </div>
-                <div>
-                    <h3 className="font-bold text-gray-900">Suhoor for Tomorrow?</h3>
-                    <p className="text-sm text-gray-600">Are you planning to fast tomorrow, <span className="font-semibold">{targetDate}</span>?</p>
-                </div>
-            </div>
-
-            <div className="flex md:gap-3 gap-5 justify-between">
-                <button
-                    onClick={() => handleResponse(false)}
-                    className="px-4 py-2 bg-white text-gray-600 font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                    No, I'm not
-                </button>
-                <button
-                    onClick={() => handleResponse(true)}
-                    className="px-4 py-2 bg-primary text-white font-medium rounded-lg shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
-                >
-                    Yes, Insha'Allah
-                </button>
-            </div>
-        </div>
-    )
-}
+// FastingPrompt removed - now only on dashboard
 
 export default function GroupDetail() {
     const { currentUser } = useAuth()
@@ -133,6 +44,7 @@ export default function GroupDetail() {
     const [showInviteModal, setShowInviteModal] = useState(false)
     const [toast, setToast] = useState(null)
     const [userLocations, setUserLocations] = useState({})
+    const [leavingGroup, setLeavingGroup] = useState(false)
 
     const { socket, on, off, isConnected } = useSocket()
     const { isWakeUpWindow } = useFastingTimes()
@@ -243,6 +155,29 @@ export default function GroupDetail() {
         })
     }, [groupId, isWakeUpWindow])
 
+    const handleLeaveGroup = async () => {
+        if (!window.confirm('Are you sure you want to leave this group?')) return
+
+        try {
+            setLeavingGroup(true)
+            const membersRef = collection(db, 'group_members')
+            const q = query(membersRef, where('group_id', '==', groupId), where('user_id', '==', currentUser.uid))
+            const querySnapshot = await getDocs(q)
+
+            if (!querySnapshot.empty) {
+                await deleteDoc(doc(db, 'group_members', querySnapshot.docs[0].id))
+                localStorage.removeItem(`suhoor_group_${groupId}`)
+                localStorage.removeItem(`suhoor_members_${groupId}`)
+                navigate('/groups')
+            }
+        } catch (err) {
+            console.error('Error leaving group:', err)
+            setToast({ type: 'error', message: 'Failed to leave group.' })
+        } finally {
+            setLeavingGroup(false)
+        }
+    }
+
     if (loading) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
@@ -276,6 +211,15 @@ export default function GroupDetail() {
                     <UserPlus className="h-5 w-5" />
                     <span>Invite Member</span>
                 </button>
+                <button
+                    onClick={handleLeaveGroup}
+                    disabled={leavingGroup}
+                    className="flex items-center cursor-pointer justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium text-[13px] border border-red-100"
+                    title="Leave Group"
+                >
+                    <LogOut className="h-4 w-4" />
+                    <span className="hidden sm:inline">Leave</span>
+                </button>
             </div>
         )
     }
@@ -307,7 +251,6 @@ export default function GroupDetail() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-4 px-4 md:px-6 mb-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50"></div>
                 <div className="relative z-10">
-                    <FastingPrompt groupId={groupId} currentUser={currentUser} />
                     <div>
                         <div className="flex md:flex-row flex-col md:items-center gap-3 mb-2">
                             <h1 className="md:text-2xl text-xl flex items-center gap-2 font-bold text-gray-900">
@@ -404,7 +347,11 @@ export default function GroupDetail() {
                 </div>
             </div>
 
-            <WakeUpTracker groupId={groupId} members={members} />
+            <WakeUpTracker groupId={groupId} members={members} onMemberRemoved={fetchMembers} />
+
+            <div className="mt-8">
+                <GroupAnalytics groupId={groupId} memberCount={members.length} />
+            </div>
 
             {showInviteModal && (
                 <InviteMemberModal
