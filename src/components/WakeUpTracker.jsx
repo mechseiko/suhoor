@@ -313,6 +313,18 @@ export default function WakeUpTracker({ groupId, members }) {
             // Update local state
             setHasWokenUp(true)
 
+            // Local Notification for success
+            if (Capacitor.isNativePlatform()) {
+                await LocalNotifications.schedule({
+                    notifications: [{
+                        title: 'Alhamdulillah! 🌅',
+                        body: 'You are logged as awake. May Allah accept your fast.',
+                        id: new Date().getTime(),
+                        schedule: { at: new Date(Date.now() + 500) }
+                    }]
+                })
+            }
+
             // Schedule "Double Check" alarm in 5 minutes
             // "come again 5 minutes after... just to check if the person is truly awake"
             if (Capacitor.isNativePlatform()) {
@@ -481,7 +493,7 @@ export default function WakeUpTracker({ groupId, members }) {
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm p- border border-gray-100">
+        <div className="bg-white rounded-xl shadow-sm md:p-6 p-4 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <h3 className="md:text-xl font-bold text-dark">

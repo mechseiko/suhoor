@@ -3,6 +3,8 @@ import { X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { Capacitor } from '@capacitor/core'
+import { LocalNotifications } from '@capacitor/local-notifications'
 
 export default function CreateGroupModal({ onClose, onSuccess }) {
     const { currentUser } = useAuth()
@@ -37,6 +39,18 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
                 role: 'admin',
                 joined_at: serverTimestamp(),
             })
+
+            // Notification for success
+            if (Capacitor.isNativePlatform()) {
+                await LocalNotifications.schedule({
+                    notifications: [{
+                        title: 'Group Created! 🚀',
+                        body: `Successfully created "${groupName}". Time to invite your friends!`,
+                        id: new Date().getTime(),
+                        schedule: { at: new Date(Date.now() + 500) }
+                    }]
+                })
+            }
 
             onSuccess()
         } catch (err) {

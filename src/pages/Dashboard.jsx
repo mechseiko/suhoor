@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Users, TrendingUp, Award } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { Users, TrendingUp, Award, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer } from 'firebase/firestore'
@@ -81,6 +82,11 @@ const chartOptions = {
 
 export default function Dashboard() {
     const { currentUser } = useAuth();
+    const [searchParams] = useSearchParams()
+    const isNewUser = searchParams.get('m') === 'n'
+    const [showWelcomeBanner, setShowWelcomeBanner] = useState(isNewUser)
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+    const [chartLoading, setChartLoading] = useState(false)
 
     const [groups, setGroups] = useState(() => {
         const cached = localStorage.getItem(`suhoor_groups_${currentUser?.uid}`)
@@ -89,7 +95,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(!groups.length)
     const [stats, setStats] = useState(() => {
         const cached = localStorage.getItem(`suhoor_stats_${currentUser?.uid}`)
-        return cached ? JSON.parse(cached) : { totalGroups: 0, totalMembers: 0, activeToday: 0 }
+        return cached ? JSON.parse(cached) : { totalGroups: 0, totalMembers: 0, activeToday: 0, consistency: 0, milestones: [] }
     })
 
     const [chartData, setChartData] = useState({
@@ -219,7 +225,7 @@ export default function Dashboard() {
             createOrUpdateProfile()
             fetchGroups()
         }
-    }, [currentUser])
+    }, [currentUser, selectedYear])
 
     const createOrUpdateProfile = async () => {
         try {
@@ -304,11 +310,25 @@ export default function Dashboard() {
             fastingLogs.forEach(log => {
                 if (log.wantsToFast) {
                     const date = new Date(log.date)
-                    if (!isNaN(date.getTime())) {
+                    if (!isNaN(date.getTime()) && date.getFullYear() === selectedYear) {
                         fastingCounts[date.getMonth()]++
                     }
                 }
             })
+
+            // Consistency Score (Percentage of days fasted vs days passed in the year)
+            const daysInYear = selectedYear === todayDate.getFullYear() ?
+                Math.floor((todayDate - new Date(selectedYear, 0, 1)) / (1000 * 60 * 60 * 24)) + 1 :
+                365
+            const totalFasts = fastingCounts.reduce((a, b) => a + b, 0)
+            const consistency = Math.round((totalFasts / daysInYear) * 100)
+
+            // Milestones
+            const milestones = []
+            if (streakCount >= 7) milestones.push({ id: 'streak_7', label: '7-Day Streak', icon: '🔥' })
+            if (streakCount >= 30) milestones.push({ id: 'streak_30', label: 'Ramadan Spirit', icon: '🌙' })
+            if (totalFasts >= 50) milestones.push({ id: 'fasts_50', label: 'Dedicated Faster', icon: '🏆' })
+            if (consistency >= 80) milestones.push({ id: 'consistency_80', label: 'Elite Focus', icon: '⭐' })
 
             setChartData(prev => ({
                 ...prev,
@@ -329,11 +349,11 @@ export default function Dashboard() {
                 ]
             }))
 
-            return streakCount
+            return { streakCount, consistency, milestones }
 
         } catch (err) {
             console.error("Error fetching fasting stats:", err)
-            return 0
+            return { streakCount: 0, consistency: 0, milestones: [] }
         }
     }
 
@@ -349,33 +369,42 @@ export default function Dashboard() {
             })
 
             const groupsData = []
+            const uniqueMemberIds = new Set()
+
             for (const groupId of groupIds) {
                 const groupRef = doc(db, 'groups', groupId)
                 const groupSnap = await getDoc(groupRef)
+
                 if (groupSnap.exists()) {
                     const membersRef = collection(db, 'group_members')
-                    const memberCountQuery = query(membersRef, where('group_id', '==', groupId))
-                    const memberCountSnap = await getCountFromServer(memberCountQuery)
+                    const membersQuery = query(membersRef, where('group_id', '==', groupId))
+                    const membersSnap = await getDocs(membersQuery)
+
+                    membersSnap.forEach(doc => {
+                        uniqueMemberIds.add(doc.data().user_id)
+                    })
 
                     groupsData.push({
                         id: groupSnap.id,
                         ...groupSnap.data(),
-                        member_count: memberCountSnap.data().count
+                        member_count: membersSnap.size
                     })
                 }
             }
             setGroups(groupsData)
             localStorage.setItem(`suhoor_groups_${currentUser.uid}`, JSON.stringify(groupsData))
 
-            const totalMembers = groupsData.reduce((sum, group) => sum + (group.member_count || 0), 0)
+            const totalMembers = uniqueMemberIds.size
 
             // Integrate Fasting Stats
-            const streak = await fetchFastingStats()
+            const { streakCount, consistency, milestones } = await fetchFastingStats()
 
             const newStats = {
                 totalGroups: groupsData.length,
                 totalMembers: totalMembers,
-                activeToday: streak // Re-purposing this field name or mapping it in UI
+                activeToday: streakCount,
+                consistency,
+                milestones
             }
             setStats(newStats)
             localStorage.setItem(`suhoor_stats_${currentUser.uid}`, JSON.stringify(newStats))
@@ -391,7 +420,11 @@ export default function Dashboard() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h1 className="text-gray-900 mb-1">
-                            Welcome back, <span className="text-primary text-lg md:text-xl">{currentUser?.displayName || currentUser?.email?.split('@')[0]}</span>
+                            {isNewUser ? (
+                                <>Welcome to <span className="text-primary">Suhoor</span>, {currentUser?.displayName || currentUser?.email?.split('@')[0]}!</>
+                            ) : (
+                                <>Welcome back, <span className="text-primary text-lg md:text-xl">{currentUser?.displayName || currentUser?.email?.split('@')[0]}</span></>
+                            )}
                         </h1>
                         <p className="text-gray-500 font-medium">
                             May your fasts be accepted and your prayers answered.
@@ -404,6 +437,33 @@ export default function Dashboard() {
                     </div>
                 </div>
 
+                {showWelcomeBanner && (
+                    <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-2xl p-6 flex items-center justify-between gap-6 relative overflow-hidden group">
+                            <button
+                                onClick={() => setShowWelcomeBanner(false)}
+                                className="absolute top-4 right-4 p-2 hover:bg-white/50 rounded-full text-primary transition-colors z-20 cursor-pointer"
+                            >
+                                <X size={20} />
+                            </button>
+                            <div className="relative z-10">
+                                <h2 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
+                                    <span className="text-2xl">✨</span> Your Journey Begins!
+                                </h2>
+                                <p className="text-gray-600 max-w-lg leading-relaxed">
+                                    We're so glad to have you with us. Start by joining a group or exploring the rewards of fasting together. Don't forget to verify your email to access all features!
+                                </p>
+                            </div>
+                            <div className="hidden md:flex relative z-10 p-4 bg-white rounded-2xl shadow-sm border border-primary/10 group-hover:scale-105 transition-transform">
+                                <TrendingUp className="h-8 w-8 text-primary" />
+                            </div>
+                            {/* Decorative Background Elements */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                            <div className="absolute bottom-0 right-1/4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+                        </div>
+                    </div>
+                )}
+
                 <div className='flex-col-reverse md:flex-col flex'>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
                         <StatsCard
@@ -414,14 +474,25 @@ export default function Dashboard() {
                             color="blue"
                             loading={loading}
                         />
-                        <StatsCard
-                            icon={TrendingUp}
-                            title="Total Members"
-                            value={stats.totalMembers}
-                            subtitle="Across all groups"
-                            color="green"
-                            loading={loading}
-                        />
+                        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="p-2 bg-green-50 rounded-xl text-green-600">
+                                    <Award className="h-5 w-5" />
+                                </div>
+                                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                    {stats.consistency}% Consistency
+                                </span>
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-500">Yearly Goal</h3>
+                                <div className="mt-2 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-green-500 rounded-full transition-all duration-1000"
+                                        style={{ width: `${stats.consistency}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
                         <StatsCard
                             icon={Award}
                             title="Fasting Streak"
@@ -433,20 +504,62 @@ export default function Dashboard() {
                     </div>
 
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-5">
-                        <div className="flex items-center space-x-2 mb-4">
-                            <Users size="24" color="#2F3437" />
-                            <div>
-                                <h4 className="font-medium text-[#2F3437]">Fasting History</h4>
-                                <p className="text-[#919BA1] leading-6 text-[14px]">
-                                    Your fasting consistency over the year
-                                </p>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center space-x-2">
+                                <Users size="24" color="#2F3437" />
+                                <div>
+                                    <h4 className="font-medium text-[#2F3437]">Fasting History</h4>
+                                    <p className="text-[#919BA1] leading-6 text-[14px]">
+                                        Your fasting consistency over time
+                                    </p>
+                                </div>
                             </div>
+                            <select
+                                value={selectedYear}
+                                onChange={(e) => {
+                                    const year = parseInt(e.target.value)
+                                    setChartLoading(true)
+                                    setSelectedYear(year)
+                                    setTimeout(() => setChartLoading(false), 2000)
+                                }}
+                                className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
+                            >
+                                {[2026, 2025].map(year => (
+                                    <option key={year} value={year}>{year}</option>
+                                ))}
+                            </select>
                         </div>
 
-                        <div className="h-[320px]">
+                        <div className="h-[320px] relative">
+                            {chartLoading ? (
+                                <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center animate-in fade-in duration-300 rounded-xl">
+                                    <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-3"></div>
+                                    <p className="text-sm font-bold text-gray-500">Recalculating {selectedYear} Data...</p>
+                                </div>
+                            ) : null}
                             <Line data={chartData} options={chartOptions} />
                         </div>
                     </div>
+
+                    {stats.milestones?.length > 0 && (
+                        <div className="mb-6">
+                            <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <Award className="h-4 w-4 text-primary" />
+                                Spiritual Milestones
+                            </h4>
+                            <div className="flex flex-wrap gap-3">
+                                {stats.milestones.map(m => (
+                                    <div
+                                        key={m.id}
+                                        className="bg-white border border-gray-100 shadow-sm px-4 py-2.5 rounded-2xl flex items-center gap-3 animate-in zoom-in duration-300"
+                                    >
+                                        <span className="text-xl">{m.icon}</span>
+                                        <span className="text-sm font-bold text-gray-700">{m.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </DashboardLayout>

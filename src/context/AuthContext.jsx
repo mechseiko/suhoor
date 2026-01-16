@@ -1,12 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
+    deleteUser
 } from 'firebase/auth'
-
 import { auth } from '../config/firebase'
 
 const AuthContext = createContext({})
@@ -29,6 +28,13 @@ export function AuthProvider({ children }) {
         setCurrentUser(null);
         await signOut(auth);
     };
+
+    const deleteAccount = async () => {
+        if (currentUser) {
+            await deleteUser(currentUser)
+            setCurrentUser(null)
+        }
+    }
 
     const [userProfile, setUserProfile] = useState(null)
     const [profileLoading, setProfileLoading] = useState(true)
@@ -84,6 +90,7 @@ export function AuthProvider({ children }) {
         signup,
         login,
         logout,
+        deleteAccount
     }
 
     return (

@@ -22,7 +22,7 @@ export default function VerifyEmail() {
         } else if (currentUser) {
             // User just signed up or was redirected here because they are not verified
             setStatus('sent')
-            setMessage(`We've sent a verification link to ${currentUser.email}. Please check your inbox and click the link to verify your account.`)
+            setMessage(`We've sent a special verification link to ${currentUser.email}. Please check your inbox and click the link to activate your account features.`)
         } else {
             setStatus('error')
             setMessage('Invalid verification link.')
@@ -80,7 +80,7 @@ export default function VerifyEmail() {
 
             // Auto-redirect after 2 seconds
             setTimeout(() => {
-                navigate('/login')
+                navigate(currentUser ? '/dashboard' : '/login')
             }, 2000)
 
         } catch (err) {
@@ -134,9 +134,9 @@ export default function VerifyEmail() {
                         <p className="text-gray-600 mb-6">You will be redirected shortly...</p>
                         <button
                             className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition"
-                            onClick={() => navigate('/login')}
+                            onClick={() => navigate(currentUser ? '/dashboard' : '/login')}
                         >
-                            Login Now
+                            {currentUser ? 'Go to Dashboard' : 'Login Now'}
                         </button>
                     </div>
                 )}

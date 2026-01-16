@@ -24,15 +24,27 @@ export const baseBooks = [
     pages: 21
   },
   {
+    title: 'Kitab Us-Sawm',
+    file: '/books/kitaabus-sawm.pdf',
+    description: "Kitab Us-Sawm (The book of fasting) is a book Compiled by Mujlisul Ulama (PE)",
+    pages: 47
+  },
+  {
     title: 'Causes Behind The Increase and Decrease of Eemaan',
     file: '/books/causes-of-eemaan.pdf',
-    description: "An explanation and clarification of the most important causes for the increase and decrease of eemaan",
+    description: "An explanation and clarification of the most important causes for the increase and decrease of eemaan.",
     pages: 164
+  },
+  {
+    title: 'Islamic Fundamentals (Zakat and Sawm)',
+    file: '/books/islamic-fundamentals-zakat-and-sawm-hints-the-principles-economic-system-in-islam.pdf',
+    description: "An indispensable handbook for students of Islamic Studies at various level of learning.",
+    pages: 66
   },
   {
     title: "Bulugh Al Maram Fee Adilatil Ahkaam",
     file: "/books/bulugh-al-maram.pdf",
-    description: "Bulugh Al-Maram is a book which was written by Imam Ibn Hajar(773H - 852H) with the objective of compiling many of the Ahadith particularly related to the Ahkam(Judgements) of the islamic Shari'ah",
+    description: "Bulugh Al-Maram is a book which was written by Imam Ibn Hajar(773H - 852H) with the objective of compiling many of the Ahadith particularly related to the Ahkam(Judgements) of the islamic Shari'ah.",
     pages: 576
   },
 ];

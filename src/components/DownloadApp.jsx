@@ -47,13 +47,20 @@ export default function DownloadApp() {
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <a
-                            href={isDownloading ? '#' : '/suhoor.apk'}
+                            href={isDownloading ? '#' : '/Suhoor.apk'}
                             onClick={handleDownload}
                             download={!isDownloading && "Suhoor.apk"}
                             className={`w-fit sm:w-auto px-6 py-3 bg-white text-primary rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 group ${isDownloading ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer hover:shadow-xl hover:bg-gray-50'}`}
                         >
                             <Download className={`h-6 w-6 ${isDownloading ? 'animate-bounce' : 'group-hover:-translate-y-1 transition-transform'}`} />
                             <span>{isDownloading ? 'Downloading...' : 'Download APK'}</span>
+                        </a>
+
+                        <a
+                            href="/docs"
+                            className="text-white/80 hover:text-white text-sm font-medium underline flex items-center gap-2 transition-colors"
+                        >
+                            How to install?
                         </a>
 
                         <div className="flex items-center gap-2 text-blue-100 text-sm px-4">
@@ -63,7 +70,7 @@ export default function DownloadApp() {
                     </div>
 
                     <p className="mt-8 text-sm text-blue-200/80">
-                        *Works on Android & iOS. No store download required.
+                        *Works on Android. No store download required.
                     </p>
                 </motion.div>
             </div>

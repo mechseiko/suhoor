@@ -22,6 +22,7 @@ import About from './pages/About'
 import { useAuth } from './context/AuthContext'
 import Groups from './pages/Groups'
 import Settings from './pages/Settings'
+import AdminAnalytics from './pages/AdminAnalytics'
 import { useNative } from './hooks/useNative'
 
 
@@ -94,6 +95,14 @@ function AppRoutes() {
       />
 
       <Route path="/*" element={<Navigate to={currentUser ? '/dashboard' : '/'} />} />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminAnalytics />
+          </ProtectedRoute>
+        }
+      />
     </Routes >
   )
 }

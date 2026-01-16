@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { User, Mail, Save, Lock, Shield, CheckCircle, AlertCircle } from 'lucide-react'
+import { User, Mail, Save, Lock, Shield, CheckCircle, AlertCircle, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { updateProfile, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth'
 import { db } from '../config/firebase'
@@ -29,7 +29,13 @@ export default function Profile() {
     const [saving, setSaving] = useState(false)
     const [changingPassword, setChangingPassword] = useState(false)
     const [sendingVerification, setSendingVerification] = useState(false)
-    const { currentUser } = useAuth()
+
+    // Delete Account Modal State
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('')
+    const [deleteConfirmPhrase, setDeleteConfirmPhrase] = useState('')
+
+    const { currentUser, deleteAccount } = useAuth()
 
     const [profile, setProfile] = useState({
         display_name: '',
@@ -486,7 +492,113 @@ export default function Profile() {
                         </form>
                     </div>
                 </div>
+
+                {/* Danger Zone */}
+                <div className="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
+                    <div className="p-6 border-b border-red-50 bg-red-50/30">
+                        <h2 className="text-lg font-bold text-red-700 flex items-center gap-2">
+                            <AlertCircle className="h-5 w-5" />
+                            Danger Zone
+                        </h2>
+                        <p className="text-sm text-red-600/80 mt-1">Irreversible account actions</p>
+                    </div>
+
+                    <div className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="font-medium text-gray-900">Delete Account</h3>
+                                <p className="text-sm text-gray-500 mt-1">Permanently delete your account and all data</p>
+                            </div>
+                            <button
+                                onClick={() => setShowDeleteModal(true)}
+                                className="px-4 cursor-pointer py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
+                            >
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            {/* Delete Account Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+                        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                            <h3 className="font-bold text-gray-900 text-lg">Delete Account</h3>
+                            <button
+                                onClick={() => setShowDeleteModal(false)}
+                                className="p-2 hover:bg-gray-100 cursor-pointer rounded-full text-gray-500 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            <div className="p-4 bg-red-50 text-red-700 text-sm rounded-xl border border-red-100 flex gap-3">
+                                <AlertCircle className="h-5 w-5 shrink-0" />
+                                <p>This action is permanent and cannot be undone. All your data will be wiped immediately.</p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Type your email to confirm
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={deleteConfirmEmail}
+                                        onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Type <span className="font-mono text-red-600 font-bold">"delete my suhoor account"</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deleteConfirmPhrase}
+                                        onChange={(e) => setDeleteConfirmPhrase(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="pt-2">
+                                <button
+                                    onClick={async () => {
+                                        if (deleteConfirmEmail !== currentUser.email) {
+                                            alert('Email does not match')
+                                            return
+                                        }
+                                        if (deleteConfirmPhrase !== 'delete my suhoor account') {
+                                            alert('Confirmation phrase is incorrect')
+                                            return
+                                        }
+
+                                        try {
+                                            await deleteAccount()
+                                        } catch (error) {
+                                            console.error("Failed to delete account", error)
+                                            if (error.code === 'auth/requires-recent-login') {
+                                                alert('Please logout and login again to perform this action.')
+                                            } else {
+                                                alert('Failed to delete account. Please try again.')
+                                            }
+                                        }
+                                    }}
+                                    disabled={deleteConfirmEmail !== currentUser.email || deleteConfirmPhrase !== 'delete my suhoor account'}
+                                    className="w-full py-3 bg-red-600 cursor-pointer text-white rounded-xl font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Permanently Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     )
 }

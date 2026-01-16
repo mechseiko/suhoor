@@ -13,6 +13,7 @@ import {
     Search,
     Moon,
     ArrowLeft,
+    Globe,
     Settings as SettingsIcon
 } from 'lucide-react'
 import { doc, getDoc } from 'firebase/firestore'
@@ -55,7 +56,7 @@ export default function DashboardLayout({
         if (path === '/fasting') return 'Fasting'
         if (path === '/profile') return 'Profile'
         if (path === '/groups') return 'Groups'
-        if (path === '/books') return 'Books'
+        if (path === '/books') return 'Resources'
         if (path === '/duas') return 'Duas'
         if (path.startsWith('/groups/')) return 'Group Details'
         return 'Dashboard'
@@ -112,6 +113,12 @@ export default function DashboardLayout({
             label: 'Settings',
             onClick: () => navigate('/settings'),
             active: location.pathname === '/settings'
+        },
+        {
+            icon: Globe,
+            label: 'Insights',
+            onClick: () => navigate('/admin'),
+            active: location.pathname === '/admin'
         },
     ]
 
