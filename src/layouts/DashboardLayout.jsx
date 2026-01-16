@@ -16,8 +16,6 @@ import {
     Globe,
     Settings as SettingsIcon
 } from 'lucide-react'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../config/firebase'
 import { useAuth } from '../context/AuthContext'
 import Logo from '../components/Logo'
 import ProfileButton from '../components/ProfileButton'
@@ -82,7 +80,7 @@ export default function DashboardLayout({
             icon: Users,
             label: 'Groups',
             onClick: () => navigate('/groups'),
-            active: location.pathname === '/groups'
+            active: location.pathname === '/groups' || location.pathname.startsWith('/groups/')
         },
         {
             icon: Moon,

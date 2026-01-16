@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Shield, Moon, ChevronRight, AlertCircle, Mail, Globe } from 'lucide-react'
+import { Bell, Shield, Moon, ChevronRight, AlertCircle, Mail, Globe, TrendingUp } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
 

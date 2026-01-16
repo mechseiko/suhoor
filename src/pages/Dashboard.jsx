@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer } from 'firebase/firestore'
 import StatsCard from '../components/StatsCard'
+import FastingPrompt from '../components/FastingPrompt'
 import DashboardLayout from '../layouts/DashboardLayout'
 import {
     Chart as ChartJS,
@@ -436,6 +437,8 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
+
+                <FastingPrompt />
 
                 {showWelcomeBanner && (
                     <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
