@@ -119,7 +119,7 @@ export default function FastingPrompt() {
 
     return (
         <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-            <div className="bg-gradient-to-br from-primary/95 to-blue-700 rounded-3xl p-6 text-white shadow-xl shadow-blue-200 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-primary/95 to-blue-700 rounded-xl p-6 text-white shadow-xl shadow-blue-200 relative overflow-hidden">
                 {/* Decorative background element */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
 
@@ -127,12 +127,11 @@ export default function FastingPrompt() {
                     {status === 'idle' && (
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30">
-                                    <Calendar className="h-6 w-6" />
+                                <div className="p-3 bg-white/20 backdrop-blur-md rounded-xl border border-white/30">
+                                    <Calendar className="h-4 w-4" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold">Suhoor for Tomorrow?</h3>
-                                    <p className="text-blue-100 text-sm">Are you planning to fast tomorrow, <span className="font-semibold">{tomorrowDate}</span>?</p>
+                                    <p className="text-blue-100 text-lg">Are you planning to fast tomorrow, <span className="font-semibold">{tomorrowDate}</span>?</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -146,7 +145,7 @@ export default function FastingPrompt() {
                                     onClick={() => setStatus('confirming_yes')}
                                     className="flex-1 md:flex-none px-4 py-2.5 bg-white text-primary hover:bg-blue-50 rounded-lg font-bold transition-all shadow-lg cursor-pointer"
                                 >
-                                    Yes, Insha Allah
+                                    Yes, InshaAllah
                                 </button>
                             </div>
                         </div>
