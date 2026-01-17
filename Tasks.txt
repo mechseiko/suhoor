@@ -4,6 +4,9 @@
     who are still sleeping.' ,
 2. Make sure the native app works on both android and Ios, whaever way possible(i.e mkae sure the APK is
     able to be downloaded on ios)
+3. Make sure The Website Loads faster (I.r every page loads faster)
+4. All images, videos and pdf's should be fetched from clouding
+
 
 //Implemented
 
