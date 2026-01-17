@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2 } from 'lucide-react'
+import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2, Calendar, X } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { useAuth } from '../context/AuthContext'
@@ -38,6 +38,10 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
     const [loading, setLoading] = useState(false)
     const [soundEnabled, setSoundEnabled] = useState(true)
     const [onlineMembers, setOnlineMembers] = useState([])
+    const [isInWindow, setIsInWindow] = useState(false)
+    const [showDateModal, setShowDateModal] = useState(false)
+    const [dateInput, setDateInput] = useState('')
+    const [dateError, setDateError] = useState('')
     const audioRef = useRef(null)
 
     // Fetch fasting status for the target date
@@ -70,29 +74,40 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
     }, [todayData, groupId, currentUser.uid])
 
     // Re-calculate isWakeUpWindow locally with Interval to ensure accuracy
-    const [isInWindow, setIsInWindow] = useState(false)
     useEffect(() => {
-        if (!todayData?.time?.sahur) return
-
         const checkTime = () => {
-            const [hours, minutes] = todayData.time.sahur.split(':').map(Number)
             const now = new Date()
-            const suhoorDate = new Date()
-            suhoorDate.setHours(hours, minutes, 0, 0)
+            let targetHour, targetMinute
 
-            // Handle day wrapping if needed (if Suhoor is early morning and we are checking late previous night?)
-            // Usually Suhoor is AM. If now is PM (e.g. 23:00) and Suhoor is 04:00.
-            // suhoorDate would be set to "Today 04:00" which is in past.
-            // So if suhoorDate < now, add 1 day.
-            if (suhoorDate < now && (now.getHours() > 12)) {
-                suhoorDate.setDate(suhoorDate.getDate() + 1)
+            // Use custom wake up time if available, otherwise 15 mins before Suhoor
+            const userProfile = members.find(m => m.profiles.id === currentUser.uid)?.profiles
+            if (userProfile?.customWakeUpTime) {
+                [targetHour, targetMinute] = userProfile.customWakeUpTime.split(':').map(Number)
+            } else if (todayData?.time?.sahur) {
+                const [suhoorH, suhoorM] = todayData.time.sahur.split(':').map(Number)
+                const suhoorTime = new Date()
+                suhoorTime.setHours(suhoorH, suhoorM, 0, 0)
+                suhoorTime.setMinutes(suhoorTime.getMinutes() - 15)
+                targetHour = suhoorTime.getHours()
+                targetMinute = suhoorTime.getMinutes()
+            } else {
+                return
             }
 
-            const diffMs = suhoorDate - now
+            const targetTime = new Date()
+            targetTime.setHours(targetHour, targetMinute, 0, 0)
+
+            // Handle day wrapping
+            if (targetTime < now && (now.getHours() > 12)) {
+                targetTime.setDate(targetTime.getDate() + 1)
+            }
+
+            const diffMs = targetTime - now
             const diffMins = diffMs / 1000 / 60
 
-            // Window: 15 mins before Suhoor
-            const active = diffMins > 0 && diffMins <= 15
+            // Window: active from the target time until Suhoor (or just a fixed duration)
+            // Let's say window stays active for 1 hour after target time or until clicked
+            const active = diffMins <= 0 && diffMins >= -60 // Active for 60 mins after target time
             setIsInWindow(active)
 
             // Trigger automatic buzz
@@ -101,10 +116,10 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
             }
         }
 
-        const interval = setInterval(checkTime, 10000) // Check every 10s
-        checkTime() // Initial check
+        const interval = setInterval(checkTime, 10000)
+        checkTime()
         return () => clearInterval(interval)
-    }, [todayData, hasWokenUp, wantsToFast, isBuzzing])
+    }, [todayData, hasWokenUp, wantsToFast, isBuzzing, members, currentUser.uid])
 
     useLocationTracking(groupId, currentUser.uid, isInWindow && !hasWokenUp && wantsToFast)
 
@@ -291,10 +306,34 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
     }, [isConnected, on, off, groupId, currentUser.uid, playNotificationSound, isBuzzing])
 
     // Handle wake-up button click
-    const handleWakeUp = async () => {
+    const handleWakeUpClick = () => {
+        setShowDateModal(true)
+        setDateInput('')
+        setDateError('')
+    }
+
+    const validateAndWakeUp = async () => {
+        // Expected format: MM-DD-YYYY or MM DD YYYY etc. 
+        // User said: "01-13-2026 will type 0 1 1 3 20 2 5"
+        // Let's normalize both to digits only for comparison
+        const today = new Date()
+        const expected = today.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+        }).replace(/\D/g, '')
+
+        const inputDigits = dateInput.replace(/\D/g, '')
+
+        if (inputDigits !== expected) {
+            setDateError('Incorrect date. Please type the full current date (MMDDYYYY).')
+            return
+        }
+
+        setShowDateModal(false)
         setLoading(true)
         try {
-            const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
+            const todayStr = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
             const wakeUpTime = new Date().toISOString()
 
             setIsBuzzing(false) // Stop current buzzing
@@ -303,23 +342,21 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
             await addDoc(collection(db, 'wake_up_logs'), {
                 user_id: currentUser.uid,
                 group_id: groupId,
-                date: today,
+                date: todayStr,
                 woke_up_at: wakeUpTime,
             })
 
-            // Emit Socket.IO event for real-time update
+            // Emit Socket.IO event
             const userName = getCurrentUserName()
             emitWakeUp(groupId, userName, wakeUpTime)
 
-            // Update local state
             setHasWokenUp(true)
 
-            // Local Notification for success
             if (Capacitor.isNativePlatform()) {
                 await LocalNotifications.schedule({
                     notifications: [{
                         title: 'Alhamdulillah! 🌅',
-                        body: 'You are logged as awake. May Allah accept your fast.',
+                        body: 'You are logged as awake.',
                         id: new Date().getTime(),
                         schedule: { at: new Date(Date.now() + 500) }
                     }]
@@ -327,41 +364,11 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
             }
 
             // Schedule "Double Check" alarm in 5 minutes
-            // "come again 5 minutes after... just to check if the person is truly awake"
-            if (Capacitor.isNativePlatform()) {
-                LocalNotifications.schedule({
-                    notifications: [{
-                        title: 'Just Checking!',
-                        body: 'Are you still awake for Suhoor?',
-                        id: new Date().getTime() + 1, // Unique ID
-                        sound: 'beep.wav',
-                        schedule: { at: new Date(Date.now() + 5 * 60 * 1000) }, // 5 minutes
-                        actionTypeId: "",
-                        extra: { type: 'double_check' }
-                    }]
-                })
-            }
-
-            // In-app "Double Check" timer
             setTimeout(() => {
-                setHasWokenUp(false) // Reset state to force "I'm Awake" again? 
-                // Or better, introduce a "confirmation_pending" state.
-                // For simplicity/robustness as per user request "buzz alarm... will come again":
-                // We can just set `isBuzzing(true)` and maybe show a specific "Confirm you are still up" message.
-                // But simply setting `isBuzzing(true)` works well as it re-triggers the loop.
-                // However, we need to distinguish between "woken up" and "confirmed".
-                // If we reset `hasWokenUp` to false, it re-enables the main button which fits the flow.
-                // But we already logged it to DB. Duplicate logs? 
-                // Maybe we only re-trigger buzz visually/audibly but don't require re-logging? or update log?
-
-                // User said "come again". Let's assume re-buzzing.
-                // To avoid complexity, we can just trigger the buzz and show a "Verify Awareness" modal or similar.
-                // Or just reset `isBuzzing` to true. 
-                // BUT `isBuzzing` logic checks `!hasWokenUp` in the interval!
-                // So I need to modify the interval check or `hasWokenUp` logic.
-
-                // Let's rely on the native notification for the "come again" if app is closed.
-                // If app is OPEN:
+                // To allow re-buzzing, we can set hasWokenUp back to false 
+                // but keep the record in DB. The UI will show them as awake to others,
+                // but "isBuzzing" will trigger for them again.
+                setHasWokenUp(false)
                 setIsBuzzing(true)
             }, 5 * 60 * 1000)
 
@@ -404,13 +411,13 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                             Group Members
                         </h3>
                         <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Action' : 'Show Action'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                            {showActions ? 'Hide' : 'Actions'}
+                            {showActions ? 'Hide' : 'Admin Actions'}
                         </button>
                     </div>
                     <div className="divide-y divide-gray-50">
                         {loading && !members.length ? (
                             <div className="p-4 space-y-4">
-                                {[1, 2, 3, 4].map(i => (
+                                {[1, 2, 3, 4, 5, 6].map(i => (
                                     <div key={i} className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
                                         <div className="space-y-1">
@@ -451,8 +458,14 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                                                     {member.role === 'admin' && <span className='text-primary'>{' '} (Admin)</span>}
                                                     {isAwake && <CheckCircle className="h-3.5 w-3.5 text-accent" />}
                                                 </div>
-                                                <div className="text-[11px] text-gray-500 flex items-center gap-2">
+                                                <div className="text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
                                                     {member.profiles.email}
+                                                    {member.profiles.customWakeUpTime && (
+                                                        <span className="text-yellow-600 font-bold bg-yellow-50 px-1.5 py-0.5 rounded border border-yellow-100 flex items-center gap-1">
+                                                            <Clock size={10} />
+                                                            {member.profiles.customWakeUpTime}
+                                                        </span>
+                                                    )}
                                                     {isAwake && wakeUpTime && (
                                                         <span className="text-accent font-medium">
                                                             • {new Date(wakeUpTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -550,7 +563,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                     </button>
                     {!hasWokenUp ? (
                         <button
-                            onClick={handleWakeUp}
+                            onClick={handleWakeUpClick}
                             disabled={loading || !isConnected}
                             className="flex items-center cursor-pointer md:space-x-2 space-x-1 w-full px-2 py-2 md:px-4 md:py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -582,11 +595,55 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                         <p className="text-2xl font-medium opacity-90">Your group needs you for Suhoor!</p>
 
                         <button
-                            onClick={() => setIsBuzzing(false)}
+                            onClick={handleWakeUpClick}
                             className="w-full max-w-md bg-white text-red-600 px-8 py-6 rounded-3xl text-2xl font-bold shadow-2xl hover:scale-105 active:scale-95 transition-transform cursor-pointer"
                         >
                             I'M AWAKE!
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Date Verification Modal */}
+            {showDateModal && (
+                <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                <Calendar className="h-5 w-5 text-primary" />
+                                Verify Awareness
+                            </h3>
+                            <button onClick={() => setShowDateModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                <X size={20} className="text-gray-400" />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <p className="text-gray-600 text-sm">
+                                To confirm you're truly awake and alert, please type today's date in full (MM-DD-YYYY).
+                            </p>
+
+                            <div className="space-y-2">
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    Today's Date
+                                </label>
+                                <input
+                                    type="text"
+                                    value={dateInput}
+                                    onChange={(e) => setDateInput(e.target.value)}
+                                    placeholder="e.g. 01 13 2026"
+                                    className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-2xl font-black tracking-[0.2em] text-center focus:border-primary focus:bg-white transition-all outline-none"
+                                />
+                                {dateError && <p className="text-red-500 text-xs font-medium">{dateError}</p>}
+                            </div>
+
+                            <button
+                                onClick={validateAndWakeUp}
+                                disabled={loading}
+                                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-2"
+                            >
+                                {loading ? 'Logging...' : 'Confirm I am Awake'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

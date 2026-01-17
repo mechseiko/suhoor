@@ -41,8 +41,13 @@ export default function Footer({currentNavItem}) {
             <h3 className="font-bold text-gray-900 mb-4">Community</h3>
             <ul className="space-y-3">
               <li>
+                <a href="mailto:suhoorapp@gmail.com" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-primary transition-colors">
+                  Support
+                </a>
+              </li>
+              <li>
                 <a href="https://devseiko.vercel.app/contact?from=suhoor" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-primary transition-colors">
-                  Contact
+                  Developer
                 </a>
               </li>
               <li>

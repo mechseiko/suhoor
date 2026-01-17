@@ -1,3 +1,34 @@
+
+1. in the capacitor app:
+
+every member of everyy group that has choosen to fast that day or that didnt say no(which defaults to yes) gets buzzed(in-app alarm) 15 MINUTES To the time for suhoor fetched from the API
+
+but let each user be able to set the time they want to wake up int he fasting times page(the page we are fetching the api from) so each group memeber sees the time each other want to wake up
+they see which members have clicked the im a wake button and those that have not(and they can trigger the buzz on the phone or app of those that are not)
+
+so he who does not update the fasting time(suhoor time) fecthed from the api in his fasting page(let it default to the time from the api of course)
+
+when they click the im  awake button they will be required to type the date for that day in full i.e 01-13-2026 will type 0 1 1 3 20 2 5 before we can accept that hes awake and his status will change and other members wont need to disturb or ake him up to know they are not feeling sleepy and they wont sleep again
+
+of course i know my buzz wil sound again after 5 minutes
+
+adittionally 
+then he who wakes up is being stored in the db of course to fecth in the dashboard grapghs and others
+
+2. check the verify-email flow, no need to verify email on signinug up or logining from anywhere please
+they can do that in the profile page
+
+3. check the capacitor app flow, will it work once i open the app on my phone now, willl i be able to download the appp
+
+
+write the docs page in full
+with navbar
+and put it in my header and footer links
+
+let it onatin how to installl the aopp, introduction, how to navigate and explain each oages in the dahsboard
+
+//Implemented
+
 1. The insights asdmin page should be removed completely, the details ablout the consistentcy of eacxg group should be shown when i enter  agroup whether to virew oyur details, memebers or to wake someone up
 
 2. I shouldnnt set if ill fast romorrow in any groups page, the one in the dashboard is okay, make sure that one works anyways

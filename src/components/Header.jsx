@@ -100,7 +100,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                     </div>
                     {
                         isMenuOpen ?
-                            <div className="animate-navBar space-y-3 mb-2 mt-5 flex flex-col">
+                            <div className="animate-navBar space-y-3 mb-2 mt-5 flex flex-col items-center">
                                 {navBar.map((navItem, index) => {
                                     const isActive = currentNavItem === navItem.to || (navItem.to === '/' && currentNavItem === '/');
 
@@ -108,7 +108,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                                         <Link
                                             key={index}
                                             onClick={() => setIsMenuOpen(false)}
-                                            className={`text-center p-2 rounded-md mx-10 ${isActive ? 'bg-primary bg-blue-500 text-white' : 'hover:bg-blue-300'}`}
+                                            className={`text-center p-2 rounded-md mx-10 ${isActive ? 'bg-primary w-[150px] text-white' : 'hover:bg-blue-300'}`}
                                             to={navItem.to}
                                         >
                                             {navItem.label}
@@ -123,7 +123,6 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                                     <Cta />
                                 )}
                                 </div>
-                                
                             </div> :
                             <></>
                     }

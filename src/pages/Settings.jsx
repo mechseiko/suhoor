@@ -57,23 +57,6 @@ export default function Settings() {
                         }
                     />
                     <SettingItem
-                        icon={TrendingUp}
-                        label="Streak Notifications"
-                        description="Get notified when you hit fasting milestones"
-                        action={
-                            <button
-                                onClick={() => setNotifications(!notifications)}
-                                className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${notifications ? 'bg-primary' : 'bg-gray-200'
-                                    }`}
-                            >
-                                <span
-                                    className={`${notifications ? 'translate-x-6' : 'translate-x-1'
-                                        } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                                />
-                            </button>
-                        }
-                    />
-                    <SettingItem
                         icon={Globe}
                         label="Community Updates"
                         description="Stay updated with global Suhoor trends"
@@ -122,7 +105,7 @@ export default function Settings() {
                     <a href="https://devseiko.vercel.app/contact" target="_blank" rel="noopener noreferrer" className="block">
                         <SettingItem
                             icon={Globe}
-                            label="Contact Developer"
+                            label="Developer"
                             description="mechseiko/contact"
                             action={<ChevronRight className="h-5 w-5 text-gray-400" />}
                         />

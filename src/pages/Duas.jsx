@@ -1,4 +1,4 @@
-import { Moon, Sun, Heart, Hand, Sparkles, Users } from 'lucide-react'
+import { Moon, Sun, Heart, Sparkles, Users } from 'lucide-react'
 import SectionHeader from '../components/SectionHeader'
 import { useAuth } from '../context/AuthContext'
 import DashboardLayout from '../layouts/DashboardLayout'
@@ -56,9 +56,6 @@ export default function Duas() {
     const content = (
         <div className={`${currentUser ? '' : 'md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
             <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full">
-                    <Hand className="h-8 w-8 text-primary" />
-                </div>
                 <SectionHeader
                     title="Duas & Adhkar"
                     subtitle="Essential supplications to illuminate your fasting journey. Recite these with presence of heart."

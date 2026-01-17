@@ -320,6 +320,7 @@ export default function Dashboard() {
             })
 
             // Consistency Score (Percentage of days fasted vs days passed in the year)
+            const todayDate = new Date()
             const daysInYear = selectedYear === todayDate.getFullYear() ?
                 Math.floor((todayDate - new Date(selectedYear, 0, 1)) / (1000 * 60 * 60 * 24)) + 1 :
                 365

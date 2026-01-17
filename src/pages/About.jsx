@@ -1,4 +1,4 @@
-import { Moon, Heart, Users, Bell, Globe, Sparkles } from 'lucide-react'
+import { Heart, Users, Bell, Globe, Sparkles } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Link } from 'react-router-dom'
 import SectionHeader from '../components/SectionHeader'
@@ -10,9 +10,6 @@ export default function About() {
         <div className="max-w-7xl mx-auto md:pt-15 pt-12 pb-8 md:px-4 px-2 mt-5">
             <div>
                 <div className="text-center mb-12">
-                    <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
-                        <Moon className="h-8 w-8 text-primary" />
-                    </div>
                     <SectionHeader
                         title="Waking the Ummah for Suhoor"
                         subtitle="Suhoor is more than just an app, it's a spiritual companion designed to ensure you never miss the blessed meal. Connect with loved ones, wake each other up, and share the blessings of Fasting."

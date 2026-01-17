@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Clock, Sun, Moon, RefreshCw } from 'lucide-react'
+import { useNavigate } from 'react-router-dom';
+import { db } from '../config/firebase'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { useAuth } from '../context/AuthContext'
 import Loader from './Loader';
 
 export default function FastingTimes() {
@@ -32,6 +34,9 @@ export default function FastingTimes() {
   const [loading, setLoading] = useState(!fastingData)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
+  const { currentUser } = useAuth()
+  const [customWakeUpTime, setCustomWakeUpTime] = useState('')
+  const [savingTime, setSavingTime] = useState(false)
 
   const onSuccess = (position) => {
     setLocation({
@@ -99,10 +104,45 @@ export default function FastingTimes() {
   useEffect(() => {
     if (!location.loaded) return;
     if (!location.coordinates.lat || !location.coordinates.lng) return;
+
+    // Fetch custom wake up time from profile
+    const fetchProfileData = async () => {
+      if (!currentUser) return
+      try {
+        const docRef = doc(db, 'profiles', currentUser.uid)
+        const docSnap = await getDoc(docRef)
+        if (docSnap.exists()) {
+          setCustomWakeUpTime(docSnap.data().customWakeUpTime || '')
+        }
+      } catch (err) {
+        console.error("Error fetching profile for wake up time", err)
+      }
+    }
+
+    fetchProfileData()
     if (fastingData) return;
 
     fetchFastingTimes();
-  }, [location.loaded, location.coordinates.lat, location.coordinates.lng]);
+  }, [location.loaded, location.coordinates.lat, location.coordinates.lng, currentUser]);
+
+  const handleWakeUpTimeChange = async (e) => {
+    const newTime = e.target.value
+    setCustomWakeUpTime(newTime)
+
+    if (!currentUser) return
+
+    setSavingTime(true)
+    try {
+      const docRef = doc(db, 'profiles', currentUser.uid)
+      await updateDoc(docRef, {
+        customWakeUpTime: newTime
+      })
+    } catch (err) {
+      console.error("Error updating wake up time", err)
+    } finally {
+      setSavingTime(false)
+    }
+  }
 
   const handleRefresh = () => {
     fetchFastingTimes(true);
@@ -200,6 +240,29 @@ export default function FastingTimes() {
                 </span>
               </div>
             )}
+
+            <div className="pt-4 border-t border-gray-100">
+              <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-100">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <Clock className="h-4 w-4 text-yellow-700" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-700 block">Personal Wake Up</span>
+                    <span className="text-[10px] text-gray-500">Default: 15m before Suhoor</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="time"
+                    value={customWakeUpTime}
+                    onChange={handleWakeUpTimeChange}
+                    className="bg-white border border-yellow-200 rounded-lg px-2 py-1 text-sm font-bold text-yellow-800 outline-none focus:ring-2 focus:ring-yellow-400"
+                  />
+                  {savingTime && <RefreshCw className="h-3 w-3 text-yellow-600 animate-spin" />}
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="text-xs text-dark/60 text-center pt-4 border-t border-muted">

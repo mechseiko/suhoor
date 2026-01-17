@@ -43,42 +43,10 @@ export default function Signup() {
         setLoading(true)
 
         try {
-            // 1. Check if email already exists in Firebase Auth
-            // Note: fetchSignInMethodsForEmail returns an array of methods (e.g., ['password']) if user exists, or [] if not.
-            // However, with email enumeration protection enabled in newer Firebase projects, this might always return [] or error.
-            // Assuming standard behavior for this codebase or that we handle the error on signup.
-
-            // Actually, let's try to send the verification email FIRST as a way to "validate" the email
-            // But we need a token. We can generate one.
-            const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-            const verificationLink = `${window.location.origin}/verify-email?token=${token}`
-
-            const templateParams = {
-                subject: 'Verify Your Account | Suhoor',
-                name: 'Suhoor',
-                company_name: 'Suhoor',
-                title: 'Verify Your Account',
-                body_intro: `Welcome to Suhoor! We're thrilled to have you join our community. To ensure the security of your account and start connecting with your group, please verify your email address below.`,
-                button_text: 'Verify My Email',
-                action_link: verificationLink,
-                accent_note: "You're one step away from your first Suhoor group!",
-                user_email: email,
-                link: window.location.origin
-            }
-
-            // 2. Attempt to send email BEFORE creating account
-            try {
-                await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID)
-            } catch (emailError) {
-                console.error("EmailJS check failed:", emailError)
-                throw new Error("Could not send verification email. Please check your email address.")
-            }
-
-            // 3. If email sent successfully, PROCEED to create account
             const userCredential = await signup(email, password)
             const user = userCredential.user
 
-            // 4. Create initial profile in Firestore
+            // Create initial profile in Firestore
             await setDoc(doc(db, 'profiles', user.uid), {
                 uid: user.uid,
                 email: email,
@@ -87,16 +55,7 @@ export default function Signup() {
                 createdAt: serverTimestamp()
             })
 
-            // 5. Store verification record in Firestore
-            await addDoc(collection(db, 'email_verifications'), {
-                uid: user.uid,
-                email: email,
-                token: token,
-                createdAt: serverTimestamp(),
-                verified: false
-            })
-
-            navigate('/dashboard?m=n')
+            navigate('/dashboard')
 
         } catch (err) {
             console.error('Signup Error:', err)

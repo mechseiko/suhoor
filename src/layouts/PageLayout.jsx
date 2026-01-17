@@ -6,6 +6,7 @@ import { useNative } from '../hooks/useNative'
 
 export const navBar = [
     { label: 'Home', to: '/' },
+    { label: 'Docs', to: '/docs' },
     { label: 'Books', to: '/books' },
     { label: 'Duas', to: '/duas' },
     { label: 'About', to: '/about' },
@@ -24,6 +25,7 @@ export default function PageLayout({ children }) {
     const dynamicNavBar = [
         { label: 'Home', to: '/' },
         ...(currentUser ? [{ label: 'Dashboard', to: '/dashboard' }] : []),
+        { label: 'Docs', to: '/docs' },
         { label: 'Books', to: '/books' },
         { label: 'Duas', to: '/duas' },
         { label: 'About', to: '/about' },
@@ -37,7 +39,7 @@ export default function PageLayout({ children }) {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    const publicPaths = ['/', '/about', '/login', '/signup', '/forgot-password', '/reset-password', '/verify-email']
+    const publicPaths = ['/', '/docs', '/about', '/login', '/signup', '/forgot-password', '/reset-password', '/verify-email']
 
     if ((currentUser && !publicPaths.includes(location.pathname)
         ||

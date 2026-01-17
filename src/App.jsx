@@ -1,7 +1,6 @@
 import Docs from './pages/Docs'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
-import { Capacitor } from '@capacitor/core';
 import { SocketProvider } from './context/SocketContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import PageLayout from './layouts/PageLayout'
@@ -28,15 +27,14 @@ import { useNative } from './hooks/useNative'
 function AppRoutes() {
   const { currentUser } = useAuth()
   const isNative = useNative()
-  const isCapacitor = Capacitor.isNativePlatform();
   return (
     <Routes>
       <Route element={<PageLayout />}>
-        <Route path="/" element={(isNative || isCapacitor) ? <Login /> : <Landing />} />
+        <Route path="/" element={(isNative) ? <Login /> : <Landing />} />
+        <Route path="/docs" element={<Docs />} />
         <Route path="/about" element={<About />} />
         <Route path="/books" element={<Books />} />
         <Route path="/duas" element={<Duas />} />
-        <Route path="/docs" element={<Docs />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/signup" element={<Signup />} />
@@ -101,7 +99,6 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-
       <ScrollToTop />
       <AuthProvider>
         <SocketProvider>

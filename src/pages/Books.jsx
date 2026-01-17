@@ -1,4 +1,4 @@
-import { Download, Search, BookOpen, Library } from 'lucide-react';
+import { Download, Search, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import SectionHeader from '../components/SectionHeader';
 import { useAuth } from '../context/AuthContext';
@@ -127,9 +127,6 @@ export default function Books() {
   const content = (
     <div className={`${currentUser ? '' : 'max-w-7xl mx-auto md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
       <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-full mb-4">
-          <Library className="h-8 w-8 text-primary" />
-        </div>
         <SectionHeader
           title="Library"
           subtitle="Explore a curated collection of essential Islamic books on fasting. Read online or download for offline access."
