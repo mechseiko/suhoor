@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2, Calendar, X } from 'lucide-react'
+import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2, Calendar, X, Clock } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { useAuth } from '../context/AuthContext'
@@ -11,7 +11,7 @@ import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } fro
 // GroupAnalytics removed
 import { Users, Crown } from 'lucide-react'
 
-export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
+export default function WakeUpTracker({ groupId, members, onMemberRemoved, groupName }) {
     // Create a map to store unique members, prioritizing admins
     const uniqueMembersMap = new Map();
     members.forEach(member => {
@@ -326,7 +326,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
         const inputDigits = dateInput.replace(/\D/g, '')
 
         if (inputDigits !== expected) {
-            setDateError('Incorrect date. Please type the full current date (MMDDYYYY).')
+            setDateError('Incorrect date. Please type the full current date (MM DD YYYY).')
             return
         }
 
@@ -410,9 +410,9 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                             <Users className="h-4 w-4 text-primary" />
                             Group Members
                         </h3>
-                        <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Action' : 'Show Action'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                        {members.length > 1 && <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Action' : 'Show Action'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
                             {showActions ? 'Hide' : 'Admin Actions'}
-                        </button>
+                        </button>}
                     </div>
                     <div className="divide-y divide-gray-50">
                         {loading && !members.length ? (
@@ -582,44 +582,42 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
             <UnifiedMemberList />
 
             {wakeUpLogs.length === 0 && (
-                <div className="text-center py-8 text-dark/50">
+                <div className="text-center py-4 text-dark/50">
                     No one has woken up yet today.
                 </div>
             )}
 
             {isBuzzing && (
-                <div className="fixed inset-0 z-[100] bg-red-600/95 flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
+                <div className="fixed inset-0 z-[100] bg-primary flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
                     <div className="text-white text-center space-y-8">
                         <Bell className="h-32 w-32 animate-bounce mx-auto" />
                         <h1 className="text-6xl font-black uppercase tracking-tighter">WAKE UP!</h1>
-                        <p className="text-2xl font-medium opacity-90">Your group needs you for Suhoor!</p>
+                        <p className="text-2xl font-medium opacity-90">{groupName} is waking you for Suhoor!</p>
 
                         <button
                             onClick={handleWakeUpClick}
-                            className="w-full max-w-md bg-white text-red-600 px-8 py-6 rounded-3xl text-2xl font-bold shadow-2xl hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+                            className="w-full max-w-md bg-white text-primary px-8 py-6 rounded-lg text-2xl font-bold shadow-2xl hover:scale-105 active:scale-95 transition-transform cursor-pointer"
                         >
-                            I'M AWAKE!
+                            I am Awake
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* Date Verification Modal */}
             {showDateModal && (
                 <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+                    <div className="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
                         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                <Calendar className="h-5 w-5 text-primary" />
-                                Verify Awareness
+                            <h3 className="font-bold text-gray-900">
+                                Awareness Verification
                             </h3>
-                            <button onClick={() => setShowDateModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                            <button onClick={() => setShowDateModal(false)} className="p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors">
                                 <X size={20} className="text-gray-400" />
                             </button>
                         </div>
                         <div className="p-6 space-y-4">
                             <p className="text-gray-600 text-sm">
-                                To confirm you're truly awake and alert, please type today's date in full (MM-DD-YYYY).
+                                To confirm you're truly awake and alert, please type today's date in full (MM DD YYYY).
                             </p>
 
                             <div className="space-y-2">
@@ -631,7 +629,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                                     value={dateInput}
                                     onChange={(e) => setDateInput(e.target.value)}
                                     placeholder="e.g. 01 13 2026"
-                                    className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-2xl font-black tracking-[0.2em] text-center focus:border-primary focus:bg-white transition-all outline-none"
+                                    className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-lg text-lg placeholder:text-md font-black tracking-[0.2em] text-center focus:border-primary focus:bg-white transition-all outline-none"
                                 />
                                 {dateError && <p className="text-red-500 text-xs font-medium">{dateError}</p>}
                             </div>
@@ -639,9 +637,9 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                             <button
                                 onClick={validateAndWakeUp}
                                 disabled={loading}
-                                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-2"
+                                className="w-full cursor-pointer hover:bg-pacity-90 py-4 bg-primary text-white rounded-lg font-bold text-lg hover:shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-2"
                             >
-                                {loading ? 'Logging...' : 'Confirm I am Awake'}
+                                {loading ? 'Logging...' : 'I am Awake'}
                             </button>
                         </div>
                     </div>

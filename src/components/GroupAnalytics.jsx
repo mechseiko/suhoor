@@ -130,7 +130,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
     )
 
     return (
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm w-full">
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">

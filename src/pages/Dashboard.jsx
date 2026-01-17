@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Users, TrendingUp, Award, X } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { Users, TrendingUp, Award, X, Smile } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer } from 'firebase/firestore'
@@ -280,7 +280,7 @@ export default function Dashboard() {
             // Simplified: Count most recent consecutive block of dates.
 
             let currentCheckDate = new Date()
-            let streakCount = 0
+            let streakCount = 0;
             let keepChecking = true
 
             // Map dates to status
@@ -441,27 +441,24 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <FastingPrompt />
+                <FastingPrompt banner={showWelcomeBanner}/>
 
                 {showWelcomeBanner && (
                     <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
-                        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-2xl p-6 flex items-center justify-between gap-6 relative overflow-hidden group">
+                        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-xl p-6 flex items-center justify-between gap-6 relative overflow-hidden group">
                             <button
                                 onClick={() => setShowWelcomeBanner(false)}
                                 className="absolute top-4 right-4 p-2 hover:bg-white/50 rounded-full text-primary transition-colors z-20 cursor-pointer"
                             >
-                                <X size={20} />
+                                <X size={20} title="Close Welcome modal" onClick={() => window.location.href = '/dashboard'}/>
                             </button>
                             <div className="relative z-10">
                                 <h2 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
-                                    <span className="text-2xl">✨</span> Your Journey Begins!
+                                    <span className="text-xl">✨</span> Your Journey Begins!
                                 </h2>
                                 <p className="text-gray-600 max-w-lg leading-relaxed">
-                                    We're so glad to have you with us. Start by joining a group or exploring the rewards of fasting together. Don't forget to verify your email to access all features!
+                                    {currentUser?.displayName}, we're so glad to have you with us. Start by <Link to='/groups?from=create' className='underline text-primary'>creating a group</Link> or exploring <Link to='/books' className='underline text-primary'>books of knowledge</Link>
                                 </p>
-                            </div>
-                            <div className="hidden md:flex relative z-10 p-4 bg-white rounded-2xl shadow-sm border border-primary/10 group-hover:scale-105 transition-transform">
-                                <TrendingUp className="h-8 w-8 text-primary" />
                             </div>
                             {/* Decorative Background Elements */}
                             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
@@ -530,7 +527,7 @@ export default function Dashboard() {
                                 }}
                                 className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                             >
-                                {[new Date().getFullYear(), 2025].map(year => (
+                                {[new Date().getFullYear()].map(year => (
                                     <option key={year} value={year}>{year}</option>
                                 ))}
                             </select>

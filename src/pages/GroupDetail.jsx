@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { db } from '../config/firebase'
 import { doc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from 'firebase/firestore'
-import { LogOut, Trash2 } from 'lucide-react'
+import { LogOut, Settings2 } from 'lucide-react'
 import WakeUpTracker from '../components/WakeUpTracker'
 import GroupAnalytics from '../components/GroupAnalytics'
 import InviteMemberModal from '../components/InviteMemberModal'
@@ -19,6 +19,7 @@ import { useSocket } from '../context/SocketContext'
 import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useAuth } from '../context/AuthContext'
 import { setDoc, serverTimestamp } from 'firebase/firestore' // Add these imports
+import Settings from './Settings'
 
 // FastingPrompt removed - now only on dashboard
 
@@ -40,6 +41,7 @@ export default function GroupDetail() {
     const [loading, setLoading] = useState(!group)
     const [copied, setCopied] = useState(false);
     const [copyInvite, setCopyInvite] = useState(false);
+    const [showLeave, setShowLeave] = useState(false);
     const [clicked, setClicked] = useState('')
     const [showInviteModal, setShowInviteModal] = useState(false)
     const [toast, setToast] = useState(null)
@@ -211,7 +213,7 @@ export default function GroupDetail() {
                     <UserPlus className="h-5 w-5" />
                     <span>Invite Member</span>
                 </button>
-                <button
+                {showLeave && <button
                     onClick={handleLeaveGroup}
                     disabled={leavingGroup}
                     className="flex items-center cursor-pointer justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium text-[13px] border border-red-100"
@@ -219,7 +221,7 @@ export default function GroupDetail() {
                 >
                     <LogOut className="h-4 w-4 hidden sm:inline" />
                     <span className="text-xs">Leave</span>
-                </button>
+                </button>}
             </div>
         )
     }
@@ -337,10 +339,12 @@ export default function GroupDetail() {
                                         </button>
                                     </div>
                                 </div>
-
-                                <span className="px-3 py-1 w-fit bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
-                                    {members.length} {members.length === 1 ? 'Member' : 'Members'}
-                                </span>
+                                <div className='flex items-center gap-2'>
+                                    <span className="px-3 py-1 w-fit bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
+                                        {members.length} {members.length === 1 ? 'Member' : 'Members'}
+                                    </span>
+                                    <Settings2 className={`h-4 w-4 cursor-pointer ${showLeave ? 'text-primary' : ''}`} onClick={() => setShowLeave(!showLeave)}/>
+                                </div>      
                             </div>
                             <GroupActions />
                         </div>
@@ -348,7 +352,7 @@ export default function GroupDetail() {
                 </div>
             </div>
 
-            <WakeUpTracker groupId={groupId} members={members} onMemberRemoved={fetchMembers} />
+            <WakeUpTracker groupId={groupId} members={members} onMemberRemoved={fetchMembers} groupName={group?.name}/>
 
             <div className="mt-8">
                 <GroupAnalytics groupId={groupId} memberCount={members.length} />

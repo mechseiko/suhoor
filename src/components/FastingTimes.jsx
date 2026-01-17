@@ -3,6 +3,8 @@ import { db } from '../config/firebase'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { useAuth } from '../context/AuthContext'
 import Loader from './Loader';
+import { useState, useEffect } from 'react';
+import { RefreshCw, Moon, Sun, Clock,  } from 'lucide-react';
 
 export default function FastingTimes() {
 
@@ -249,10 +251,10 @@ export default function FastingTimes() {
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-700 block">Personal Wake Up</span>
-                    <span className="text-[10px] text-gray-500">Default: 15m before Suhoor</span>
+                    <span className="text-[10px] text-gray-500">Default: 15minutes before Suhoor</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="time"
                     value={customWakeUpTime}

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Logo from "./Logo";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -80,7 +80,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
     return (
         <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || isMenuOpen === true ? 'bg-white/80 backdrop-blur-md shadow-sm py-2' : 'bg-transparent py-4'}`}>
             <Container>
-                <header className="md:flex hidden">
+                <header className="lg:flex hidden">
                     <div className="container mx-auto flex items-center justify-between xl:px-15">
                         <Logo />
                         <div className="flex gap-8">
@@ -93,7 +93,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                     </div>
                 </header>
 
-                <header className="md:hidden">
+                <header className="lg:hidden">
                     <div className="flex justify-between items-center px-3">
                         <Logo />
                         <div onClick={() => setIsMenuOpen(!isMenuOpen)}>{isMenuOpen ? <X /> : <Menu />}</div>

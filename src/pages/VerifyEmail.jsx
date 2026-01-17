@@ -4,7 +4,7 @@ import AuthWrapper from '../components/AuthWrapper'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore'
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { CheckCircle, XCircle, Loader2, Bell, Layout, Shield } from 'lucide-react'
 
 export default function VerifyEmail() {
     const [searchParams] = useSearchParams()
@@ -20,12 +20,12 @@ export default function VerifyEmail() {
         if (token) {
             verifyToken()
         } else if (currentUser) {
-            // User just signed up or was redirected here because they are not verified
-            setStatus('sent')
-            setMessage(`We've sent a special verification link to ${currentUser.email}. Please check your inbox and click the link to activate your account features.`)
+            // User arrived here without a token (e.g. from Profile page or manual nav)
+            setStatus('pending')
+            setMessage(`To verify your email (${currentUser.email}), please check your inbox for the verification link.`)
         } else {
             setStatus('error')
-            setMessage('Invalid verification link.')
+            setMessage('Invalid verification link. Please log in to resend the verification link from your profile.')
         }
     }, [token, currentUser])
 
@@ -104,25 +104,43 @@ export default function VerifyEmail() {
                     </div>
                 )}
 
-                {status === 'sent' && (
+                {(status === 'sent' || status === 'pending') && (
                     <div className="flex flex-col items-center">
-                        <div className="bg-primary/10 p-4 rounded-full mb-4">
-                            <Loader2 className="w-12 h-12 text-primary animate-pulse" />
+                        <div className="bg-primary/10 p-4 rounded-full mb-6">
+                            <Bell className="w-12 h-12 text-primary animate-bounce" />
                         </div>
 
-                        <div className="flex flex-col gap-4 w-full">
-                            <div className="text-sm text-gray-400">
-                                Didn't receive it? Check your spam folder.
-                            </div>
+                        <p className="text-gray-600 mb-8 text-center px-4 leading-relaxed">
+                            {message}
+                        </p>
 
+                        <div className="flex flex-col gap-3 w-full">
+                            <button
+                                onClick={() => navigate('/dashboard')}
+                                className="w-full bg-primary text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                            >
+                                <Layout size={18} />
+                                Go to Dashboard
+                            </button>
+
+                            <button
+                                onClick={() => navigate('/profile')}
+                                className="w-full bg-gray-50 text-gray-700 py-4 rounded-2xl font-bold border border-gray-100 hover:bg-gray-100 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                            >
+                                <Shield size={18} />
+                                View Profile
+                            </button>
+                        </div>
+
+                        <div className="mt-8 pt-8 border-t border-gray-100 w-full">
                             <button
                                 onClick={() => {
                                     logout()
-                                    navigate('/signup')
+                                    navigate('/login')
                                 }}
-                                className="text-primary hover:underline font-medium cursor-pointer"
+                                className="text-gray-400 hover:text-red-500 text-sm font-medium transition-colors cursor-pointer"
                             >
-                                Sign out and use a different email
+                                Sign out
                             </button>
                         </div>
                     </div>

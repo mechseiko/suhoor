@@ -7,7 +7,7 @@ export default function About() {
     const { currentUser } = useAuth()
 
     return (
-        <div className="max-w-7xl mx-auto md:pt-15 pt-12 pb-8 md:px-4 px-2 mt-5">
+        <div className="max-w-7xl mx-auto pt-20 pb-8 md:px-4 px-2 mt-5">
             <div>
                 <div className="text-center mb-12">
                     <SectionHeader
@@ -28,9 +28,9 @@ export default function About() {
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6">
                             <h2 className="text-3xl font-bold text-gray-900">The Mission</h2>
-                            We realized that waking up for Suhoor alone can be difficult, and traditional alarms are easy to snooze. Suhoor revives the Sunnah of communal waking, allowing groups of friends and families to hold each other accountable with persistent, looping alarms that ensure everyone is awake.
+                            We realized that waking up for Suhoor alone can be difficult, and traditional alarms are easy to snooze. Suhoor revives the Sunnah of communal waking, allowing groups of friends and families to hold each other accountable with persistent, alarms that ensure everyone wakes up.
 
-                            <p className="text-gray-600 leading-loose">
+                            <p className="text-gray-600 leading-loose mt-1">
                                 Our goal is to leverage technology to strengthen spiritual bonds, ensuring that every Muslim can maximize the blessings of their fasting days starting with a nourishing Suhoor.
                             </p>
                             <div className="flex gap-4 pt-4">
@@ -55,14 +55,14 @@ export default function About() {
                                     </div>
                                     <div className="bg-orange-50 p-4 rounded-2xl">
                                         <Sparkles className="h-8 w-8 text-orange-600 mb-2" />
-                                        <h3 className="font-bold text-gray-900">Daily Duas</h3>
+                                        <h3 className="font-bold text-gray-900">Books and Duas</h3>
                                         <p className="text-xs text-gray-500 mt-1">Curated spiritual content</p>
                                     </div>
                                 </div>
                                 <div className="space-y-4 pt-8">
                                     <div className="bg-green-50 p-4 rounded-2xl">
                                         <Globe className="h-8 w-8 text-green-600 mb-2" />
-                                        <h3 className="font-bold text-gray-900">Global Times</h3>
+                                        <h3 className="font-bold text-gray-900">Fasting Times</h3>
                                         <p className="text-xs text-gray-500 mt-1">Accurate prayer timings worldwide</p>
                                     </div>
                                 </div>

@@ -6,7 +6,7 @@ import { db } from '../config/firebase';
 import { collection, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 
-export default function FastingPrompt() {
+export default function FastingPrompt({banner}) {
     const { currentUser } = useAuth();
     const [status, setStatus] = useState('idle'); // idle, confirming_yes, confirming_no, success, hidden
     const [loading, setLoading] = useState(false);
@@ -115,19 +115,19 @@ export default function FastingPrompt() {
         }
     };
 
-    if (status === 'hidden') return null;
+    if (status === 'hidden' || banner) return null;
 
     return (
         <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-            <div className="bg-gradient-to-br from-primary/95 to-blue-700 rounded-xl p-6 text-white shadow-xl shadow-blue-200 relative overflow-hidden">
+            <div className="bg-primary/90 rounded-xl p-4 text-white shadow-sm border-1 border-blue-600 shadow-blue-200 relative overflow-hidden">
                 {/* Decorative background element */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-xl"></div>
 
                 <div className="relative z-10">
                     {status === 'idle' && (
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-white/20 backdrop-blur-md rounded-xl border border-white/30">
+                                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
                                     <Calendar className="h-4 w-4" />
                                 </div>
                                 <div>
@@ -145,7 +145,7 @@ export default function FastingPrompt() {
                                     onClick={() => setStatus('confirming_yes')}
                                     className="flex-1 md:flex-none px-4 py-2.5 bg-white text-primary hover:bg-blue-50 rounded-lg font-bold transition-all shadow-lg cursor-pointer"
                                 >
-                                    Yes, InshaAllah
+                                    Yes
                                 </button>
                             </div>
                         </div>

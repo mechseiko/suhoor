@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Shield, ChevronRight, Mail, Globe, TrendingUp } from 'lucide-react'
+import { Bell, Shield, ChevronRight, Mail, Globe } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
 
@@ -102,11 +102,11 @@ export default function Settings() {
                             action={<ChevronRight className="h-5 w-5 text-gray-400" />}
                         />
                     </a>
-                    <a href="https://devseiko.vercel.app/contact" target="_blank" rel="noopener noreferrer" className="block">
+                    <a href="https://devseiko.vercel.app" target="_blank" rel="noopener noreferrer" className="block">
                         <SettingItem
                             icon={Globe}
                             label="Developer"
-                            description="mechseiko/contact"
+                            description="mechseiko"
                             action={<ChevronRight className="h-5 w-5 text-gray-400" />}
                         />
                     </a>

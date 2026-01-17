@@ -17,10 +17,5 @@ export default function ProtectedRoute({ children }) {
         return <Navigate to="/login" />
     }
 
-    // Strictly block unverified users from accessing the dashboard/protected routes
-    if (userProfile && !userProfile.isVerified) {
-        return <Navigate to="/verify-email" />
-    }
-
     return children;
 }
