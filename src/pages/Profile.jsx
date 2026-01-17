@@ -507,7 +507,7 @@ export default function Profile() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <h3 className="font-medium text-gray-900">Delete Account</h3>
-                                <p className="text-sm text-gray-500 mt-1">Permanently delete your account and all data</p>
+                                <p className="text-sm text-gray-500 mt-1">Permanently delete your account</p>
                             </div>
                             <button
                                 onClick={() => setShowDeleteModal(true)}

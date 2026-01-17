@@ -28,6 +28,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
     const { isConnected, joinGroup, leaveGroup, emitWakeUp, buzzUser, on, off } = useSocket()
     const { todayData } = useFastingTimes();
     const [wantsToFast, setWantsToFast] = useState(true) // Default to true
+    const [showActions, setShowActions] = useState(false)
 
     // State declarations moved to top to prevent ReferenceError
     const [userLocations, setUserLocations] = useState({})
@@ -402,9 +403,9 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                             <Users className="h-4 w-4 text-primary" />
                             Group Members
                         </h3>
-                        <span className="text-[10px] font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                            {members.length}
-                        </span>
+                        <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Action' : 'Show Action'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                            {showActions ? 'Hide' : 'Actions'}
+                        </button>
                     </div>
                     <div className="divide-y divide-gray-50">
                         {loading && !members.length ? (
@@ -447,9 +448,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                                             <div>
                                                 <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
                                                     {member.profiles.display_name || member.profiles.email.split('@')[0]}
-                                                    {member.role === 'admin' && (
-                                                        <Crown className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                                                    )}
+                                                    {member.role === 'admin' && <span className='text-primary'>{' '} (Admin)</span>}
                                                     {isAwake && <CheckCircle className="h-3.5 w-3.5 text-accent" />}
                                                 </div>
                                                 <div className="text-[11px] text-gray-500 flex items-center gap-2">
@@ -495,13 +494,14 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved }) {
                                                     <MapPin className="h-4 w-4" />
                                                 </a>
                                             )}
-                                            {isCurrentUserAdmin && member.profiles.id !== currentUser.uid && (
+                                            {isCurrentUserAdmin && member.profiles.id !== currentUser.uid && showActions && (
                                                 <button
                                                     onClick={() => handleRemoveMember(member.id, member.profiles.display_name || member.profiles.email)}
-                                                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                                    className="p-2 text-xs flex items-center gap-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                                     title="Remove Member"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
+                                                    Remove
                                                 </button>
                                             )}
                                         </div>

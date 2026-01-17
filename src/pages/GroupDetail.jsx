@@ -202,7 +202,7 @@ export default function GroupDetail() {
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-[13px]"
                 >
                     {copyInvite ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    <span>{copyInvite ? 'Link Copied' : 'Copy Invite Link'}</span>
+                    <span>{copyInvite ? 'Link Copied' : 'Invite Link'}</span>
                 </button>
                 <button
                     onClick={() => setShowInviteModal(true)}
@@ -217,8 +217,8 @@ export default function GroupDetail() {
                     className="flex items-center cursor-pointer justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium text-[13px] border border-red-100"
                     title="Leave Group"
                 >
-                    <LogOut className="h-4 w-4" />
-                    <span className="hidden sm:inline">Leave</span>
+                    <LogOut className="h-4 w-4 hidden sm:inline" />
+                    <span className="text-xs">Leave</span>
                 </button>
             </div>
         )
@@ -238,6 +238,7 @@ export default function GroupDetail() {
             setIsEditingName(false)
             setToast({ type: 'success', message: 'Group name updated.' })
         } catch (err) {
+
             console.error('Error updating group name:', err)
             setToast({ type: 'info', message: 'Failed to update group name.' })
         } finally {

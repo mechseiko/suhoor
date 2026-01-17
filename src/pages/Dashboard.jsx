@@ -529,7 +529,7 @@ export default function Dashboard() {
                                 }}
                                 className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                             >
-                                {[2026, 2025].map(year => (
+                                {[new Date().getFullYear(), 2025].map(year => (
                                     <option key={year} value={year}>{year}</option>
                                 ))}
                             </select>
