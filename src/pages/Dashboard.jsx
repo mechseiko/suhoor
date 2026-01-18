@@ -483,11 +483,11 @@ export default function Dashboard() {
                                     <Award className="h-5 w-5" />
                                 </div>
                                 <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                    {stats.consistency}% Consistency
+                                    {stats.consistency}%
                                 </span>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Yearly Goal</h3>
+                                <h3 className="text-sm font-medium text-gray-500">Consistency</h3>
                                 <div className="mt-2 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-green-500 rounded-full transition-all duration-1000"

@@ -452,11 +452,11 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                     <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                                                 )}
                                             </div>
-                                            <div>
+                                            <div className='space-y-1'>
                                                 <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
                                                     {member.profiles.display_name || member.profiles.email.split('@')[0]}
                                                     {member.role === 'admin' && <span className='text-primary'>{' '} (Admin)</span>}
-                                                    {isAwake && <CheckCircle className="h-3.5 w-3.5 text-accent" />}
+                                                    {isAwake && <div className='bg-gray-100 px-1 py-0.5 rounded flex items-center gap-1'><CheckCircle className="h-3.5 w-3.5 text-accent" />Awake</div>}
                                                 </div>
                                                 <div className="text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
                                                     {member.profiles.email}

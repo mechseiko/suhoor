@@ -159,7 +159,7 @@ export default function FastingPrompt({banner}) {
                             <div>
                                 <h3 className="text-lg font-bold">Confirm Fasting Intention?</h3>
                                 <p className="text-blue-100 text-sm max-w-sm">
-                                    We'll schedule an alarm for Suhoor at your local time tomorrow.
+                                    We'll schedule an alarm for Suhoor and your group members will be aware.
                                 </p>
                             </div>
                             <div className="flex gap-3 w-full max-w-xs">
@@ -185,7 +185,7 @@ export default function FastingPrompt({banner}) {
                         <div className="flex flex-col items-center text-center py-2 space-y-4 animate-in zoom-in-95 duration-200">
                             <div>
                                 <h3 className="text-lg font-bold">Dismiss for today?</h3>
-                                <p className="text-blue-100 text-sm">You can still track your progress later in the dashboard.</p>
+                                <p className="text-blue-100 text-sm">Your group members won't be able to wake you for suhoor.</p>
                             </div>
                             <div className="flex gap-3 w-full max-w-xs">
                                 <button
@@ -210,7 +210,7 @@ export default function FastingPrompt({banner}) {
                                 <Bell className="h-8 w-8 animate-bounce" />
                             </div>
                             <h3 className="text-2xl font-black">Alhamdulillah!</h3>
-                            <p className="text-blue-50 text-sm">Alarms scheduled. May your fast be accepted.</p>
+                            <p className="text-blue-50 text-sm">Alarms scheduled. We'll wake you for suhoor.</p>
                         </div>
                     )}
                 </div>

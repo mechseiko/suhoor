@@ -18,7 +18,7 @@ export default function DownloadApp() {
         setIsDownloading(true)
         setTimeout(() => {
             setIsDownloading(false)
-        }, 3000)
+        }, 5000)
     }
 
     // Only show on Mobile Web (Not Capacitor, Not Standalone/PWA)

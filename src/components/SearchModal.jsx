@@ -23,7 +23,7 @@ export default function SearchModal({ onClose }) {
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-8 transform transition-all scale-100 animate-in zoom-in-95 duration-200 gap-4 flex flex-col h-auto max-h-[85vh]">
+            <div className="bg-white rounded-xl shadow-2xl max-w-xl w-full p-8 transform transition-all scale-100 animate-in zoom-in-95 duration-200 gap-4 flex flex-col h-auto max-h-[85vh]">
                 <div className="flex items-center justify-between mb-2 shrink-0">
                     <div>
                         <h3 className="text-2xl font-bold text-gray-900">Suhoor Search</h3>
