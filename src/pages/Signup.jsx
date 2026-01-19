@@ -5,7 +5,6 @@ import AuthWrapper from '../components/AuthWrapper'
 import { Eye, EyeOff } from 'lucide-react'
 import { db } from '../config/firebase'
 import { collection, addDoc, setDoc, doc, serverTimestamp } from 'firebase/firestore'
-import emailjs from 'emailjs-com'
 
 export default function Signup() {
     const [email, setEmail] = useState('')
@@ -17,11 +16,6 @@ export default function Signup() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const { signup } = useAuth()
     const navigate = useNavigate()
-
-    // EmailJS Credentials
-    const SERVICE_ID = 'service_3flsb3n'
-    const TEMPLATE_ID = 'template_vhylt41'
-    const USER_ID = 'JKRA71R40HTU6vo6W'
 
     const handleSubmit = async e => {
         e.preventDefault()
@@ -55,7 +49,7 @@ export default function Signup() {
                 createdAt: serverTimestamp()
             })
 
-            navigate('/dashboard')
+            navigate('/dashboard?m=n')
 
         } catch (err) {
             console.error('Signup Error:', err)

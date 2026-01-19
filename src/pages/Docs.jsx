@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
     Download, AlertTriangle, Check, Shield, Layout, Users,
     Clock, Bell, Info, ArrowRight, Smartphone, Globe,
@@ -7,12 +8,22 @@ import {
     Settings2
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import Settings from './Settings'
 
 export default function Docs() {
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const section = queryParams.get("section");
     const { currentUser } = useAuth()
-    const [activeSection, setActiveSection] = useState('introduction')
+    const [activeSection, setActiveSection] = useState(section === 'mobile-setup' ? 'mobile-setup' : 'introduction')
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [isDownloading, setIsDownloading] = useState(false)
+
+    const handleDownload = () => {
+        setIsDownloading(true)
+        setTimeout(() => {
+            setIsDownloading(false)
+        }, 5000)
+    }
 
     const sections = [
         {
@@ -31,7 +42,7 @@ export default function Docs() {
                         </div>
                         <div className="p-4 bg-accent/5 rounded-2xl border border-accent/10">
                             <h4 className="font-bold text-accent mb-1">Accountability</h4>
-                        <p className="text-sm text-gray-600">No more unanswered calls. See who is awake and who needs a helping hand to get up.</p>
+                            <p className="text-sm text-gray-600">No more unanswered calls. See who is awake and who needs a helping hand to get up.</p>
                         </div>
                     </div>
                 </div>
@@ -46,9 +57,10 @@ export default function Docs() {
                     <p className="text-gray-600">The best experience is on Android. Follow these steps to install the native app:</p>
                     <div className="space-y-4">
                         {[
-                            { step: 1, title: 'Download APK', desc: 'Visit the landing page and click "Download App" to get the latest APK file.', alert: false },
-                            { step: 2, title: 'Enable Unknown Sources', desc: 'Go to Settings > Security and enable "Install from Unknown Sources" for your browser.', alert: true },
-                            { step: 3, title: 'Install APK', desc: 'Open the downloaded file and click "Install". If Play Protect warns you, tap "Install Anyway".', alert: false },
+                            { step: 1, title: 'Download APK', alert: false },
+                            { step: 2, title: 'Download APK Installer', desc: "You'll need to download an Apk installer app from google play store or app store. ", alert: true },
+                            { step: 3, title: 'Enable Unknown Sources', desc: 'Go to Settings > Security and enable "Install from Unknown Sources" for your browser.', alert: true },
+                            // { step: 3, title: 'Install APK', desc: 'Open the downloaded file and click "Install". If Play Protect warns you, tap "Install Anyway".', alert: false },
                             { step: 4, title: 'Permissions', desc: 'When you first open the app, allow Location and Notification permissions for full features.', alert: false }
                         ].map((s) => (
                             <div key={s.step} className="flex gap-4 p-5 bg-white border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -56,8 +68,24 @@ export default function Docs() {
                                 <div>
                                     <h4 className="font-bold text-gray-900">{s.title}</h4>
                                     <p className="text-sm text-gray-500">{s.desc}</p>
-                                    {s.alert && (
-                                        <div className="mt-2 flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
+                                    {s.step === 1 && (
+                                        <p className="text-sm text-gray-500">If you haven't already, <a
+                                            href='/Suhoor.apk'
+                                            onClick={handleDownload}
+                                            download="Suhoor.apk"
+                                            className="mt-2 flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100"
+                                        >
+                                            <Download size={12} /> {isDownloading ? 'Downloading...' : 'Download the App'}
+                                        </a>
+                                        </p>
+                                    )}
+                                    {s.alert && s.step === 2 && (
+                                        <div className="mt-2 w-fit flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
+                                            <Download size={12} /> <a href="">Download Apk Installer</a>
+                                        </div>
+                                    )}
+                                    {s.alert && s.step === 3 && (
+                                        <div className="mt-2 w-fit flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
                                             <AlertTriangle size={12} /> Mandatory for Android beta versions.
                                         </div>
                                     )}
@@ -112,7 +140,7 @@ export default function Docs() {
             subsections: [
                 { id: 'dash-overview', title: 'Dashboard Overview', icon: <Layout size={14} />, desc: 'Here, you see your past and current stats, an email verification banner and pending prompts, which asks you if you want to fast the next day. The top banner will guide you on your next steps if you are a new user.' },
                 { id: 'groups', title: 'Group Management', icon: <Users size={14} />, desc: 'From this page you can join or create groups using unique keys. Within a group, you can monitor the status of members, see live locations during wake up windows (15 minutes before Suhoor), and manually "Buzz" members who are still sleeping.' },
-                { id: 'fasting', title: 'Fasting Times & Prompts', icon: <Clock size={14} />, desc: "A dedicated prompt appears every evening asking if you wish to fast the next day. If you agree, The location you give will be released to your group members 15 minutes before suhoor time and you can buzzed if you have'nt already woken up. If you choose no, your team members will be aware of this from your group's detail page."},
+                { id: 'fasting', title: 'Fasting Times & Prompts', icon: <Clock size={14} />, desc: "A dedicated prompt appears every evening asking if you wish to fast the next day. If you agree, The location you give will be released to your group members 15 minutes before suhoor time and you can buzzed if you have'nt already woken up. If you choose no, your team members will be aware of this from your group's detail page." },
                 { id: 'resources', title: 'Resources', icon: <BookOpen size={14} />, desc: "This is where you have unlimited access to the available books of knowledge on fasting and more from different scholars, It's built to make your fasting period more productive and blessed." },
                 { id: 'settings', title: 'Profile & Settings', icon: <Settings2 size={14} />, desc: 'Here you can set your preferences, or make some chages to your suhoor account.' }
             ],
@@ -150,8 +178,15 @@ export default function Docs() {
         }
     }
 
+    useEffect(() => {
+        if(section === 'mobile-setup'){
+            scrollTo('mobile-setup')
+        }
+    }, [section])
+    
+
     return (
-        <div className={`relative min-h-screen ${currentUser ? 'bg-transparent' : 'bg-white pt-20'}`}>
+        <div className={`relative min-h-screen bg-transparent pt-20`}>
             {/* Mobile Sidebar Toggle */}
             <div className="lg:hidden fixed bottom-6 right-6 z-50">
                 <button
@@ -162,7 +197,7 @@ export default function Docs() {
                 </button>
             </div>
 
-            <div className={`flex max-w-[1400px] mx-auto ${currentUser ? 'p-4 md:p-6' : 'px-6 lg:px-10'}`}>
+            <div className={`flex max-w-[1400px] mx-auto p-4 md:p-6`}>
                 {/* Sidebar / Navigation */}
                 <aside className={`
                         fixed lg:sticky overflow-y-auto top-0 lg:top-20 left-0 h-full lg:h-fit w-72 bg-white lg:bg-transparent z-40 p-6 lg:p-2 border-r lg:border-r-0 border-gray-100 transition-transform duration-300

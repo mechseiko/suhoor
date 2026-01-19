@@ -10,7 +10,7 @@ export default function VerificationBanner() {
                 <div className="flex items-center gap-2 text-amber-800">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     <p className="font-medium">
-                        Your account is not verified. Please verify your email to access all features.
+                        Your account is not verified. Please verify your account to access all features.
                     </p>
                 </div>
                 <button

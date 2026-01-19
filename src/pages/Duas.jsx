@@ -54,7 +54,7 @@ export const duas = [
 
 export default function Duas() {
   const { currentUser } = useAuth()
-  const [openIndex, setOpenIndex] = useState(null)
+  const [openIndex, setOpenIndex] = useState(0)
 
   const toggle = (idx) => {
     setOpenIndex(openIndex === idx ? null : idx)
@@ -83,7 +83,7 @@ export default function Duas() {
               {/* Header (FAQ Question) */}
               <button
                 onClick={() => toggle(idx)}
-                className="w-full flex items-center justify-between p-4 md:p-6 text-left hover:bg-gray-50 transition"
+                className="w-full flex items-center cursor-pointer justify-between p-4 md:p-6 text-left hover:bg-gray-50 transition"
               >
                 <div className="flex items-center gap-3">
                   <div className={`p-2 md:p-3 rounded-xl ${dua.bg}`}>

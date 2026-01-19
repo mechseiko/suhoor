@@ -53,7 +53,7 @@ export default function DownloadApp() {
                         </a>
 
                         <a
-                            href="/docs"
+                            href="/docs?section=mobile-setup"
                             className="text-white/80 hover:text-white text-sm font-medium underline flex items-center gap-2 transition-colors"
                         >
                             How to install?

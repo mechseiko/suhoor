@@ -133,8 +133,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm w-full">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-bold text-gray-900">
                         Wake Up Stats
                     </h3>
                     <p className="text-sm text-gray-500">Last 7 days consistency</p>
@@ -144,7 +143,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                 </div>
             </div>
 
-            <div className="h-[200px]">
+            <div className="h-[200px] w-full">
                 {chartData && <Bar data={chartData} options={options} />}
             </div>
         </div>
