@@ -64,11 +64,6 @@ export default function DownloadApp() {
                             <span>v1.0.0</span>
                         </div>
                     </div>
-
-                    <p className="mt-4 text-sm text-blue-200/80">
-                        *No store download required.
-                        {/* *Works on Android. No store download required. */}
-                    </p>
                 </motion.div>
             </div>
         </section>
