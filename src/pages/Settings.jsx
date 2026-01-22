@@ -1,11 +1,9 @@
-import { useState } from 'react'
 import { Bell, Shield, ChevronRight, Mail, Globe } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
 
 export default function Settings() {
     const { currentUser, userProfile } = useAuth()
-    const [notifications, setNotifications] = useState(true)
 
     const Section = ({ title, children }) => (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
@@ -41,27 +39,12 @@ export default function Settings() {
                 <Section title="Preferences">
                     <SettingItem
                         icon={Bell}
-                        label="Wake Up Alarms"
-                        description="Enable loud, persistent alarms for Suhoor"
+                        label="Wake Up Time"
+                        description="Set your own wake-up time"
                         action={
-                            <button
-                                onClick={() => setNotifications(!notifications)}
-                                className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${notifications ? 'bg-primary' : 'bg-gray-200'
-                                    }`}
-                            >
-                                <span
-                                    className={`${notifications ? 'translate-x-6' : 'translate-x-1'
-                                        } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                                />
-                            </button>
-                        }
-                    />
-                    <SettingItem
-                        icon={Globe}
-                        label="Community Updates"
-                        description="Stay updated with global Suhoor trends"
-                        action={
-                            <div className="text-sm text-gray-400">Always On</div>
+                            <a href="/fasting" className="text-sm text-primary font-medium hover:underline">
+                                Configure
+                            </a>
                         }
                     />
                 </Section>
@@ -97,7 +80,7 @@ export default function Settings() {
                     <a href="mailto:suhoorapp@gmail.com" className="block">
                         <SettingItem
                             icon={Mail}
-                            label="Contact Support"
+                            label="Support"
                             description="suhoorapp@gmail.com"
                             action={<ChevronRight className="h-5 w-5 text-gray-400" />}
                         />

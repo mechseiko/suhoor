@@ -4,17 +4,17 @@ import AuthWrapper from '../components/AuthWrapper'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore'
-import { CheckCircle, XCircle, Loader2, Bell, Layout, Shield } from 'lucide-react'
+import { CheckCircle, XCircle, Loader2, Bell, Shield } from 'lucide-react'
 
 export default function VerifyEmail() {
     const [searchParams] = useSearchParams()
     const token = searchParams.get('token')
 
-    const [status, setStatus] = useState('verifying') // verifying, success, error
+    const [status, setStatus] = useState('verifying') // verifying, success, error, pending
     const [message, setMessage] = useState('')
     const navigate = useNavigate()
 
-    const { currentUser, logout } = useAuth() // Get current user and logout function
+    const { currentUser, logout } = useAuth()
 
     useEffect(() => {
         if (token) {
@@ -22,7 +22,7 @@ export default function VerifyEmail() {
         } else if (currentUser) {
             // User arrived here without a token (e.g. from Profile page or manual nav)
             setStatus('pending')
-            setMessage(`To verify your email (${currentUser.email}), please check your inbox for the verification link.`)
+            setMessage('')
         } else {
             setStatus('error')
             setMessage('Invalid verification link. Please log in to resend the verification link from your profile.')
@@ -56,12 +56,9 @@ export default function VerifyEmail() {
             const uid = verificationDoc.data().uid
             if (uid) {
                 const profileRef = doc(db, 'profiles', uid)
-                // Check if profile exists (for legacy random-ID profiles, we might fallback, but let's assume standard)
-                // Actually, let's try to update direct path first.
                 await updateDoc(profileRef, {
                     isVerified: true
                 }).catch(async (err) => {
-                    // Fallback for legacy data: Query by email if direct update fails (e.g. doc doesn't exist at UID path)
                     console.log("Direct profile update failed, trying query fallback", err)
                     const email = verificationDoc.data().email
                     const profilesQuery = query(collection(db, 'profiles'), where('email', '==', email))
@@ -80,7 +77,7 @@ export default function VerifyEmail() {
 
             // Auto-redirect after 2 seconds
             setTimeout(() => {
-                navigate(currentUser ? '/dashboard' : '/login')
+                navigate(currentUser ? '/dashboard?m=n' : '/login')
             }, 2000)
 
         } catch (err) {
@@ -92,8 +89,8 @@ export default function VerifyEmail() {
 
     return (
         <AuthWrapper
-            title={status === 'success' ? "Verification Successful" : status === 'error' ? "Verification Failed" : "Verifying Email"}
-            subtitle={message || "Please wait while we verify your account..."}
+            title={status === 'success' ? "Verification Successful" : status === 'error' ? "Verification Failed" : "Verify Your Email"}
+            subtitle={status === 'pending' ? `Check your inbox at ${currentUser?.email}` : status === 'verifying' ? "Please wait..." : ""}
             bottomTitle="Need help?"
             bottomsubTitle="Login"
         >
@@ -101,6 +98,7 @@ export default function VerifyEmail() {
                 {status === 'verifying' && (
                     <div className="flex flex-col items-center">
                         <Loader2 className="w-16 h-16 text-primary animate-spin mb-4" />
+                        <p className="text-gray-600">Verifying your email...</p>
                     </div>
                 )}
 
@@ -110,25 +108,19 @@ export default function VerifyEmail() {
                             <Bell className="w-12 h-12 text-primary animate-bounce" />
                         </div>
 
-                        <p className="text-gray-600 mb-8 text-center px-4 leading-relaxed">
-                            {message}
-                        </p>
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 w-full">
+                            <p className="text-sm text-blue-800 font-medium text-center">
+                                📧 Check your email inbox and click the verification link to continue.
+                            </p>
+                        </div>
 
                         <div className="flex flex-col gap-3 w-full">
                             <button
-                                onClick={() => navigate('/dashboard')}
+                                onClick={() => navigate('/profile')}
                                 className="w-full bg-primary text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
                             >
-                                <Layout size={18} />
-                                Go to Dashboard
-                            </button>
-
-                            <button
-                                onClick={() => navigate('/profile')}
-                                className="w-full bg-gray-50 text-gray-700 py-4 rounded-2xl font-bold border border-gray-100 hover:bg-gray-100 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                            >
                                 <Shield size={18} />
-                                View Profile
+                                Resend Verification Email
                             </button>
                         </div>
 
@@ -149,10 +141,11 @@ export default function VerifyEmail() {
                 {status === 'success' && (
                     <div className="flex flex-col items-center">
                         <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-                        <p className="text-gray-600 mb-6">You will be redirected shortly...</p>
+                        <p className="text-gray-600 mb-6">{message}</p>
+                        <p className="text-sm text-gray-500 mb-4">You will be redirected shortly...</p>
                         <button
                             className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition"
-                            onClick={() => navigate(currentUser ? '/dashboard' : '/login')}
+                            onClick={() => navigate(currentUser ? '/dashboard?m=n' : '/login')}
                         >
                             {currentUser ? 'Go to Dashboard' : 'Login Now'}
                         </button>
@@ -162,6 +155,7 @@ export default function VerifyEmail() {
                 {status === 'error' && (
                     <div className="flex flex-col items-center">
                         <XCircle className="w-16 h-16 text-red-500 mb-4" />
+                        <p className="text-gray-600 mb-6">{message}</p>
                         <button
                             className="w-full cursor-pointer bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium transition"
                             onClick={() => navigate('/login')}

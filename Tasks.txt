@@ -6,6 +6,8 @@
     able to be downloaded on ios)
 3. Make sure The Website Loads faster (I.r every page loads faster)
 4. All images, videos and pdf's should be fetched from clouding
+also the wake up time they set for them selves should have limit, 15 minutes before the time from the api is minimum and
+15 minutes after the time from the api is maximum.
 
 
 //Implemented

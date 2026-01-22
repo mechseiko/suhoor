@@ -504,14 +504,14 @@ export default function Profile() {
                     </div>
 
                     <div className="p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
+                        <div className="md:flex items-center justify-between">
+                            <div className='mb-3'>
                                 <h3 className="font-medium text-gray-900">Delete Account</h3>
                                 <p className="text-sm text-gray-500 mt-1">Permanently delete your account</p>
                             </div>
                             <button
                                 onClick={() => setShowDeleteModal(true)}
-                                className="px-4 cursor-pointer py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
+                                className="px-4 w-full md:w-fit cursor-pointer py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
                             >
                                 Delete Account
                             </button>

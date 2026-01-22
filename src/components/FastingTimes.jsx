@@ -4,7 +4,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { useAuth } from '../context/AuthContext'
 import Loader from './Loader';
 import { useState, useEffect } from 'react';
-import { RefreshCw, Moon, Sun, Clock,  } from 'lucide-react';
+import { RefreshCw, Moon, Sun, Clock, } from 'lucide-react';
 
 export default function FastingTimes() {
 
@@ -39,6 +39,8 @@ export default function FastingTimes() {
   const { currentUser } = useAuth()
   const [customWakeUpTime, setCustomWakeUpTime] = useState('')
   const [savingTime, setSavingTime] = useState(false)
+  const [timeError, setTimeError] = useState('')
+  const [allowedTimeRange, setAllowedTimeRange] = useState({ min: '', max: '' })
 
   const onSuccess = (position) => {
     setLocation({
@@ -57,6 +59,29 @@ export default function FastingTimes() {
       coordinates: { lat: null, lng: null },
       error: err.message,
     });
+  };
+
+  // Calculate allowed time range (15 min before, 5 min after Suhoor)
+  const calculateTimeRange = (suhoorTime) => {
+    if (!suhoorTime) return { min: '', max: '' };
+
+    const [hours, minutes] = suhoorTime.split(':').map(Number);
+    const suhoorDate = new Date();
+    suhoorDate.setHours(hours, minutes, 0, 0);
+
+    const minTime = new Date(suhoorDate.getTime() - 15 * 60000); // -15 mins
+    const maxTime = new Date(suhoorDate.getTime() + 5 * 60000); // +5 mins
+
+    return {
+      min: `${String(minTime.getHours()).padStart(2, '0')}:${String(minTime.getMinutes()).padStart(2, '0')}`,
+      max: `${String(maxTime.getHours()).padStart(2, '0')}:${String(maxTime.getMinutes()).padStart(2, '0')}`
+    };
+  };
+
+  // Validate if time is within allowed range
+  const isTimeInRange = (time, minTime, maxTime) => {
+    if (!time || !minTime || !maxTime) return true; // Allow if no constraints
+    return time >= minTime && time <= maxTime;
   };
 
   useEffect(() => {
@@ -127,11 +152,28 @@ export default function FastingTimes() {
     fetchFastingTimes();
   }, [location.loaded, location.coordinates.lat, location.coordinates.lng, currentUser]);
 
+  // Calculate allowed time range when fasting data changes
+  useEffect(() => {
+    if (fastingData?.fasting?.[0]?.time?.sahur) {
+      const range = calculateTimeRange(fastingData.fasting[0].time.sahur);
+      setAllowedTimeRange(range);
+    }
+  }, [fastingData]);
+
   const handleWakeUpTimeChange = async (e) => {
     const newTime = e.target.value
     setCustomWakeUpTime(newTime)
+    setTimeError('') // Clear previous errors
 
     if (!currentUser) return
+
+    // Validate time is within allowed range
+    if (allowedTimeRange.min && allowedTimeRange.max) {
+      if (!isTimeInRange(newTime, allowedTimeRange.min, allowedTimeRange.max)) {
+        setTimeError(`Time must be between ${allowedTimeRange.min} and ${allowedTimeRange.max}`);
+        return; // Don't save invalid time
+      }
+    }
 
     setSavingTime(true)
     try {
@@ -141,6 +183,7 @@ export default function FastingTimes() {
       })
     } catch (err) {
       console.error("Error updating wake up time", err)
+      setTimeError('Failed to save wake-up time')
     } finally {
       setSavingTime(false)
     }
@@ -244,25 +287,38 @@ export default function FastingTimes() {
             )}
 
             <div className="pt-4 border-t border-gray-100">
-              <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-100">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <Clock className="h-4 w-4 text-yellow-700" />
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-yellow-100 rounded-lg">
+                      <Clock className="h-4 w-4 text-yellow-700" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 block">Personal Wake Up</span>
+                      {allowedTimeRange.min && allowedTimeRange.max ? (
+                        <span className="text-[10px] text-gray-500">Allowed: {allowedTimeRange.min} - {allowedTimeRange.max}</span>
+                      ) : (
+                        <span className="text-[10px] text-gray-500">Default: 15 minutes before Suhoor</span>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-sm font-medium text-gray-700 block">Personal Wake Up</span>
-                    <span className="text-[10px] text-gray-500">Default: 15 minutes before Suhoor</span>
+                  <div className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="time"
+                      value={customWakeUpTime}
+                      onChange={handleWakeUpTimeChange}
+                      min={allowedTimeRange.min}
+                      max={allowedTimeRange.max}
+                      className="bg-white border border-yellow-200 rounded-lg px-2 py-1 text-sm font-bold text-yellow-800 outline-none focus:ring-2 focus:ring-yellow-400"
+                    />
+                    {savingTime && <RefreshCw className="h-3 w-3 text-yellow-600 animate-spin" />}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="time"
-                    value={customWakeUpTime}
-                    onChange={handleWakeUpTimeChange}
-                    className="bg-white border border-yellow-200 rounded-lg px-2 py-1 text-sm font-bold text-yellow-800 outline-none focus:ring-2 focus:ring-yellow-400"
-                  />
-                  {savingTime && <RefreshCw className="h-3 w-3 text-yellow-600 animate-spin" />}
-                </div>
+                {timeError && (
+                  <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-xs text-red-600 font-medium">{timeError}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

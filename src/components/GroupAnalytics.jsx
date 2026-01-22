@@ -136,7 +136,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                     <h3 className="text-lg font-bold text-gray-900">
                         Wake Up Stats
                     </h3>
-                    <p className="text-sm text-gray-500">Last 7 days consistency</p>
+                    <p className="text-sm text-gray-500">Last 7 days activity</p>
                 </div>
                 <div className="p-2 bg-gray-50 rounded-lg">
                     <Calendar className="h-5 w-5 text-gray-400" />

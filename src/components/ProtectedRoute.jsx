@@ -17,5 +17,10 @@ export default function ProtectedRoute({ children }) {
         return <Navigate to="/login" />
     }
 
+    // Check if email is verified
+    if (userProfile && !userProfile.isVerified) {
+        return <Navigate to="/verify-email" />
+    }
+
     return children;
 }

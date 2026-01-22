@@ -3,33 +3,51 @@ import { Calendar, Check, X, Bell, Loader2, AlertCircle } from 'lucide-react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { db } from '../config/firebase';
-import { collection, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 
-export default function FastingPrompt({banner}) {
+export default function FastingPrompt() {
     const { currentUser } = useAuth();
     const [status, setStatus] = useState('idle'); // idle, confirming_yes, confirming_no, success, hidden
     const [loading, setLoading] = useState(false);
-    const [tomorrowDate, setTomorrowDate] = useState('');
-    const [tomorrowDisplay, setTomorrowDisplay] = useState('');
+    const [targetDate, setTargetDate] = useState('');
+    const [targetDisplay, setTargetDisplay] = useState('');
 
     useEffect(() => {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const dateStr = tomorrow.toLocaleDateString('en-CA'); // YYYY-MM-DD
-        setTomorrowDate(dateStr);
-        setTomorrowDisplay(tomorrow.toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-        }));
+        const determineTargetDate = async () => {
+            const now = new Date();
+            const today = new Date();
+            const todayStr = today.toLocaleDateString('en-CA');
 
-        // Check if already answered for tomorrow
-        const answered = localStorage.getItem(`suhoor_intent_${dateStr}`);
-        if (answered) {
-            setStatus('hidden');
-        }
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toLocaleDateString('en-CA');
+
+            // 1. Check if answered for today
+            const answeredToday = localStorage.getItem(`suhoor_intent_${todayStr}`);
+
+            // If it's early (e.g. before 10 AM) and not answered for today, ask for today
+            if (!answeredToday && now.getHours() < 10) {
+                setTargetDate(todayStr);
+                setTargetDisplay(today.toLocaleDateString('en-US', {
+                    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+                }));
+                return;
+            }
+
+            // 2. Otherwise ask for tomorrow
+            const answeredTomorrow = localStorage.getItem(`suhoor_intent_${tomorrowStr}`);
+            if (answeredTomorrow) {
+                setStatus('hidden');
+            } else {
+                setTargetDate(tomorrowStr);
+                setTargetDisplay(tomorrow.toLocaleDateString('en-US', {
+                    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+                }));
+            }
+        };
+
+        determineTargetDate();
     }, []);
 
     const handleYes = async () => {
@@ -40,23 +58,18 @@ export default function FastingPrompt({banner}) {
                 navigator.geolocation.getCurrentPosition(resolve, reject);
             });
 
-            // 2. Fetch tomorrow's fasting times
+            // 2. Fetch fasting times
             const response = await fetch(
                 `https://islamicapi.com/api/v1/fasting/?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs`
             );
             const data = await response.json();
-
-            // Note: The API might return today's data, we need to ensure we schedule for tomorrow
-            // For a production app, we'd ensure the API returns tomorrow's specific time.
-            // If the API only returns [0] as today, we'd usually calculate or ask for a monthly list.
             const fastingInfo = data.data.fasting[0];
-            const sahurTime = fastingInfo.time.sahur; // e.g. "05:12"
+            const sahurTime = fastingInfo.time.sahur;
 
             // 3. Schedule Notification if on native
             if (Capacitor.isNativePlatform()) {
                 const [hours, minutes] = sahurTime.split(':').map(Number);
-                const scheduleDate = new Date();
-                scheduleDate.setDate(scheduleDate.getDate() + 1);
+                const scheduleDate = new Date(targetDate);
                 scheduleDate.setHours(hours, minutes, 0, 0);
 
                 await LocalNotifications.schedule({
@@ -66,7 +79,7 @@ export default function FastingPrompt({banner}) {
                             body: "Time for your pre-fast meal. May Allah accept your fast.",
                             id: 1001,
                             schedule: { at: scheduleDate },
-                            sound: 'alarm.wav', // If available
+                            sound: 'alarm.wav',
                             extra: { type: 'suhoor_alarm' }
                         }
                     ]
@@ -74,17 +87,16 @@ export default function FastingPrompt({banner}) {
             }
 
             // 4. Log to Firebase
-            // Using a predictable ID: userId_date
-            const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${tomorrowDate}`);
+            const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${targetDate}`);
             await setDoc(statusRef, {
                 userId: currentUser.uid,
-                date: tomorrowDate,
+                date: targetDate,
                 wantsToFast: true,
                 updatedAt: serverTimestamp()
             });
 
             // 5. Save locally and finish
-            localStorage.setItem(`suhoor_intent_${tomorrowDate}`, 'yes');
+            localStorage.setItem(`suhoor_intent_${targetDate}`, 'yes');
             setStatus('success');
 
             // Auto hide after 3 seconds
@@ -100,14 +112,14 @@ export default function FastingPrompt({banner}) {
 
     const handleNo = async () => {
         try {
-            const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${tomorrowDate}`);
+            const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${targetDate}`);
             await setDoc(statusRef, {
                 userId: currentUser.uid,
-                date: tomorrowDate,
+                date: targetDate,
                 wantsToFast: false,
                 updatedAt: serverTimestamp()
             });
-            localStorage.setItem(`suhoor_intent_${tomorrowDate}`, 'no');
+            localStorage.setItem(`suhoor_intent_${targetDate}`, 'no');
             setStatus('hidden');
         } catch (error) {
             console.error("Error dismissing fasting:", error);
@@ -115,12 +127,11 @@ export default function FastingPrompt({banner}) {
         }
     };
 
-    if (status === 'hidden' || banner) return null;
+    if (status === 'hidden') return null;
 
     return (
         <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="bg-primary/90 rounded-xl p-4 text-white shadow-sm border-1 border-blue-600 shadow-blue-200 relative overflow-hidden">
-                {/* Decorative background element */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-xl"></div>
 
                 <div className="relative z-10">
@@ -130,8 +141,33 @@ export default function FastingPrompt({banner}) {
                                 <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
                                     <Calendar className="h-4 w-4" />
                                 </div>
-                                <div>
-                                    <p className="text-blue-100 text-lg">Are you planning to fast tomorrow, <span className="font-semibold">{tomorrowDate}</span>?</p>
+                                <div className="flex-1">
+                                    <p className="text-blue-100 text-lg">Are you planning to fast tomorrow, <span className="font-semibold">{targetDate}</span>?</p>
+                                    {(() => {
+                                        const date = new Date(targetDate);
+                                        const dayOfWeek = date.getDay();
+                                        const isSunnahDay = dayOfWeek === 1 || dayOfWeek === 4;
+                                        const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+
+                                        if (isSunnahDay) {
+                                            return (
+                                                <div className="mt-3 bg-green-500/20 border border-green-300/30 rounded-lg p-3 backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                                                    <div className="flex items-start gap-2">
+                                                        <span className="text-lg">🌙</span>
+                                                        <div>
+                                                            <p className="text-sm font-bold text-green-100">
+                                                                {dayName === new Date().toLocaleDateString('en-US', { weekday: 'long' }) ? "Today" : "Tomorrow"} is {dayName} - A Blessed Sunnah Day!
+                                                            </p>
+                                                            <p className="text-xs text-green-200 mt-1">
+                                                                The Prophet ﷺ used to fast on Mondays and Thursdays 💚
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    })()}
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -143,7 +179,7 @@ export default function FastingPrompt({banner}) {
                                 </button>
                                 <button
                                     onClick={() => setStatus('confirming_yes')}
-                                    className="flex-1 md:flex-none px-4 py-2.5 bg-white text-primary hover:bg-blue-50 rounded-lg font-bold transition-all shadow-lg cursor-pointer"
+                                    className="flex-1 md:flex-none px-4 py-2.5 bg-white text-primary rounded-lg font-bold transition-all shadow-lg cursor-pointer"
                                 >
                                     Yes
                                 </button>
@@ -159,7 +195,7 @@ export default function FastingPrompt({banner}) {
                             <div>
                                 <h3 className="text-lg font-bold">Confirm Fasting Intention?</h3>
                                 <p className="text-blue-100 text-sm max-w-sm">
-                                    We'll schedule an alarm for Suhoor and your group members will be aware.
+                                    We'll schedule an alarm for {targetDate} and your group members will be aware.
                                 </p>
                             </div>
                             <div className="flex gap-3 w-full max-w-xs">

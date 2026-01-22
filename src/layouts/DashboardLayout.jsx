@@ -229,7 +229,7 @@ export default function DashboardLayout({
                                     <ArrowLeft className={`${!['/dashboard'].includes(location.pathname) ? '' : 'hidden'} cursor-pointer pl-2 size-6 text-gray-500`} title="Back" onClick={() => navigate(-1)} />
                                     <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
                                 </div>
-                                <div className='hidden md:flex items-center gap-3'>
+                                <div className='hidden lg:flex items-center gap-3'>
                                     <div className='cursor-pointer flex items-center bg-gray-50 hover:bg-gray-100 rounded-full px-2 py-1 text-primary' title="Search" onClick={() => setShowSearchModal(true)}>
                                         <Search size="18" />
                                         <p className="text-xs font-semibold text-gray-400 tracking-widest px-2">Ctrl + K</p>
@@ -245,10 +245,8 @@ export default function DashboardLayout({
 
                     {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto no-scrollbar p-4 md:px-6 py-3 pb-10">
-                        <div className="flex flex-col xl:flex-row gap-8">
-                            <div className="flex-1">
-                                {children ? children : <Outlet />}
-                            </div>
+                        <div className="max-w-6xl mx-auto w-full">
+                            {children ? children : <Outlet />}
                         </div>
                     </div>
                 </main>

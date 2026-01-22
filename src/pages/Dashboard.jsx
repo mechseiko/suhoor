@@ -96,7 +96,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(!groups.length)
     const [stats, setStats] = useState(() => {
         const cached = localStorage.getItem(`suhoor_stats_${currentUser?.uid}`)
-        return cached ? JSON.parse(cached) : { totalGroups: 0, totalMembers: 0, activeToday: 0, consistency: 0, milestones: [] }
+        return cached ? JSON.parse(cached) : { totalGroups: 0, totalMembers: 0, totalFastingDays: 0, milestones: [] }
     })
 
     const [chartData, setChartData] = useState({
@@ -225,8 +225,60 @@ export default function Dashboard() {
         if (currentUser) {
             createOrUpdateProfile()
             fetchGroups()
+            checkMissedFastingPrompt()
         }
     }, [currentUser, selectedYear])
+
+    const checkMissedFastingPrompt = async () => {
+        try {
+            const today = new Date();
+            const todayStr = today.toLocaleDateString('en-CA');
+            const dayOfWeek = today.getDay();
+            const isSunnahDay = dayOfWeek === 1 || dayOfWeek === 4; // Mon=1, Thu=4
+
+            // If it's a Sunnah day, we don't auto-default to "No" (as per user request)
+            if (isSunnahDay) return;
+
+            // Check if status for today already exists
+            const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${todayStr}`);
+            const statusSnap = await getDoc(statusRef);
+
+            if (!statusSnap.exists()) {
+                // If not exists, check if it's 1 hour past suhoor
+                // 1. Get coords
+                const pos = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject);
+                });
+
+                // 2. Fetch today's fasting times
+                const response = await fetch(
+                    `https://islamicapi.com/api/v1/fasting/?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs`
+                );
+                const data = await response.json();
+                const sahurTimeStr = data.data.fasting[0].time.sahur; // e.g. "05:12"
+
+                const [sHours, sMinutes] = sahurTimeStr.split(':').map(Number);
+                const sahurTime = new Date();
+                sahurTime.setHours(sHours, sMinutes, 0, 0);
+
+                const oneHourAfterSahur = new Date(sahurTime.getTime() + 60 * 60 * 1000);
+
+                if (today > oneHourAfterSahur) {
+                    // Default to NO
+                    await setDoc(statusRef, {
+                        userId: currentUser.uid,
+                        date: todayStr,
+                        wantsToFast: false,
+                        updatedAt: serverTimestamp(),
+                        isAutoDefault: true
+                    });
+                    console.log(`Auto-defaulted fasting status for ${todayStr} to NO`);
+                }
+            }
+        } catch (err) {
+            console.error("Error checking missed fasting prompt:", err);
+        }
+    }
 
     const createOrUpdateProfile = async () => {
         try {
@@ -327,12 +379,12 @@ export default function Dashboard() {
             const totalFasts = fastingCounts.reduce((a, b) => a + b, 0)
             const consistency = Math.round((totalFasts / daysInYear) * 100)
 
-            // Milestones
+            // Milestones based on actual fasting days
             const milestones = []
-            if (streakCount >= 7) milestones.push({ id: 'streak_7', label: '7-Day Streak', icon: '🔥' })
-            if (streakCount >= 30) milestones.push({ id: 'streak_30', label: 'Ramadan Spirit', icon: '🌙' })
+            if (totalFasts >= 10) milestones.push({ id: 'fasts_10', label: 'Getting Started', icon: '🌱' })
+            if (totalFasts >= 30) milestones.push({ id: 'fasts_30', label: 'Ramadan Spirit', icon: '🌙' })
             if (totalFasts >= 50) milestones.push({ id: 'fasts_50', label: 'Dedicated Faster', icon: '🏆' })
-            if (consistency >= 80) milestones.push({ id: 'consistency_80', label: 'Elite Focus', icon: '⭐' })
+            if (totalFasts >= 100) milestones.push({ id: 'fasts_100', label: 'Elite Devotion', icon: '⭐' })
 
             setChartData(prev => ({
                 ...prev,
@@ -353,11 +405,11 @@ export default function Dashboard() {
                 ]
             }))
 
-            return { streakCount, consistency, milestones }
+            return { fastingCounts, milestones }
 
         } catch (err) {
             console.error("Error fetching fasting stats:", err)
-            return { streakCount: 0, consistency: 0, milestones: [] }
+            return { fastingCounts: new Array(12).fill(0), milestones: [] }
         }
     }
 
@@ -401,13 +453,12 @@ export default function Dashboard() {
             const totalMembers = uniqueMemberIds.size
 
             // Integrate Fasting Stats
-            const { streakCount, consistency, milestones } = await fetchFastingStats()
+            const { fastingCounts, milestones } = await fetchFastingStats()
 
             const newStats = {
                 totalGroups: groupsData.length,
                 totalMembers: totalMembers,
-                activeToday: streakCount,
-                consistency,
+                totalFastingDays: fastingCounts.reduce((a, b) => a + b, 0),
                 milestones
             }
             setStats(newStats)
@@ -441,7 +492,7 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <FastingPrompt banner={showWelcomeBanner}/>
+                <FastingPrompt />
 
                 {showWelcomeBanner && (
                     <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
@@ -450,7 +501,7 @@ export default function Dashboard() {
                                 onClick={() => setShowWelcomeBanner(false)}
                                 className="absolute top-4 right-4 p-2 hover:bg-white/50 rounded-full text-primary transition-colors z-20 cursor-pointer"
                             >
-                                <X size={20} title="Close Welcome modal" onClick={() => window.location.href = '/dashboard'}/>
+                                <X size={20} title="Close Welcome modal" onClick={() => window.location.href = '/dashboard'} />
                             </button>
                             <div className="relative z-10">
                                 <h2 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
@@ -477,30 +528,19 @@ export default function Dashboard() {
                             color="blue"
                             loading={loading}
                         />
-                        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col justify-between">
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="p-2 bg-green-50 rounded-xl text-green-600">
-                                    <Award className="h-5 w-5" />
-                                </div>
-                                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                    {stats.consistency}%
-                                </span>
-                            </div>
-                            <div>
-                                <h3 className="text-sm font-medium text-gray-500">Consistency</h3>
-                                <div className="mt-2 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-green-500 rounded-full transition-all duration-1000"
-                                        style={{ width: `${stats.consistency}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        </div>
+                        <StatsCard
+                            icon={Users}
+                            title="Total Members"
+                            value={stats.totalMembers}
+                            subtitle="Across all groups"
+                            color="green"
+                            loading={loading}
+                        />
                         <StatsCard
                             icon={Award}
-                            title="Fasting Streak"
-                            value={stats.activeToday}
-                            subtitle="Consecutive Days"
+                            title="Fasting Days"
+                            value={stats.totalFastingDays || 0}
+                            subtitle="This year"
                             color="purple"
                             loading={loading}
                         />

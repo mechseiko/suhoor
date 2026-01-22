@@ -35,5 +35,28 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            'vendor-firebase-core': ['firebase/app', 'firebase/auth'],
+            'vendor-firebase-db': ['firebase/firestore', 'firebase/storage'],
+            'vendor-ui-libs': ['framer-motion', 'lucide-react'],
+            'vendor-charts': ['chart.js', 'react-chartjs-2'],
+            'vendor-capacitor': ['@capacitor/core', '@capacitor/geolocation', '@capacitor/local-notifications'],
+            'vendor-utils': ['socket.io-client', 'cors']
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000,
+      sourcemap: false,
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: mode === 'production',
+        }
+      }
+    }
   }
 })

@@ -1,13 +1,160 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Suhoor - Wake up for suhoor in groups.</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suhoor - Wake up for suhoor in groups.</title>
+  <style>
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0f172a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-in-out, visibility 0.5s;
+    }
+
+    #splash-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .splash-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .splash-logo {
+      width: 100px;
+      height: 100px;
+      z-index: 10;
+      animation: float-and-glow 3s ease-in-out infinite;
+    }
+
+    .splash-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: breathe-glow 3s ease-in-out infinite;
+    }
+
+    .splash-text {
+      margin-top: 40px;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: reveal-text 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards 0.5s;
+    }
+
+    .loading-line {
+      margin-top: 20px;
+      width: 120px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+      animation: slide-loading 2s infinite ease-in-out;
+    }
+
+    @keyframes float-and-glow {
+
+      0%,
+      100% {
+        transform: translateY(0);
+        filter: drop-shadow(0 5px 15px rgba(59, 130, 246, 0.3));
+      }
+
+      50% {
+        transform: translateY(-10px);
+        filter: drop-shadow(0 20px 30px rgba(59, 130, 246, 0.6));
+      }
+    }
+
+    @keyframes breathe-glow {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.3;
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.6;
+      }
+    }
+
+    @keyframes reveal-text {
+      from {
+        opacity: 0;
+        letter-spacing: 0.1em;
+        filter: blur(5px);
+      }
+
+      to {
+        opacity: 1;
+        letter-spacing: 0.4em;
+        filter: blur(0);
+      }
+    }
+
+    @keyframes slide-loading {
+      0% {
+        left: -100%;
+      }
+
+      50% {
+        left: 0%;
+      }
+
+      100% {
+        left: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="splash-screen">
+    <div class="splash-container">
+      <div class="splash-glow"></div>
+      <img src="/logo.png" alt="Suhoor Logo" class="splash-logo" />
+    </div>
+    <div class="splash-text">SUHOOR</div>
+    <div class="loading-line"></div>
+  </div>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

@@ -17,3 +17,14 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+
+// Hide splash screen after initialization
+setTimeout(() => {
+  const splash = document.getElementById('splash-screen');
+  if (splash) {
+    splash.classList.add('fade-out');
+    setTimeout(() => {
+      splash.remove();
+    }, 500);
+  }
+}, 300);

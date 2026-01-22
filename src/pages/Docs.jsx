@@ -102,7 +102,7 @@ export default function Docs() {
             icon: <Globe size={18} />,
             content: (
                 <div className="space-y-6">
-                    <div className="overflow-hidden border border-gray-100 rounded-2xl">
+                    <div className="overflow-x-auto border border-gray-100 rounded-2xl">
                         <table className="w-full text-left text-sm">
                             <thead className="bg-gray-50 text-gray-500 uppercase text-[10px] font-bold tracking-widest">
                                 <tr>
@@ -146,7 +146,7 @@ export default function Docs() {
             ],
             content: (
                 <div className="space-y-12">
-                    <p className="text-gray-600">The Suhoor dashboard is optimized for clarity and high-stakes mornings. It serves as your command center for both spiritual reflection and group coordination.</p>
+                    <p className="text-gray-600">The Suhoor dashboard serves as your command center for both spiritual reflection and group coordination.</p>
                 </div>
             )
         }
@@ -179,15 +179,14 @@ export default function Docs() {
     }
 
     useEffect(() => {
-        if(section === 'mobile-setup'){
+        if (section === 'mobile-setup') {
             scrollTo('mobile-setup')
         }
     }, [section])
-    
+
 
     return (
-        <div className={`relative min-h-screen bg-transparent pt-20`}>
-            {/* Mobile Sidebar Toggle */}
+        <div className={`relative min-h-screen bg-transparent pt-8 md:pt-20 text-gray-900`}>
             <div className="lg:hidden fixed bottom-6 right-6 z-50">
                 <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -197,8 +196,7 @@ export default function Docs() {
                 </button>
             </div>
 
-            <div className={`flex max-w-[1400px] mx-auto p-4 md:p-6`}>
-                {/* Sidebar / Navigation */}
+            <div className={`flex max-w-[1400px] mx-auto md:p-6`}>
                 <aside className={`
                         fixed lg:sticky overflow-y-auto top-0 lg:top-20 left-0 h-full lg:h-fit w-72 bg-white lg:bg-transparent z-40 p-6 lg:p-2 border-r lg:border-r-0 border-gray-100 transition-transform duration-300
                         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -252,8 +250,8 @@ export default function Docs() {
                 </aside>
 
                 {/* Main Content */}
-                <main className="flex-1 lg:ml-12 max-w-4xl">
-                    <header className="mb-12 mt-20">
+                <main className="flex-1 lg:ml-12 max-w-4xl pr-4">
+                    <header className="mb-12 md:mt-5 mt-15">
                         <h1 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight mb-4">Documentation</h1>
                         <p className="text-lg text-gray-500 leading-relaxed max-w-2xl">
                             Welcome to the official Suhoor documentation. Everything you need to set up, navigate, and master the group wake up experience.
