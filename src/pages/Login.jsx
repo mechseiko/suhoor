@@ -22,7 +22,7 @@ export default function Login() {
             await login(email, password)
             navigate('/dashboard')
         } catch (err) {
-            setError('Failed to login. Please check your credentials.')
+            setError('Failed to login. Please check your credentials and try again.')
         } finally {
             setLoading(false)
         }
