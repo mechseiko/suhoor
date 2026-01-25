@@ -14,9 +14,9 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
         manifest: {
-          name: 'Suhoor - Wake up together',
+          name: 'Suhoor',
           short_name: 'Suhoor',
-          description: 'Wake up for Suhoor with your friends and family.',
+          description: 'Wake up for suhoor in groups.',
           theme_color: '#0f172a',
           background_color: '#0f172a',
           display: 'standalone',

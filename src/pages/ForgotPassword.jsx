@@ -4,8 +4,10 @@ import AuthWrapper from '../components/AuthWrapper'
 import { db } from '../config/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import emailjs from 'emailjs-com'
+import { useAuth } from '../context/AuthContext'
 
 export default function ForgotPassword() {
+    const { currentUser } = useAuth()
     const [email, setEmail] = useState('')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState(false)
@@ -38,7 +40,7 @@ export default function ForgotPassword() {
             const resetLink = `${window.location.origin}/reset-password?token=${token}`
             const templateParams = {
                 subject: 'Suhoor - Reset Your Password',
-                name: 'Suhoor',
+                name: `${currentUser.displayName}, `,
                 company_name: 'Suhoor',
                 title: 'Reset Your Password',
                 body_intro: `We received a request to reset the password for your account associated with ${email}.`,

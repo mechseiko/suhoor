@@ -17,10 +17,10 @@ export default function LanderCta({className1, className2}) {
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
-                onClick={() => navigate(currentUser ? '/books' : '/about')}
+                onClick={() => navigate(currentUser ? '/books' : '/docs')}
                 className={className2}
             >
-                {currentUser ? 'Explore Resources' : 'Learn More'}
+                {currentUser ? 'Explore Resources' : 'Documentation'}
             </button>
         </div>
     )

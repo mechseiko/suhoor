@@ -13,7 +13,6 @@ import {
     Search,
     Moon,
     ArrowLeft,
-    Globe,
     Settings as SettingsIcon
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'

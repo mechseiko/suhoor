@@ -10,17 +10,16 @@ export default function VerifyEmail() {
     const [searchParams] = useSearchParams()
     const token = searchParams.get('token')
 
-    const [status, setStatus] = useState('verifying') // verifying, success, error, pending
+    const [status, setStatus] = useState('verifying')
     const [message, setMessage] = useState('')
     const navigate = useNavigate()
 
-    const { currentUser, logout } = useAuth()
+    const { currentUser } = useAuth()
 
     useEffect(() => {
         if (token) {
             verifyToken()
         } else if (currentUser) {
-            // User arrived here without a token (e.g. from Profile page or manual nav)
             setStatus('pending')
             setMessage('')
         } else {
@@ -46,13 +45,11 @@ export default function VerifyEmail() {
 
             const verificationDoc = querySnapshot.docs[0]
 
-            // 1. Mark verification as done
             await updateDoc(doc(db, 'email_verifications', verificationDoc.id), {
                 verified: true,
                 verifiedAt: new Date()
             })
 
-            // 2. Update the profile document
             const uid = verificationDoc.data().uid
             if (uid) {
                 const profileRef = doc(db, 'profiles', uid)
@@ -75,7 +72,6 @@ export default function VerifyEmail() {
             setStatus('success')
             setMessage('Your email has been successfully verified!')
 
-            // Auto-redirect after 2 seconds
             setTimeout(() => {
                 navigate(currentUser ? '/dashboard?m=n' : '/login')
             }, 2000)
@@ -91,8 +87,8 @@ export default function VerifyEmail() {
         <AuthWrapper
             title={status === 'success' ? "Verification Successful" : status === 'error' ? "Verification Failed" : "Verify Your Email"}
             subtitle={status === 'pending' ? `Check your inbox at ${currentUser?.email}` : status === 'verifying' ? "Please wait..." : ""}
-            bottomTitle="Need help?"
-            bottomsubTitle="Login"
+            // bottomTitle="Need help?"
+            // bottomsubTitle="Login"
         >
             <div className="text-center">
                 {status === 'verifying' && (
@@ -105,34 +101,21 @@ export default function VerifyEmail() {
                 {(status === 'sent' || status === 'pending') && (
                     <div className="flex flex-col items-center">
                         <div className="bg-primary/10 p-4 rounded-full mb-6">
-                            <Bell className="w-12 h-12 text-primary animate-bounce" />
+                            <Bell className="w-10 h-10 text-primary animate-bounce" />
                         </div>
 
-                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 w-full">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-6 w-full">
                             <p className="text-sm text-blue-800 font-medium text-center">
-                                📧 Check your email inbox and click the verification link to continue.
+                                Check your email inbox and click the verification link to continue.
                             </p>
                         </div>
 
                         <div className="flex flex-col gap-3 w-full">
                             <button
                                 onClick={() => navigate('/profile')}
-                                className="w-full bg-primary text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                                className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 cursor-pointer font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <Shield size={18} />
                                 Resend Verification Email
-                            </button>
-                        </div>
-
-                        <div className="mt-8 pt-8 border-t border-gray-100 w-full">
-                            <button
-                                onClick={() => {
-                                    logout()
-                                    navigate('/login')
-                                }}
-                                className="text-gray-400 hover:text-red-500 text-sm font-medium transition-colors cursor-pointer"
-                            >
-                                Sign out
                             </button>
                         </div>
                     </div>
@@ -140,7 +123,7 @@ export default function VerifyEmail() {
 
                 {status === 'success' && (
                     <div className="flex flex-col items-center">
-                        <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+                        <CheckCircle className="w-10 h-10 text-green-500 mb-4" />
                         <p className="text-gray-600 mb-6">{message}</p>
                         <p className="text-sm text-gray-500 mb-4">You will be redirected shortly...</p>
                         <button

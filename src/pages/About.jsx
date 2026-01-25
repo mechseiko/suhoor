@@ -15,7 +15,7 @@ export default function About() {
                         subtitle="Suhoor is more than just an app, it's a spiritual companion designed to ensure you never miss the blessed meal. Connect with loved ones, wake each other up, and share the blessings of Fasting."
                     />
                 </div><div className='text-center'>{!currentUser && (
-                    <Link to="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-2xl hover:opacity-90 transition-all font-semibold shadow-lg shadow-blue-200 md:mb-10 mb-8">
+                    <Link to="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-lg hover:opacity-90 transition-all font-semibold shadow-lg shadow-blue-200 md:mb-10 mb-8">
                         Start Your Journey
                     </Link>
                 )}</div>

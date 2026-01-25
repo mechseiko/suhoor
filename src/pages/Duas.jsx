@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Moon, Sun, Heart, Sparkles, Users, BookOpen, Copy, Check } from 'lucide-react'
+import { Moon, Sun, Heart, Sparkles, Users, BookOpen } from 'lucide-react'
 import SectionHeader from '../components/SectionHeader'
 import { useAuth } from '../context/AuthContext'
 import DashboardLayout from '../layouts/DashboardLayout'
@@ -49,13 +49,6 @@ export const duas = [
 
 export default function Duas() {
   const { currentUser } = useAuth()
-  const [copiedIndex, setCopiedIndex] = useState(null)
-
-  const copyToClipboard = (text, index) => {
-    navigator.clipboard.writeText(text)
-    setCopiedIndex(index)
-    setTimeout(() => setCopiedIndex(null), 2000)
-  }
 
   const content = (
     <div className={`${currentUser ? '' : 'md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
@@ -70,7 +63,6 @@ export default function Duas() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
         {duas.map((dua, idx) => {
           const Icon = dua.icon
-          const isCopied = copiedIndex === idx
 
           return (
             <div
@@ -83,7 +75,7 @@ export default function Duas() {
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
-                      <Icon className="h-6 w-6" />
+                      <Icon className="h-6 w-6" />7
                     </div>
                     <h2 className="text-xl font-bold">
                       {dua.title}
@@ -119,18 +111,6 @@ export default function Duas() {
                   <p className="text-gray-600 leading-relaxed italic">
                     "{dua.translation}"
                   </p>
-                  <button
-                    onClick={() => copyToClipboard(dua.arabic, idx)}
-                    className="mt-4 mx-auto flex items-center gap-2 p-2 px-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors cursor-pointer text-xs font-semibold text-gray-500"
-                    title="Copy Arabic text"
-                  >
-                    {isCopied ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                    {isCopied ? 'Copied!' : 'Copy Arabic'}
-                  </button>
                 </div>
               </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2, Calendar, X, Clock } from 'lucide-react'
+import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2, X, Clock } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { useAuth } from '../context/AuthContext'
@@ -79,7 +79,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
             const now = new Date()
             let targetHour, targetMinute
 
-            // Use custom wake up time if available, otherwise 15 mins before Suhoor
+            // Use custom wake up time if available, otherwise 30 mins before Suhoor
             const userProfile = members.find(m => m.profiles.id === currentUser.uid)?.profiles
             if (userProfile?.customWakeUpTime) {
                 [targetHour, targetMinute] = userProfile.customWakeUpTime.split(':').map(Number)
@@ -87,7 +87,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                 const [suhoorH, suhoorM] = todayData.time.sahur.split(':').map(Number)
                 const suhoorTime = new Date()
                 suhoorTime.setHours(suhoorH, suhoorM, 0, 0)
-                suhoorTime.setMinutes(suhoorTime.getMinutes() - 15)
+                suhoorTime.setMinutes(suhoorTime.getMinutes() - 30)
                 targetHour = suhoorTime.getHours()
                 targetMinute = suhoorTime.getMinutes()
             } else {
@@ -107,7 +107,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
 
             // Window: active from the target time until Suhoor (or just a fixed duration)
             // Let's say window stays active for 1 hour after target time or until clicked
-            const active = diffMins <= 0 && diffMins >= -60 // Active for 60 mins after target time
+            const active = diffMins <= 0 && diffMins >= -30 // Active for 30 mins after target time
             setIsInWindow(active)
 
             // Trigger automatic buzz
@@ -244,7 +244,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                         }]
                     })
                 }
-            }, 1000)
+            }, 500)
         }
         return () => clearInterval(interval)
     }, [isBuzzing, playNotificationSound])
@@ -355,7 +355,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
             if (Capacitor.isNativePlatform()) {
                 await LocalNotifications.schedule({
                     notifications: [{
-                        title: 'Alhamdulillah! 🌅',
+                        title: 'Alhamdulillah!',
                         body: 'You are logged as awake.',
                         id: new Date().getTime(),
                         schedule: { at: new Date(Date.now() + 500) }
@@ -366,7 +366,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
             // Schedule "Double Check" alarm in 5 minutes
             setTimeout(() => {
                 // To allow re-buzzing, we can set hasWokenUp back to false 
-                // but keep the record in DB. The UI will show them as awake to others,
+                // but keep the record in DB. The UI will show them as awake to other group members,
                 // but "isBuzzing" will trigger for them again.
                 setHasWokenUp(false)
                 setIsBuzzing(true)
@@ -628,7 +628,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                     type="text"
                                     value={dateInput}
                                     onChange={(e) => setDateInput(e.target.value)}
-                                    placeholder="e.g. 01 13 2026"
+                                    placeholder="MM DD YYYY"
                                     className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-lg text-lg placeholder:text-md font-black tracking-[0.2em] text-center focus:border-primary focus:bg-white transition-all outline-none"
                                 />
                                 {dateError && <p className="text-red-500 text-xs font-medium">{dateError}</p>}

@@ -69,8 +69,8 @@ export default function FastingTimes() {
     const suhoorDate = new Date();
     suhoorDate.setHours(hours, minutes, 0, 0);
 
-    const minTime = new Date(suhoorDate.getTime() - 15 * 60000); // -15 mins
-    const maxTime = new Date(suhoorDate.getTime() + 5 * 60000); // +5 mins
+    const minTime = new Date(suhoorDate.getTime() - 30 * 60000); // -30 mins
+    const maxTime = new Date(suhoorDate.getTime() + 0 * 60000); // +0 mins
 
     return {
       min: `${String(minTime.getHours()).padStart(2, '0')}:${String(minTime.getMinutes()).padStart(2, '0')}`,
@@ -298,7 +298,7 @@ export default function FastingTimes() {
                       {allowedTimeRange.min && allowedTimeRange.max ? (
                         <span className="text-[10px] text-gray-500">Allowed: {allowedTimeRange.min} - {allowedTimeRange.max}</span>
                       ) : (
-                        <span className="text-[10px] text-gray-500">Default: 15 minutes before Suhoor</span>
+                        <span className="text-[10px] text-gray-500">Default: 30 minutes before Suhoor</span>
                       )}
                     </div>
                   </div>

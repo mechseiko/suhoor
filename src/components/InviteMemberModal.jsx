@@ -13,7 +13,6 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
     const [success, setSuccess] = useState(false)
     const [error, setError] = useState('')
 
-    // EmailJS Credentials
     const SERVICE_ID = 'service_3flsb3n'
     const TEMPLATE_ID = 'template_vhylt41'
     const USER_ID = 'JKRA71R40HTU6vo6W'
@@ -39,7 +38,7 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
 
             const templateParams = {
                 subject: 'Join my group on Suhoor',
-                name: 'Suhoor',
+                name: '',
                 company_name: 'Suhoor',
                 title: 'You\'ve been invited!',
                 body_intro: `${currentUser.displayName || currentUser.email} has invited you to join their Suhoor group: "${groupName}".`,
