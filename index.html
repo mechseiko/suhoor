@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/logo.png" />
@@ -54,20 +53,30 @@
     }
 
     .splash-text {
-      margin-top: 40px;
+      margin-top: 30px;
+      margin-bottom: 10px;
       color: #fff;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 700;
       letter-spacing: 0.4em;
       text-transform: uppercase;
       opacity: 0;
-      animation: reveal-text 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards 0.5s;
+      animation: reveal-text 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards 0.3s;
+    }
+
+    #splash-text2 {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+      font-weight: 400;
+      position: center;
+      color: #fff;
+      opacity: 0;
+      animation: reveal-text 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards 1.2s;
     }
 
     .loading-line {
-      margin-top: 20px;
-      width: 120px;
+      margin-top: 30px;
+      width: 300px;
       height: 2px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 2px;
@@ -87,7 +96,6 @@
     }
 
     @keyframes float-and-glow {
-
       0%,
       100% {
         transform: translateY(0);
@@ -96,12 +104,11 @@
 
       50% {
         transform: translateY(-10px);
-        filter: drop-shadow(0 20px 30px rgba(59, 130, 246, 0.6));
+        filter: drop-shadow(0 20px 20px rgba(59, 130, 246, 0.6));
       }
     }
 
     @keyframes breathe-glow {
-
       0%,
       100% {
         transform: translate(-50%, -50%) scale(0.8);
@@ -151,6 +158,7 @@
       <img src="/logo.png" alt="Suhoor Logo" class="splash-logo" />
     </div>
     <div class="splash-text">SUHOOR</div>
+    <p class="text-center text-white md:text-sm text-xs" id="splash-text2">Wake up for suhoor in groups.</p>
     <div class="loading-line"></div>
   </div>
   <div id="root"></div>

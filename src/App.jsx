@@ -27,7 +27,6 @@ const Groups = lazy(() => import('./pages/Groups'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Docs = lazy(() => import('./pages/Docs'))
 
-// Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen bg-white flex items-center justify-center">
     <Loader />
@@ -122,4 +121,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

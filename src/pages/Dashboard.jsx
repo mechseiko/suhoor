@@ -508,7 +508,7 @@ export default function Dashboard() {
                                     <span className="text-xl">✨</span> Your Journey Begins!
                                 </h2>
                                 <p className="text-gray-600 max-w-lg leading-relaxed">
-                                    {currentUser?.displayName}, we're so glad to have you with us. Start by <Link to='/groups?from=create' className='underline text-primary'>creating a group</Link> or exploring <Link to='/books' className='underline text-primary'>books of knowledge</Link>
+                                    We're so glad to have you with us. Start by <Link to='/groups?from=create' className='underline text-primary'>creating a group</Link> or exploring <Link to='/books' className='underline text-primary'>books of knowledge</Link>
                                 </p>
                             </div>
                             {/* Decorative Background Elements */}

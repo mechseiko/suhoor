@@ -1,14 +1,12 @@
-# 🌙 Suhoor
+# Suhoor
 
-## Waking the Ummah for Suhoor
+## Wake up for suhoor in groups.
 
-Suhoor is a spiritual companion app designed to help Muslims wake up for Suhoor together. By reviving the Sunnah of communal waking, Suhoor strengthens bonds between friends, families, and communities.
+Suhoor is a mobile application built to help fasting Muslims wake up for Suhoor through collective accountability rather than relying on individual alarms alone. Users create an account, join or form groups using unique keys, and work together to ensure no one misses their pre-dawn meal.
 
----
+Each evening, the app prompts users to confirm whether they plan to fast the next day. If they opt in, their location becomes visible to group members 30 minutes before Suhoor time. During this period, members can view each other’s wake-up status, see live locations, and send persistent “buzz” alerts to anyone still asleep.
 
-## ✨ Mission
-
-Waking up alone is hard — alarms are easy to snooze. Suhoor transforms Suhoor into a shared act of worship by allowing groups to wake and support one another, ensuring no one misses the meal.
+Suhoor also provides user stats, group management tools, and guided onboarding for new users. By combining technology with community support, the app revives the Sunnah of waking one another for Suhoor, making fasting more consistent, connected, and sustainable.
 
 ---
 
@@ -32,10 +30,3 @@ Waking up alone is hard — alarms are easy to snooze. Suhoor transforms Suhoor 
 ## 📱 Mobile Ready
 
 Built with Capacitor to run seamlessly on both web and mobile from a single codebase.
-
----
-
-## 🎁 Pitch Deck Links
-
-- (https://www.figma.com/design/jHOi76DStwx9x3UuJpfRNG/Startup-Pitch-Deck-Template--Community-?node-id=710-33802&p=f&t=BA5X80mO7ErPu2CT-0)  
-- (https://www.figma.com/design/RFzJoiwIx0xZk4gW2QFJ5t/Pitch-Deck-Template--Free---Community-?node-id=3-479&p=f&t=7XpsyxQ7u5cenkyF-0)

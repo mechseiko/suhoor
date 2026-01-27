@@ -186,7 +186,7 @@ export default function Docs() {
 
 
     return (
-        <div className={`relative min-h-screen bg-transparent pt-8 md:pt-20 text-gray-900`}>
+        <div className={`relative min-h-screen  pt-8 md:pt-20 text-gray-900 mb-10`}>
             <div className="lg:hidden fixed bottom-6 right-6 z-50">
                 <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
