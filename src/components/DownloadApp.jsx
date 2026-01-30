@@ -8,17 +8,43 @@ export default function DownloadApp() {
     const isNative = useNative()
     const isCapacitor = Capacitor.isNativePlatform()
     const [isMobile, setIsMobile] = useState(false)
-    const [isDownloading, setIsDownloading] = useState(false)
+    const [deferredPrompt, setDeferredPrompt] = useState(null)
+    const [canInstall, setCanInstall] = useState(false)
 
     useEffect(() => {
         setIsMobile(window.innerWidth < 768)
+
+        const handler = (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault()
+            // Stash the event so it can be triggered later.
+            setDeferredPrompt(e)
+            setCanInstall(true)
+        }
+
+        window.addEventListener('beforeinstallprompt', handler)
+
+        // Check if already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            setCanInstall(false)
+        }
+
+        return () => window.removeEventListener('beforeinstallprompt', handler)
     }, [])
 
-    const handleDownload = () => {
-        setIsDownloading(true)
-        setTimeout(() => {
-            setIsDownloading(false)
-        }, 5000)
+    const handleInstall = async () => {
+        if (!deferredPrompt) return
+
+        // Show the install prompt
+        deferredPrompt.prompt()
+
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice
+        console.log(`User response to the install prompt: ${outcome}`)
+
+        // We've used the prompt, and can't use it again, throw it away
+        setDeferredPrompt(null)
+        setCanInstall(false)
     }
 
     // Only show on Mobile Web (Not Capacitor, Not Standalone/PWA)
@@ -38,19 +64,28 @@ export default function DownloadApp() {
                     className="max-w-3xl mx-auto"
                 >
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                        Download the App
+                        {canInstall ? 'Install Suhoor App' : 'Get Suhoor for Mobile'}
                     </h2>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <a
-                            href='/Suhoor.apk'
-                            onClick={handleDownload}
-                            download="Suhoor.apk"
-                            className={`w-fit sm:w-auto px-6 py-2 bg-white text-primary rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3 group ${isDownloading ? 'opacity-50' : 'cursor-pointer hover:shadow-xl hover:bg-gray-50'}`}
-                        >
-                            <Download className={`h-6 w-6 ${isDownloading ? 'animate-bounce' : 'group-hover:-translate-y-1 transition-transform'}`} />
-                            <span>{isDownloading ? 'Downloading...' : 'Download APK'}</span>
-                        </a>
+                        {canInstall ? (
+                            <button
+                                onClick={handleInstall}
+                                className="w-fit sm:w-auto px-6 py-2 bg-white text-primary rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3 group cursor-pointer hover:shadow-xl hover:bg-gray-50"
+                            >
+                                <Download className="h-6 w-6 group-hover:-translate-y-1 transition-transform" />
+                                <span>Add to Home Screen</span>
+                            </button>
+                        ) : (
+                            <a
+                                href='/Suhoor.apk'
+                                download="Suhoor.apk"
+                                className="w-fit sm:w-auto px-6 py-2 bg-white text-primary rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3 group cursor-pointer hover:shadow-xl hover:bg-gray-50"
+                            >
+                                <Download className="h-6 w-6 group-hover:-translate-y-1 transition-transform" />
+                                <span>Download APK</span>
+                            </a>
+                        )}
 
                         <a
                             href="/docs?section=mobile-setup"

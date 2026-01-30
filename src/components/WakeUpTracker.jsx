@@ -79,7 +79,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
             const now = new Date()
             let targetHour, targetMinute
 
-            // Use custom wake up time if available, otherwise 30 mins before Suhoor
+            // Use custom wake up time if available, otherwise 45 mins before Suhoor
             const userProfile = members.find(m => m.profiles.id === currentUser.uid)?.profiles
             if (userProfile?.customWakeUpTime) {
                 [targetHour, targetMinute] = userProfile.customWakeUpTime.split(':').map(Number)
@@ -87,7 +87,8 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                 const [suhoorH, suhoorM] = todayData.time.sahur.split(':').map(Number)
                 const suhoorTime = new Date()
                 suhoorTime.setHours(suhoorH, suhoorM, 0, 0)
-                suhoorTime.setMinutes(suhoorTime.getMinutes() - 30)
+                // Window starts 45 mins before Suhoor (e.g. 5:47 -> 5:02)
+                suhoorTime.setMinutes(suhoorTime.getMinutes() - 45)
                 targetHour = suhoorTime.getHours()
                 targetMinute = suhoorTime.getMinutes()
             } else {
@@ -105,9 +106,9 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
             const diffMs = targetTime - now
             const diffMins = diffMs / 1000 / 60
 
-            // Window: active from the target time until Suhoor (or just a fixed duration)
-            // Let's say window stays active for 1 hour after target time or until clicked
-            const active = diffMins <= 0 && diffMins >= -30 // Active for 30 mins after target time
+            // Window: active for 15 minutes starting from targetTime
+            // If Suhoor is 5:47, targetTime is 5:02. Window ends at 5:17 (Suhoor - 30).
+            const active = diffMins <= 0 && diffMins >= -15
             setIsInWindow(active)
 
             // Trigger automatic buzz
@@ -211,14 +212,15 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         oscillator.connect(gainNode)
         gainNode.connect(audioContext.destination)
 
-        oscillator.frequency.value = 800
-        oscillator.type = 'square'
+        oscillator.frequency.value = 850 // Slightly higher frequency for better piercing
+        oscillator.type = 'square' // Square wave is much louder/harsher than sine
 
-        gainNode.gain.setValueAtTime(1.0, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
+        // Maximize gain and duration
+        gainNode.gain.setValueAtTime(1.2, audioContext.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2.0)
 
         oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.5)
+        oscillator.stop(audioContext.currentTime + 2.0)
     }, [soundEnabled])
 
     // Handle persistent buzzing sound

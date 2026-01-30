@@ -105,7 +105,7 @@ export function useFastingTimes() {
     const todayData = fastingData?.fasting?.[0];
 
     // Helper to check if we are in the "Wake Up Window"
-    // Defined as: 15 minutes before Suhoor time
+    // Defined as: 45 to 30 minutes before Suhoor time (15 minute window)
     const checkWakeUpWindow = () => {
         if (!todayData?.time?.sahur) return false;
 
@@ -116,16 +116,11 @@ export function useFastingTimes() {
         const suhoorDate = new Date();
         suhoorDate.setHours(hours, minutes, 0, 0);
 
-        // Calculate difference in minutes
-        const diffMs = suhoorDate - now;
-        const diffMins = diffMs / 1000 / 60;
+        // Window starts 45 mins before and ends 30 mins before
+        const windowStart = new Date(suhoorDate.getTime() - 45 * 60000);
+        const windowEnd = new Date(suhoorDate.getTime() - 30 * 60000);
 
-        // If we represent "15 mins before suhoor" as a window.
-        // Let's say the window starts 30 mins before and ends at Suhoor time.
-        // Actually user said "15 minutes before suhoor".
-        // So if (0 < diffMins <= 15) -> return true. 
-        // Or maybe even earlier? Let's stick to 15 mins for now.
-        return diffMins > 0 && diffMins <= 15;
+        return now >= windowStart && now <= windowEnd;
     };
 
     return {

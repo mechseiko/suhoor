@@ -39,7 +39,7 @@ function AppRoutes() {
   const { currentUser } = useAuth()
   const isNative = useNative()
   return (
-    <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={null}>
       <Routes>
         <Route element={<PageLayout />}>
           <Route path="/" element={(isNative) ? <Login /> : <Landing />} />
