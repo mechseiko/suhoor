@@ -152,7 +152,7 @@ export default function FastingPrompt() {
                                         if (isSunnahDay) {
                                             return (
                                                 <div className="mt-3 bg-green-500/20 border border-green-300/30 rounded-lg p-3 backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-500">
-                                                    <div className="flex items-start gap-2">
+                                                    <div className="flex items-start gap-2">    
                                                         <div>
                                                             <p className="text-sm font-bold text-green-100">
                                                                 {dayName === new Date().toLocaleDateString('en-US', { weekday: 'long' }) ? "Today" : "Tomorrow"} is {dayName} - A Blessed Sunnah Day!

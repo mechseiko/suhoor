@@ -75,7 +75,7 @@ export default function Duas() {
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
-                      <Icon className="h-6 w-6" />7
+                      <Icon className="h-6 w-6" />
                     </div>
                     <h2 className="text-xl font-bold">
                       {dua.title}

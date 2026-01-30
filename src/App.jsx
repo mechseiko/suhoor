@@ -11,6 +11,7 @@ import Loader from './components/Loader'
 
 // Lazy load all page components for better performance
 import Landing from './pages/Landing'
+
 const Login = lazy(() => import('./pages/Login'))
 const Signup = lazy(() => import('./pages/Signup'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
