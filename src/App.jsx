@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { SocketProvider } from './context/SocketContext'
@@ -8,6 +8,7 @@ import ScrollToTop from './components/ScrollToTop'
 import { useAuth } from './context/AuthContext'
 import { useNative } from './hooks/useNative'
 import Landing from './pages/Landing'
+import { hideSplashScreen } from './utils/splash'
 
 const Login = lazy(() => import('./pages/Login'))
 const Signup = lazy(() => import('./pages/Signup'))
@@ -24,12 +25,6 @@ const About = lazy(() => import('./pages/About'))
 const Groups = lazy(() => import('./pages/Groups'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Docs = lazy(() => import('./pages/Docs'))
-
-
-import { useEffect } from 'react'
-import { hideSplashScreen } from './main'
-
-
 function AppRoutes() {
   const { currentUser, loading } = useAuth()
   const isNative = useNative()
@@ -41,7 +36,7 @@ function AppRoutes() {
   }, [loading]);
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="min-h-screen bg-blue-50" />}>
       <Routes>
         <Route element={<PageLayout />}>
           <Route path="/" element={isNative ? <Login /> : <Landing />} />

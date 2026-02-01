@@ -16,9 +16,9 @@ export default function CtaSection() {
                             {currentUser ? 'Jump right Back In!' : 'Ready to Get Started?'}
                         </h2>
                         <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-                            {currentUser.displayName ? `${currentUser?.displayName}, Pick up right where you left off` : 'Join Muslims already using Suhoor'}
+                            {currentUser?.displayName ? `${currentUser.displayName}, Pick up right where you left off` : 'Join Muslims already using Suhoor'}
                         </p>
-                        <LanderCta 
+                        <LanderCta
                             className1="group md:px-6 px-4 py-2 bg-white text-primary rounded-lg font-semibold hover:bg-white/90 transition-all flex items-center justify-center gap-2"
                             className2="md:px-6 px-4 py-2 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition"
                         />

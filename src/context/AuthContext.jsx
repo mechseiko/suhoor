@@ -6,7 +6,8 @@ import {
     onAuthStateChanged,
     deleteUser
 } from 'firebase/auth'
-import { auth } from '../config/firebase'
+import { auth, db } from '../config/firebase'
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore'
 
 const AuthContext = createContext({})
 
@@ -47,27 +48,21 @@ export function AuthProvider({ children }) {
 
             if (user) {
                 // Subscribe to profile updates
-                import('firebase/firestore').then(({ doc, onSnapshot }) => {
-                    import('../config/firebase').then(({ db }) => {
-                        unsubscribeProfile = onSnapshot(doc(db, 'profiles', user.uid), (doc) => {
-                            if (doc.exists()) {
-                                const profileData = doc.data()
-                                setUserProfile(profileData)
+                unsubscribeProfile = onSnapshot(doc(db, 'profiles', user.uid), (docSnapshot) => {
+                    if (docSnapshot.exists()) {
+                        const profileData = docSnapshot.data()
+                        setUserProfile(profileData)
 
-                                // Sync verification status if needed
-                                if (user.emailVerified && !profileData.isVerified) {
-                                    import('firebase/firestore').then(({ updateDoc }) => {
-                                        updateDoc(doc.ref, { isVerified: true })
-                                            .catch(err => console.error("Error syncing verification status:", err))
-                                    })
-                                }
-                            }
-                            setProfileLoading(false)
-                        }, (error) => {
-                            console.error("Profile listen error:", error)
-                            setProfileLoading(false)
-                        })
-                    })
+                        // Sync verification status if needed
+                        if (user.emailVerified && !profileData.isVerified) {
+                            updateDoc(docSnapshot.ref, { isVerified: true })
+                                .catch(err => console.error("Error syncing verification status:", err))
+                        }
+                    }
+                    setProfileLoading(false)
+                }, (error) => {
+                    console.error("Profile listen error:", error)
+                    setProfileLoading(false)
                 })
             } else {
                 setUserProfile(null)
@@ -85,6 +80,7 @@ export function AuthProvider({ children }) {
 
     const value = {
         currentUser,
+        loading,
         userProfile,
         profileLoading,
         signup,
@@ -95,7 +91,7 @@ export function AuthProvider({ children }) {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     )
 }
