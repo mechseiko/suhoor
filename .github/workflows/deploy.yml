@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build and Deploy Suhoor
 
 on:
   push:
@@ -6,11 +6,13 @@ on:
       - main
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -45,8 +47,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          name: Suhoor-APK
-          path: public/Suhoor.apk
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SUHOORAPP }}
+          channelId: live
+          projectId: suhoorapp

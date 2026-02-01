@@ -21,7 +21,8 @@ Suhoor also provides user stats, group management tools, and guided onboarding f
 
 ## 🧱 Tech Stack
 
-- React + Tailwind CSS  
+- Reactjs
+- Tailwind CSS  
 - Capacitor (Android & iOS)  
 - Gradle Kit (Android)
 - Node.js (v24 LTS)
