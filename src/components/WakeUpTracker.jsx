@@ -135,11 +135,14 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         return member?.profiles?.display_name || currentUser.email
     }, [members, currentUser])
 
-    // Fetch today's wake-up logs from Firestore
+    const [memberIntentions, setMemberIntentions] = useState({})
+
+    // Fetch today's wake-up logs and fasting intentions from Firestore
     const fetchTodayLogs = useCallback(async () => {
         try {
             const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
 
+            // 1. Fetch Wake Up Logs
             const logsRef = collection(db, 'wake_up_logs')
             const q = query(
                 logsRef,
@@ -157,10 +160,29 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
             setHasWokenUp(
                 logsData.some(log => log.user_id === currentUser.uid) || false
             )
+
+            // 2. Fetch Fasting Intentions for all members
+            const intentions = {}
+            await Promise.all(members.map(async (member) => {
+                try {
+                    const docRef = doc(db, 'daily_fasting_status', `${member.profiles.id}_${today}`)
+                    const docSnap = await getDoc(docRef)
+                    if (docSnap.exists()) {
+                        intentions[member.profiles.id] = docSnap.data().wantsToFast
+                    } else {
+                        // Default to true if not found, or handle as 'unknown'
+                        intentions[member.profiles.id] = true
+                    }
+                } catch (e) {
+                    console.error(`Error fetching intention for ${member.profiles.id}`, e)
+                }
+            }))
+            setMemberIntentions(intentions)
+
         } catch (err) {
-            console.error('Error fetching wake up logs:', err)
+            console.error('Error fetching logs/intentions:', err)
         }
-    }, [groupId, currentUser.uid])
+    }, [groupId, currentUser.uid, members])
 
     // Join group room when component mounts
     useEffect(() => {
@@ -221,12 +243,13 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
 
         oscillator.start(audioContext.currentTime)
         oscillator.stop(audioContext.currentTime + 2.0)
+        
     }, [soundEnabled])
 
     // Handle persistent buzzing sound
     useEffect(() => {
         let interval;
-        if (isBuzzing) {
+        if (lisBuzzing) {
             // Play sound immediately
             playNotificationSound()
 
@@ -251,7 +274,6 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         return () => clearInterval(interval)
     }, [isBuzzing, playNotificationSound])
 
-    // Listen for real-time wake-up events
     useEffect(() => {
         if (!isConnected) return
 
@@ -413,7 +435,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                             Group Members
                         </h3>
                         {members.length > 1 && <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Action' : 'Show Action'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                            {showActions ? 'Hide' : 'Admin Actions'}
+                            {showActions ? 'Hide' : 'Actions'}
                         </button>}
                     </div>
                     <div className="divide-y divide-gray-50">
@@ -438,12 +460,13 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                 )?.woke_up_at
                                 const location = userLocations[member.profiles.id]
                                 const hasLocation = !!location
+                                const intendsToFast = memberIntentions[member.profiles.id] !== false // Default true
 
                                 return (
                                     <div
                                         key={member.id}
                                         className={`p-4 transition-colors flex items-center justify-between group ${isAwake ? 'bg-accent/5' : ''
-                                            }`}
+                                            } ${!intendsToFast ? 'opacity-60 bg-gray-50' : ''}`}
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="relative">
@@ -459,6 +482,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                     {member.profiles.display_name || member.profiles.email.split('@')[0]}
                                                     {member.role === 'admin' && <span className='text-primary'>{' '} (Admin)</span>}
                                                     {isAwake && <div className='bg-gray-100 px-1 py-0.5 rounded flex items-center gap-1'><CheckCircle className="h-3.5 w-3.5 text-accent" />Awake</div>}
+                                                    {!intendsToFast && <span className='text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded'>Not Fasting</span>}
                                                 </div>
                                                 <div className="text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
                                                     {member.profiles.email}

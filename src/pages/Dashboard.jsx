@@ -371,15 +371,6 @@ export default function Dashboard() {
                 }
             })
 
-            // Consistency Score (Percentage of days fasted vs days passed in the year)
-            const todayDate = new Date()
-            const daysInYear = selectedYear === todayDate.getFullYear() ?
-                Math.floor((todayDate - new Date(selectedYear, 0, 1)) / (1000 * 60 * 60 * 24)) + 1 :
-                365
-            const totalFasts = fastingCounts.reduce((a, b) => a + b, 0)
-            const consistency = Math.round((totalFasts / daysInYear) * 100)
-
-            // Milestones based on actual fasting days
             const milestones = []
             if (totalFasts >= 10) milestones.push({ id: 'fasts_10', label: 'Getting Started', icon: '🌱' })
             if (totalFasts >= 30) milestones.push({ id: 'fasts_30', label: 'Ramadan Spirit', icon: '🌙' })
@@ -508,10 +499,9 @@ export default function Dashboard() {
                                     <span className="text-xl">✨</span> Your Journey Begins!
                                 </h2>
                                 <p className="text-gray-600 max-w-lg leading-relaxed">
-                                    We're so glad to have you with us. Start by <Link to='/groups?from=create' className='underline text-primary'>creating a group</Link> or exploring <Link to='/books' className='underline text-primary'>books of knowledge</Link>
+                                    {currentUser?.displayName ? `${currentUser?.displayName}, w` : 'W'}e're so glad to have you with us. You can start by <Link to='/groups?from=create' className='underline text-primary'>creating a group</Link> or reading <Link to='/books' className='underline text-primary'>books of knowledge</Link>
                                 </p>
                             </div>
-                            {/* Decorative Background Elements */}
                             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
                             <div className="absolute bottom-0 right-1/4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
                         </div>

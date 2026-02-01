@@ -7,8 +7,8 @@ import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc } from 'fireba
 import { useAuth } from '../context/AuthContext';
 
 export default function FastingPrompt() {
-    const { currentUser } = useAuth();
-    const [status, setStatus] = useState('idle'); // idle, confirming_yes, confirming_no, success, hidden
+    const { currentUser, userProfile } = useAuth();
+    const [status, setStatus] = useState('idle');
     const [loading, setLoading] = useState(false);
     const [targetDate, setTargetDate] = useState('');
     const [targetDisplay, setTargetDisplay] = useState('');
@@ -16,35 +16,32 @@ export default function FastingPrompt() {
     useEffect(() => {
         const determineTargetDate = async () => {
             const now = new Date();
-            const today = new Date();
-            const todayStr = today.toLocaleDateString('en-CA');
+            const hour = now.getHours();
+            let target = null;
 
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toLocaleDateString('en-CA');
-
-            // 1. Check if answered for today
-            const answeredToday = localStorage.getItem(`suhoor_intent_${todayStr}`);
-
-            // If it's early (e.g. before 10 AM) and not answered for today, ask for today
-            if (!answeredToday && now.getHours() < 10) {
-                setTargetDate(todayStr);
-                setTargetDisplay(today.toLocaleDateString('en-US', {
-                    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-                }));
+            if (hour >= 0 && hour < 5) {
+                target = new Date();
+            } else if (hour >= 17) {
+                target = new Date();
+                target.setDate(target.getDate() + 1);
+            } else {
+                setStatus('hidden');
                 return;
             }
 
-            // 2. Otherwise ask for tomorrow
-            const answeredTomorrow = localStorage.getItem(`suhoor_intent_${tomorrowStr}`);
-            if (answeredTomorrow) {
+            const targetStr = target.toLocaleDateString('en-CA');
+
+            // Check if already answered for this specific target date
+            const alreadyAnswered = localStorage.getItem(`suhoor_intent_${targetStr}`);
+            if (alreadyAnswered) {
                 setStatus('hidden');
-            } else {
-                setTargetDate(tomorrowStr);
-                setTargetDisplay(tomorrow.toLocaleDateString('en-US', {
-                    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-                }));
+                return;
             }
+
+            setTargetDate(targetStr);
+            setTargetDisplay(target.toLocaleDateString('en-US', {
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+            }));
         };
 
         determineTargetDate();
@@ -53,12 +50,10 @@ export default function FastingPrompt() {
     const handleYes = async () => {
         setLoading(true);
         try {
-            // 1. Get location for fasting times
             const pos = await new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject);
             });
 
-            // 2. Fetch fasting times
             const response = await fetch(
                 `https://islamicapi.com/api/v1/fasting/?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs`
             );
@@ -66,17 +61,26 @@ export default function FastingPrompt() {
             const fastingInfo = data.data.fasting[0];
             const sahurTime = fastingInfo.time.sahur;
 
-            // 3. Schedule Notification if on native
             if (Capacitor.isNativePlatform()) {
+                let scheduleDate = new Date(targetDate);
                 const [hours, minutes] = sahurTime.split(':').map(Number);
-                const scheduleDate = new Date(targetDate);
-                scheduleDate.setHours(hours, minutes, 0, 0);
+
+                // Determine Alarm Time
+                if (userProfile?.customWakeUpTime) {
+                    // Use User's Custom Preference
+                    const [customH, customM] = userProfile.customWakeUpTime.split(':').map(Number);
+                    scheduleDate.setHours(customH, customM, 0, 0);
+                } else {
+                    // Default: 30 minutes BEFORE Sahur ends
+                    scheduleDate.setHours(hours, minutes, 0, 0);
+                    scheduleDate.setMinutes(scheduleDate.getMinutes() - 30);
+                }
 
                 await LocalNotifications.schedule({
                     notifications: [
                         {
                             title: "Suhoor Time! 🌅",
-                            body: "Time for your pre-fast meal. May Allah accept your fast.",
+                            body: "It's time for suhoor. May Allah accept your fast.",
                             id: 1001,
                             schedule: { at: scheduleDate },
                             sound: 'alarm.wav',
@@ -86,7 +90,6 @@ export default function FastingPrompt() {
                 });
             }
 
-            // 4. Log to Firebase
             const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${targetDate}`);
             await setDoc(statusRef, {
                 userId: currentUser.uid,
@@ -95,11 +98,9 @@ export default function FastingPrompt() {
                 updatedAt: serverTimestamp()
             });
 
-            // 5. Save locally and finish
             localStorage.setItem(`suhoor_intent_${targetDate}`, 'yes');
             setStatus('success');
 
-            // Auto hide after 3 seconds
             setTimeout(() => setStatus('hidden'), 3000);
 
         } catch (error) {
@@ -142,30 +143,40 @@ export default function FastingPrompt() {
                                     <Calendar className="h-4 w-4" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-blue-100 text-lg">Are you planning to fast tomorrow, <span className="font-semibold">{targetDate}</span>?</p>
                                     {(() => {
-                                        const date = new Date(targetDate);
-                                        const dayOfWeek = date.getDay();
-                                        const isSunnahDay = dayOfWeek === 1 || dayOfWeek === 4;
-                                        const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                                        const dateObj = new Date(targetDate + 'T00:00:00');
+                                        const dayOfWeek = dateObj.getDay();
+                                        const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
 
-                                        if (isSunnahDay) {
-                                            return (
-                                                <div className="mt-3 bg-green-500/20 border border-green-300/30 rounded-lg p-3 backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-500">
-                                                    <div className="flex items-start gap-2">    
-                                                        <div>
-                                                            <p className="text-sm font-bold text-green-100">
-                                                                {dayName === new Date().toLocaleDateString('en-US', { weekday: 'long' }) ? "Today" : "Tomorrow"} is {dayName} - A Blessed Sunnah Day!
-                                                            </p>
-                                                            <p className="text-xs text-green-200 mt-1">
-                                                                The Prophet ﷺ used to fast on Mondays and Thursdays
-                                                            </p>
+                                        const todayStr = new Date().toLocaleDateString('en-CA');
+                                        const isToday = targetDate === todayStr;
+                                        const timeLabel = isToday ? "today" : "tomorrow";
+                                        const TitleLabel = isToday ? "Today" : "Tomorrow";
+
+                                        const isSunnahDay = dayOfWeek === 1 || dayOfWeek === 4;
+
+                                        return (
+                                            <>
+                                                <p className="text-blue-100 text-lg">
+                                                    Are you planning to fast {timeLabel}, <span className="font-semibold">{targetDisplay}</span>?
+                                                </p>
+
+                                                {isSunnahDay && (
+                                                    <div className="mt-3 bg-green-500/20 border border-green-300/30 rounded-lg p-3 backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                                                        <div className="flex items-start gap-2">
+                                                            <div>
+                                                                <p className="text-sm font-bold text-green-100">
+                                                                    {TitleLabel} is {dayName}, a blessed Sunnah day!
+                                                                </p>
+                                                                <p className="text-xs text-green-200 mt-1">
+                                                                    The Prophet ﷺ used to fast on Mondays and Thursdays
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
+                                                )}
+                                            </>
+                                        );
                                     })()}
                                 </div>
                             </div>
@@ -202,7 +213,7 @@ export default function FastingPrompt() {
                                     onClick={() => setStatus('idle')}
                                     className="flex-1 px-4 py-2.5 bg-white/10 rounded-xl font-bold border border-white/20 cursor-pointer"
                                 >
-                                    Cancel
+                                    Go Back
                                 </button>
                                 <button
                                     onClick={handleYes}
@@ -210,7 +221,7 @@ export default function FastingPrompt() {
                                     className="flex-1 px-4 py-2.5 bg-white text-primary rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                                    Confirm
+                                    {loading ? 'Confirming...' : 'Confirm'}
                                 </button>
                             </div>
                         </div>
@@ -220,7 +231,7 @@ export default function FastingPrompt() {
                         <div className="flex flex-col items-center text-center py-2 space-y-4 animate-in zoom-in-95 duration-200">
                             <div>
                                 <h3 className="text-lg font-bold">Dismiss for today?</h3>
-                                <p className="text-blue-100 text-sm">Your group members won't be able to wake you for suhoor.</p>
+                                <p className="text-blue-100 text-sm">Your group members will not wake you for suhoor.</p>
                             </div>
                             <div className="flex gap-3 w-full max-w-xs">
                                 <button

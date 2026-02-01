@@ -18,10 +18,9 @@ import DashboardLayout from '../layouts/DashboardLayout'
 import { useSocket } from '../context/SocketContext'
 import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useAuth } from '../context/AuthContext'
-import { setDoc, serverTimestamp } from 'firebase/firestore' // Add these imports
+import { setDoc, serverTimestamp } from 'firebase/firestore'
 import Settings from './Settings'
 
-// FastingPrompt removed - now only on dashboard
 
 export default function GroupDetail() {
     const { currentUser } = useAuth()
@@ -51,7 +50,6 @@ export default function GroupDetail() {
     const { socket, on, off, isConnected } = useSocket()
     const { isWakeUpWindow } = useFastingTimes()
 
-    // Function to fetch members (hoisted for reuse)
     const fetchMembers = async () => {
         try {
             const membersRef = collection(db, 'group_members')
@@ -204,7 +202,7 @@ export default function GroupDetail() {
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all duration-200 font-medium text-[13px]"
                 >
                     {copyInvite ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    <span>{copyInvite ? 'Link Copied' : 'Copy Invite Link'}</span>
+                    <span>{copyInvite ? 'Invite Link Copied' : 'Copy Invite Link'}</span>
                 </button>
                 <button
                     onClick={() => setShowInviteModal(true)}
@@ -343,7 +341,7 @@ export default function GroupDetail() {
                                     <span className="px-3 py-1 w-fit bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
                                         {members.length} {members.length === 1 ? 'Member' : 'Members'}
                                     </span>
-                                    <Settings2 className={`h-4 w-4 cursor-pointer ${showLeave ? 'text-primary' : ''}`} onClick={() => setShowLeave(!showLeave)}/>
+                                    <span title={`${showLeave ? 'Hide Actions' : 'Show Actions'}`}><Settings2 className={`h-4 w-4 cursor-pointer ${showLeave ? 'text-primary' : ''}`} onClick={() => setShowLeave(!showLeave)}/></span>
                                 </div>      
                             </div>
                             <GroupActions />

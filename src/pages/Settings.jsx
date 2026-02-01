@@ -40,7 +40,7 @@ export default function Settings() {
                     <SettingItem
                         icon={Bell}
                         label="Wake Up Time"
-                        description="Set your own wake-up time"
+                        description="Set your own wake up time"
                         action={
                             <a href="/fasting" className="text-sm text-primary font-medium hover:underline">
                                 Configure

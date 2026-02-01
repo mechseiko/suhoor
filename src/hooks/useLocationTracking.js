@@ -13,7 +13,6 @@ export function useLocationTracking(groupId, userId, shouldTrack) {
         let isMounted = true;
 
         const startTracking = async () => {
-            // 1. Request Permission
             try {
                 if (Capacitor.isNativePlatform()) {
                     const permission = await Geolocation.checkPermissions();
@@ -23,12 +22,9 @@ export function useLocationTracking(groupId, userId, shouldTrack) {
                 }
             } catch (err) {
                 console.warn("Error checking permissions", err);
-                // Continues safely, browser might handle it
             }
 
-            // 2. Start Watch
             try {
-                // Clear existing watch if any
                 if (watchId.current) {
                     Geolocation.clearWatch({ id: watchId.current });
                 }

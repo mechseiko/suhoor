@@ -59,24 +59,14 @@ export default function DownloadApp() {
                     </h2>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        {canInstall ? (
-                            <button
-                                onClick={handleInstall}
-                                className="w-fit sm:w-auto px-6 py-2 bg-white text-primary rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3 group cursor-pointer hover:shadow-xl hover:bg-gray-50"
-                            >
-                                <Download className="h-6 w-6 group-hover:-translate-y-1 transition-transform" />
-                                <span>Add to Home Screen</span>
-                            </button>
-                        ) : (
-                            <a
-                                href='/Suhoor.apk'
-                                download="Suhoor.apk"
-                                className="w-fit sm:w-auto px-6 py-2 bg-white text-primary rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3 group cursor-pointer hover:shadow-xl hover:bg-gray-50"
-                            >
-                                <Download className="h-6 w-6 group-hover:-translate-y-1 transition-transform" />
-                                <span>Download APK</span>
-                            </a>
-                        )}
+                        <a
+                            href='/Suhoor.apk'
+                            download="Suhoor.apk"
+                            className="w-fit sm:w-auto px-6 py-2 bg-white text-primary rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3 group cursor-pointer hover:shadow-xl hover:bg-gray-50"
+                        >
+                            <Download className="md:h-5 md:w-5 h-4 w-4 group-hover:-translate-y-1 transition-transform" />
+                            <span>Download APK</span>
+                        </a>
                         <a
                             href="/docs?section=mobile-setup"
                             className="text-white/80 hover:text-white text-sm font-medium underline flex items-center gap-2 transition-colors"

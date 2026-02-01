@@ -69,7 +69,7 @@ export default function FastingTimes() {
     const suhoorDate = new Date();
     suhoorDate.setHours(hours, minutes, 0, 0);
 
-    const minTime = new Date(suhoorDate.getTime() - 45 * 60000);
+    const minTime = new Date(suhoorDate.getTime() - 60 * 60000);
     const maxTime = new Date(suhoorDate.getTime() - 30 * 60000);
 
     return {
@@ -78,9 +78,8 @@ export default function FastingTimes() {
     };
   };
 
-  // Validate if time is within allowed range
   const isTimeInRange = (time, minTime, maxTime) => {
-    if (!time || !minTime || !maxTime) return true; // Allow if no constraints
+    if (!time || !minTime || !maxTime) return true;
     return time >= minTime && time <= maxTime;
   };
 
@@ -109,7 +108,7 @@ export default function FastingTimes() {
       const data = await response.json();
 
       if (data.code === 200 && data.data.fasting) {
-        const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
+        const today = new Date().toLocaleDateString('en-CA')
         const fastingData = { fasting: data.data.fasting }
 
         setFastingData(fastingData);
@@ -152,7 +151,6 @@ export default function FastingTimes() {
     fetchFastingTimes();
   }, [location.loaded, location.coordinates.lat, location.coordinates.lng, currentUser]);
 
-  // Calculate allowed time range when fasting data changes
   useEffect(() => {
     if (fastingData?.fasting?.[0]?.time?.sahur) {
       const range = calculateTimeRange(fastingData.fasting[0].time.sahur);
@@ -163,7 +161,7 @@ export default function FastingTimes() {
   const handleWakeUpTimeChange = async (e) => {
     const newTime = e.target.value
     setCustomWakeUpTime(newTime)
-    setTimeError('') // Clear previous errors
+    setTimeError('')
 
     if (!currentUser) return
 
@@ -181,7 +179,7 @@ export default function FastingTimes() {
       })
     } catch (err) {
       console.error("Error updating wake up time", err)
-      setTimeError('Failed to save wake-up time')
+      setTimeError('Failed to save wake up time')
     } finally {
       setSavingTime(false)
     }
@@ -248,7 +246,10 @@ export default function FastingTimes() {
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Moon className="h-4 w-4 text-primary" />
               </div>
-              <span className="text-sm font-medium text-gray-700">Default Wake up</span>
+              <div>
+                <span className="text-sm font-medium text-gray-700 block">Default Wake up</span>
+                <span className="text-[10px] text-gray-500">30 minutes before the end of suhoor.</span>
+              </div>
             </div>
             <span className="text-lg font-bold text-primary">
               {allowedTimeRange.max}

@@ -1,0 +1,7 @@
+This is a dummy APK file to replace the missing one. The build failed due to network restrictions on your machine (Gradle download blocked).
+
+To fix the build properly:
+1. You need to allow "services.gradle.org" through your firewall.
+2. Or manually download "gradle-8.14.3-bin.zip" and place it in the wrapper folder.
+
+For now, this file exists so your "Download" links don't return 404, but it is NOT a working app.
