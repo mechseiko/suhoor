@@ -18,6 +18,14 @@ const faqs = [
     {
         question: "How accurate are the prayer times?",
         answer: "We use high precision calculation methods based on your location. You can also adjust the calculation method in your settings to match your local mosque."
+    },
+    {
+        question: "Is my location data private?",
+        answer: "Your location is ONLY shared within your selected group and ONLY during the 30 minute wake up window before Suhoor. We never track you outside of these times."
+    },
+    {
+        question: "Can I use Suhoor for voluntary fasts?",
+        answer: "Of course! Suhoor is designed to be used year round for Sunnah fasts (like Mondays and Thursdays) or any other voluntary fasting you do with friends."
     }
 ]
 
