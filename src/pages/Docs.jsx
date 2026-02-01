@@ -68,9 +68,8 @@ export default function Docs() {
                                     <p className="text-sm text-gray-500">{s.desc}</p>
                                     {s.step === 1 && (
                                         <p className="text-sm text-gray-500">If you haven't already, <a
-                                            href='/Suhoor.apk'
+                                            href="https://github.com/mechseiko/suhoor/releases/latest/download/Suhoor.apk"
                                             onClick={handleDownload}
-                                            download="Suhoor.apk"
                                             className="mt-2 flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100"
                                         >
                                             <Download size={12} /> {isDownloading ? 'Downloading...' : 'Download the App'}

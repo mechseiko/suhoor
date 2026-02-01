@@ -26,9 +26,20 @@ const Settings = lazy(() => import('./pages/Settings'))
 const Docs = lazy(() => import('./pages/Docs'))
 
 
+import { useEffect } from 'react'
+import { hideSplashScreen } from './main'
+
+
 function AppRoutes() {
-  const { currentUser } = useAuth()
+  const { currentUser, loading } = useAuth()
   const isNative = useNative()
+
+  useEffect(() => {
+    if (!loading) {
+      hideSplashScreen();
+    }
+  }, [loading]);
+
   return (
     <Suspense fallback={null}>
       <Routes>
