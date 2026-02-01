@@ -37,13 +37,15 @@ jobs:
       - name: Build APK
         run: npm run build:apk
 
-      - name: Commit APK
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add public/Suhoor.apk
-          git commit -m "chore: update Suhoor.apk [skip ci]" || echo "No changes to commit"
-          git push
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          name: Latest Suhoor Build
+          files: public/Suhoor.apk
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 

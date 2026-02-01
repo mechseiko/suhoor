@@ -43,14 +43,6 @@ const main = () => {
     if (fs.existsSync(apkSource)) {
         fs.copyFileSync(apkSource, apkDest);
         console.log(`✅ APK copied successfully to: ${apkDest}`);
-
-        // Also copy to dist for hosting
-        const distApkDest = path.join(rootDir, 'dist', 'Suhoor.apk');
-        if (!fs.existsSync(path.join(rootDir, 'dist'))) {
-            fs.mkdirSync(path.join(rootDir, 'dist'), { recursive: true });
-        }
-        fs.copyFileSync(apkSource, distApkDest);
-        console.log(`✅ APK copied successfully to: ${distApkDest}`);
     } else {
         console.error('❌ APK file not found at expected location:', apkSource);
         process.exit(1);
