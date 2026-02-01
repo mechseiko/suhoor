@@ -8,8 +8,6 @@ import ScrollToTop from './components/ScrollToTop'
 import { useAuth } from './context/AuthContext'
 import { useNative } from './hooks/useNative'
 import Loader from './components/Loader'
-
-// Lazy load all page components for better performance
 import Landing from './pages/Landing'
 
 const Login = lazy(() => import('./pages/Login'))
@@ -42,7 +40,7 @@ function AppRoutes() {
     <Suspense fallback={null}>
       <Routes>
         <Route element={<PageLayout />}>
-          <Route path="/" element={(isNative) ? <Login /> : <Landing />} />
+          <Route path="/" element={isNative ? <Login /> : <Landing />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="/about" element={<About />} />
           <Route path="/books" element={<Books />} />

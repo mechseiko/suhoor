@@ -50,7 +50,7 @@ export default function DashboardLayout({
         if (pageTitle) return pageTitle
         const path = location.pathname
         if (path === '/dashboard') return 'Dashboard'
-        if (path === '/fasting') return 'Fasting'
+        if (path === '/fasting') return 'Fasting Times'
         if (path === '/profile') return 'Profile'
         if (path === '/groups') return 'Groups'
         if (path === '/books') return 'Resources'
@@ -83,7 +83,7 @@ export default function DashboardLayout({
         },
         {
             icon: Moon,
-            label: 'Fasting',
+            label: 'Fasting Times',
             onClick: () => navigate('/fasting'),
             active: location.pathname === '/fasting'
         },

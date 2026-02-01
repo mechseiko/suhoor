@@ -13,18 +13,14 @@ export default function DownloadApp() {
 
     useEffect(() => {
         setIsMobile(window.innerWidth < 768)
-
         const handler = (e) => {
-            // Prevent the mini-infobar from appearing on mobile
             e.preventDefault()
-            // Stash the event so it can be triggered later.
             setDeferredPrompt(e)
             setCanInstall(true)
         }
 
         window.addEventListener('beforeinstallprompt', handler)
 
-        // Check if already installed
         if (window.matchMedia('(display-mode: standalone)').matches) {
             setCanInstall(false)
         }
@@ -35,24 +31,19 @@ export default function DownloadApp() {
     const handleInstall = async () => {
         if (!deferredPrompt) return
 
-        // Show the install prompt
         deferredPrompt.prompt()
 
-        // Wait for the user to respond to the prompt
         const { outcome } = await deferredPrompt.userChoice
         console.log(`User response to the install prompt: ${outcome}`)
 
-        // We've used the prompt, and can't use it again, throw it away
         setDeferredPrompt(null)
         setCanInstall(false)
     }
 
-    // Only show on Mobile Web (Not Capacitor, Not Standalone/PWA)
     if (isCapacitor || isNative || !isMobile) return null
 
     return (
         <section className="bg-gradient-to-r from-primary to-primary/90 rounded-lg md:py-14 py-10 relative overflow-hidden">
-            {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10 pattern-dots"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
@@ -86,7 +77,6 @@ export default function DownloadApp() {
                                 <span>Download APK</span>
                             </a>
                         )}
-
                         <a
                             href="/docs?section=mobile-setup"
                             className="text-white/80 hover:text-white text-sm font-medium underline flex items-center gap-2 transition-colors"

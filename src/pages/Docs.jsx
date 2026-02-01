@@ -57,11 +57,9 @@ export default function Docs() {
                     <p className="text-gray-600">The best experience is on Android. Follow these steps to install the native app:</p>
                     <div className="space-y-4">
                         {[
-                            { step: 1, title: 'Download APK', alert: false },
-                            { step: 2, title: 'Download APK Installer', desc: "You'll need to download an Apk installer app from google play store or app store. ", alert: true },
-                            { step: 3, title: 'Enable Unknown Sources', desc: 'Go to Settings > Security and enable "Install from Unknown Sources" for your browser.', alert: true },
-                            // { step: 3, title: 'Install APK', desc: 'Open the downloaded file and click "Install". If Play Protect warns you, tap "Install Anyway".', alert: false },
-                            { step: 4, title: 'Permissions', desc: 'When you first open the app, allow Location and Notification permissions for full features.', alert: false }
+                            { step: 1, title: 'Download App', alert: false },
+                            { step: 2, title: 'Install APK', desc: 'Open the downloaded file. If your browser asks for permission, tap "Settings" and enable "Allow from this source".', alert: true },
+                            { step: 3, title: 'Permissions', desc: 'When you first open the app, allow Location and Notification permissions for full features.', alert: false },
                         ].map((s) => (
                             <div key={s.step} className="flex gap-4 p-5 bg-white border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                                 <div className="flex-shrink-0 w-6 h-6 bg-primary text-white text-sm rounded-full flex items-center justify-center">{s.step}</div>
@@ -81,12 +79,7 @@ export default function Docs() {
                                     )}
                                     {s.alert && s.step === 2 && (
                                         <div className="mt-2 w-fit flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
-                                            <Download size={12} /> <a href="">Download Apk Installer</a>
-                                        </div>
-                                    )}
-                                    {s.alert && s.step === 3 && (
-                                        <div className="mt-2 w-fit flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
-                                            <AlertTriangle size={12} /> Mandatory for Android beta versions.
+                                            <AlertTriangle size={12} /> Enable "Unknown Sources" if prompted.
                                         </div>
                                     )}
                                 </div>

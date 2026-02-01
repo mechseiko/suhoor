@@ -7,6 +7,6 @@ export default function FastingTimesPage() {
             <div className="mx-auto space-y-6">
                 <FastingTimes />
             </div>
-        </DashboardLayout>
+        </DashboardLayout>  
     )
 }

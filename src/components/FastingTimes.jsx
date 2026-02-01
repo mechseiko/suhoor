@@ -20,7 +20,7 @@ export default function FastingTimes() {
 
     try {
       const parsed = JSON.parse(cached)
-      const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
+      const today = new Date().toLocaleDateString('en-CA')
 
       if (parsed.date !== today) {
         localStorage.removeItem('suhoor_fasting_times')
@@ -69,8 +69,8 @@ export default function FastingTimes() {
     const suhoorDate = new Date();
     suhoorDate.setHours(hours, minutes, 0, 0);
 
-    const minTime = new Date(suhoorDate.getTime() - 30 * 60000); // -30 mins
-    const maxTime = new Date(suhoorDate.getTime() + 0 * 60000); // +0 mins
+    const minTime = new Date(suhoorDate.getTime() - 45 * 60000);
+    const maxTime = new Date(suhoorDate.getTime() - 30 * 60000);
 
     return {
       min: `${String(minTime.getHours()).padStart(2, '0')}:${String(minTime.getMinutes()).padStart(2, '0')}`,
@@ -167,14 +167,12 @@ export default function FastingTimes() {
 
     if (!currentUser) return
 
-    // Validate time is within allowed range
     if (allowedTimeRange.min && allowedTimeRange.max) {
       if (!isTimeInRange(newTime, allowedTimeRange.min, allowedTimeRange.max)) {
         setTimeError(`Time must be between ${allowedTimeRange.min} and ${allowedTimeRange.max}`);
-        return; // Don't save invalid time
+        return;
       }
     }
-
     setSavingTime(true)
     try {
       const docRef = doc(db, 'profiles', currentUser.uid)
@@ -214,20 +212,25 @@ export default function FastingTimes() {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden md:p-6 p-3">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-800">Today's Fasting Times</h3>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors disabled:opacity-50"
-          title="Refresh fasting times"
-        >
-          <RefreshCw className={`h-5 w-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
-        </button>
-      </div>
-
       {todayData && (
         <div className="md:space-y-6 space-y-4">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="text-sm text-gray-500 mb-1">Hijri Date</div>
+              <div className="text-lg font-semibold text-gray-900">
+                Today is <span className='text-[14px] border border-green-200 rounded-sm px-2 py-1 bg-green-50 text-green-700'>{todayData.hijri_readable}</span>
+              </div>
+            </div>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors disabled:opacity-50"
+              title="Refresh fasting times"
+            >
+              <RefreshCw className={`h-5 w-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+
           <div>
             <div className="text-sm text-gray-500 mb-1">Gregorian Date</div>
             <div className="text-lg font-semibold text-gray-900">
@@ -240,14 +243,58 @@ export default function FastingTimes() {
             </div>
           </div>
 
-          <div>
-            <div className="text-sm text-gray-500 mb-1">Hijri Date</div>
-            <div className="text-lg font-semibold text-gray-900">
-              {todayData.hijri_readable}
+          <div className="flex items-center justify-between p-3 bg-primary/5 rounded-xl border border-primary/10">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Moon className="h-4 w-4 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">Default Wake up</span>
             </div>
+            <span className="text-lg font-bold text-primary">
+              {allowedTimeRange.max}
+            </span>
           </div>
 
           <div className="border-t pt-6 space-y-3">
+            <div className="pt-4 border-t border-gray-100">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-yellow-100 rounded-lg">
+                      <Clock className="h-4 w-4 text-yellow-700" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 block">Personal Wake Up</span>
+                      {allowedTimeRange.min && allowedTimeRange.max ? (
+                        <div className='flex-col flex gap-0.3 mt-1'>
+                          <span className="text-[10px] text-gray-500">Configure your own wake up time.</span>
+                          <span className="text-[10px] text-gray-500">Allowed: {allowedTimeRange.min} - {allowedTimeRange.max}</span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-gray-500">Default: 30 minutes before Suhoor</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="time"
+                      value={customWakeUpTime}
+                      onChange={handleWakeUpTimeChange}
+                      min={allowedTimeRange.min}
+                      max={allowedTimeRange.max}
+                      className="bg-white border border-yellow-200 rounded-lg px-2 py-1 text-sm font-bold text-yellow-800 outline-none focus:ring-2 focus:ring-yellow-400 cursor-pointer"
+                    />
+                    {savingTime && <RefreshCw className="h-3 w-3 text-yellow-600 animate-spin" />}
+                  </div>
+                </div>
+                {timeError && (
+                  <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-xs text-red-600 font-medium">{timeError}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex items-center justify-between p-3 bg-primary/5 rounded-xl border border-primary/10">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-primary/10 rounded-lg">
@@ -285,42 +332,6 @@ export default function FastingTimes() {
                 </span>
               </div>
             )}
-
-            <div className="pt-4 border-t border-gray-100">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-100">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-yellow-100 rounded-lg">
-                      <Clock className="h-4 w-4 text-yellow-700" />
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-gray-700 block">Personal Wake Up</span>
-                      {allowedTimeRange.min && allowedTimeRange.max ? (
-                        <span className="text-[10px] text-gray-500">Allowed: {allowedTimeRange.min} - {allowedTimeRange.max}</span>
-                      ) : (
-                        <span className="text-[10px] text-gray-500">Default: 30 minutes before Suhoor</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="time"
-                      value={customWakeUpTime}
-                      onChange={handleWakeUpTimeChange}
-                      min={allowedTimeRange.min}
-                      max={allowedTimeRange.max}
-                      className="bg-white border border-yellow-200 rounded-lg px-2 py-1 text-sm font-bold text-yellow-800 outline-none focus:ring-2 focus:ring-yellow-400"
-                    />
-                    {savingTime && <RefreshCw className="h-3 w-3 text-yellow-600 animate-spin" />}
-                  </div>
-                </div>
-                {timeError && (
-                  <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-xs text-red-600 font-medium">{timeError}</p>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
           <div className="text-xs text-dark/60 text-center pt-4 border-t border-muted">

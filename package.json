@@ -10,7 +10,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "format": "prettier --write",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:apk": "node scripts/build-apk.js"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
