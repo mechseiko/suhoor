@@ -243,13 +243,13 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
 
         oscillator.start(audioContext.currentTime)
         oscillator.stop(audioContext.currentTime + 2.0)
-        
+
     }, [soundEnabled])
 
     // Handle persistent buzzing sound
     useEffect(() => {
         let interval;
-        if (lisBuzzing) {
+        if (isBuzzing) {
             // Play sound immediately
             playNotificationSound()
 

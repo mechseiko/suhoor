@@ -32,14 +32,21 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build APK (Debug)
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+      - name: Build APK
+        run: npm run build:apk
 
-      - name: Upload APK
+      - name: Commit APK
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add public/Suhoor.apk
+          git commit -m "chore: update Suhoor.apk [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Suhoor-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: public/Suhoor.apk

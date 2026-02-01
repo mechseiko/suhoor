@@ -7,7 +7,6 @@ import PageLayout from './layouts/PageLayout'
 import ScrollToTop from './components/ScrollToTop'
 import { useAuth } from './context/AuthContext'
 import { useNative } from './hooks/useNative'
-import Loader from './components/Loader'
 import Landing from './pages/Landing'
 
 const Login = lazy(() => import('./pages/Login'))
@@ -25,12 +24,6 @@ const About = lazy(() => import('./pages/About'))
 const Groups = lazy(() => import('./pages/Groups'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Docs = lazy(() => import('./pages/Docs'))
-
-const PageLoader = () => (
-  <div className="min-h-screen bg-white flex items-center justify-center">
-    <Loader />
-  </div>
-)
 
 
 function AppRoutes() {
