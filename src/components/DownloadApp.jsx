@@ -1,12 +1,10 @@
 import { Download } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { Capacitor } from '@capacitor/core'
 import { useNative } from '../hooks/useNative'
 import { useState, useEffect } from 'react'
 
 export default function DownloadApp() {
     const isNative = useNative()
-    const isCapacitor = Capacitor.isNativePlatform()
     const [isMobile, setIsMobile] = useState(false)
     const [deferredPrompt, setDeferredPrompt] = useState(null)
     const [canInstall, setCanInstall] = useState(false)
@@ -40,7 +38,7 @@ export default function DownloadApp() {
         setCanInstall(false)
     }
 
-    if (isCapacitor || isNative || !isMobile) return null
+    // if (isNative || !isMobile) return null
 
     return (
         <section className="bg-gradient-to-r from-primary to-primary/90 rounded-lg md:py-14 py-10 relative overflow-hidden">

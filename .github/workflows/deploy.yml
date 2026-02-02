@@ -46,8 +46,10 @@ jobs:
           files: public/Suhoor.apk
           draft: false
           prerelease: false
+          generate_release_notes: true
+          allowUpdates: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
@@ -55,4 +57,4 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SUHOORAPP }}
           channelId: live
-          projectId: suhoorapp
+          projectId: suhoor-group
