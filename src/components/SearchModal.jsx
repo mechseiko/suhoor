@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, X } from 'lucide-react'
+import { Search, X, SearchX } from 'lucide-react'
 import { searchData } from '../config/searchData';
 
 export default function SearchModal({ onClose }) {
@@ -95,7 +95,8 @@ export default function SearchModal({ onClose }) {
                                 item.queries.some(q => q.toLowerCase().includes(query))
                             )
                         }) && (
-                                <div className="text-center py-8 text-gray-500">
+                                <div className="text-center items-center flex flex-col justify-center py-8 text-gray-500">
+                                    <SearchX className='size-15 mb-5'/>
                                     No results found for "{searchQuery}"
                                 </div>
                             )}

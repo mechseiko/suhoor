@@ -1,12 +1,12 @@
 
 
-export default function ProfileButton({ currentUser , navigate }) {
-    const displayName = currentUser?.displayName?.split(' ')[0] || currentUser?.email?.split('@')[0];
-    const initial = displayName?.charAt(0).toUpperCase();
+export default function ProfileButton({ currentUser, navigate }) {
+    const displayName = currentUser?.displayName?.split(' ')[0] || currentUser?.email?.split('@')[0] || 'User';
+    const initial = displayName?.charAt(0).toUpperCase() || '?';
 
     return (
         <button
-            title={`Logged in as ${currentUser?.email ? currentUser?.email : currentUser}`}
+            title={`Logged in as ${currentUser?.email ? currentUser?.email : (currentUser?.uid || 'Guest')}`}
             onClick={() => navigate('/profile')}
             className="flex items-center gap-3 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-100 hover:bg-gray-100 transition-colors"
         >

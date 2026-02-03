@@ -16,7 +16,6 @@ if ('serviceWorker' in navigator) {
 setTimeout(() => {
   const splash = document.getElementById('splash-screen');
   if (splash && !splash.classList.contains('fade-out')) {
-    // console.log('Main.jsx failsafe: Hiding splash screen');
     splash.classList.add('fade-out');
     setTimeout(() => {
       // if (splash.parentNode) splash.remove();
