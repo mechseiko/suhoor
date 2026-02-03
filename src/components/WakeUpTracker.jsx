@@ -122,7 +122,14 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         return () => clearInterval(interval)
     }, [todayData, hasWokenUp, wantsToFast, isBuzzing, members, currentUser.uid])
 
-    useLocationTracking(groupId, currentUser.uid, isInWindow && !hasWokenUp && wantsToFast)
+    const suhoorTime = todayData?.time?.sahur
+    const [hours, minutes] = suhoorTime ? suhoorTime.split(':').map(Number) : [0, 0]
+    const suhoorDate = new Date()
+    suhoorDate.setHours(hours, minutes, 0, 0)
+    const thirtyMinsBefore = new Date(suhoorDate.getTime() - 30 * 60000)
+    const isLocationReleaseTime = new Date() >= thirtyMinsBefore
+
+    useLocationTracking(groupId, currentUser.uid, isLocationReleaseTime && !hasWokenUp && wantsToFast)
 
     // Track location if in window and NOT woken up
     // ... existing logs fetching ...
@@ -514,11 +521,18 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                         <div className="flex items-center gap-2">
                                             {!isAwake && memberOnline && member.profiles.id !== currentUser.uid && (
                                                 <button
-                                                    onClick={() => buzzUser(member.profiles.id, groupId, getCurrentUserName())}
-                                                    className="p-2 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-colors flex items-center gap-2 cursor-pointer"
+                                                    onClick={() => {
+                                                        const targetMemberIntent = memberIntentions[member.profiles.id] !== false
+                                                        if (targetMemberIntent) {
+                                                            buzzUser(member.profiles.id, groupId, getCurrentUserName())
+                                                        } else {
+                                                            alert(`${member.profiles.display_name || 'Member'} is not fasting today and cannot be buzzed.`)
+                                                        }
+                                                    }}
+                                                    className={`p-2 rounded-lg border transition-colors flex items-center gap-2 cursor-pointer ${memberIntentions[member.profiles.id] !== false ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-200' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-50 cursor-not-allowed'}`}
                                                     title={`Buzz ${member.profiles.display_name || member.profiles.email}`}
                                                 >
-                                                    <Bell className="h-3.5 w-3.5 animate-bounce" />
+                                                    <Bell className={`h-3.5 w-3.5 ${memberIntentions[member.profiles.id] !== false ? 'animate-bounce' : ''}`} />
                                                     <span className="text-[10px] font-bold uppercase">Buzz</span>
                                                 </button>
                                             )}

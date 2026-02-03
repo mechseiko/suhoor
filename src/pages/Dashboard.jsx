@@ -7,6 +7,7 @@ import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromSer
 import StatsCard from '../components/StatsCard'
 import FastingPrompt from '../components/FastingPrompt'
 import DashboardLayout from '../layouts/DashboardLayout'
+import { getTargetFastingDate, getDefaultIntention } from '../utils/fastingUtils'
 import {
     Chart as ChartJS,
     LineElement,
@@ -233,11 +234,6 @@ export default function Dashboard() {
         try {
             const today = new Date();
             const todayStr = today.toLocaleDateString('en-CA');
-            const dayOfWeek = today.getDay();
-            const isSunnahDay = dayOfWeek === 1 || dayOfWeek === 4; // Mon=1, Thu=4
-
-            // If it's a Sunnah day, we don't auto-default to "No" (as per user request)
-            if (isSunnahDay) return;
 
             // Check if status for today already exists
             const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${todayStr}`);
@@ -245,7 +241,7 @@ export default function Dashboard() {
 
             if (!statusSnap.exists()) {
                 // If not exists, check if it's 1 hour past suhoor
-                // 1. Get coords
+                // 1. Get coords (or use userProfile if available)
                 const pos = await new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject);
                 });
@@ -255,7 +251,7 @@ export default function Dashboard() {
                     `https://islamicapi.com/api/v1/fasting/?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs`
                 );
                 const data = await response.json();
-                const sahurTimeStr = data.data.fasting[0].time.sahur; // e.g. "05:12"
+                const sahurTimeStr = data.data.fasting[0].time.sahur;
 
                 const [sHours, sMinutes] = sahurTimeStr.split(':').map(Number);
                 const sahurTime = new Date();
@@ -264,15 +260,17 @@ export default function Dashboard() {
                 const oneHourAfterSahur = new Date(sahurTime.getTime() + 60 * 60 * 1000);
 
                 if (today > oneHourAfterSahur) {
-                    // Default to NO
+                    // Use getDefaultIntention to see what it SHOULD have been
+                    const intention = getDefaultIntention(today, userProfile);
+
                     await setDoc(statusRef, {
                         userId: currentUser.uid,
                         date: todayStr,
-                        wantsToFast: false,
+                        wantsToFast: intention,
                         updatedAt: serverTimestamp(),
                         isAutoDefault: true
                     });
-                    console.log(`Auto-defaulted fasting status for ${todayStr} to NO`);
+                    console.log(`Auto-defaulted fasting status for ${todayStr} to ${intention ? 'YES' : 'NO'}`);
                 }
             }
         } catch (err) {

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Check, X, Bell, Loader2, AlertCircle } from 'lucide-react';
+import { Calendar, Check, X, Bell, Loader2, AlertCircle, Moon, Sun } from 'lucide-react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { db } from '../config/firebase';
-import { collection, addDoc, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
+import { getHijriDate, isMondayOrThursday, isWhiteDay, isRamadan, getTargetFastingDate, getDefaultIntention } from '../utils/fastingUtils';
 
 export default function FastingPrompt() {
     const { currentUser, userProfile } = useAuth();
@@ -12,19 +13,13 @@ export default function FastingPrompt() {
     const [loading, setLoading] = useState(false);
     const [targetDate, setTargetDate] = useState('');
     const [targetDisplay, setTargetDisplay] = useState('');
+    const [defaultAnswer, setDefaultAnswer] = useState(false);
 
     useEffect(() => {
-        const determineTargetDate = async () => {
-            const now = new Date();
-            const hour = now.getHours();
-            let target = null;
+        const determineTarget = async () => {
+            const target = getTargetFastingDate();
 
-            if (hour >= 0 && hour < 5) {
-                target = new Date();
-            } else if (hour >= 17) {
-                target = new Date();
-                target.setDate(target.getDate() + 1);
-            } else {
+            if (!target) {
                 setStatus('hidden');
                 return;
             }
@@ -38,14 +33,32 @@ export default function FastingPrompt() {
                 return;
             }
 
+            // Also check Firestore to be sure (server of truth)
+            try {
+                const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${targetStr}`);
+                const statusSnap = await getDoc(statusRef);
+                if (statusSnap.exists()) {
+                    localStorage.setItem(`suhoor_intent_${targetStr}`, statusSnap.data().wantsToFast ? 'yes' : 'no');
+                    setStatus('hidden');
+                    return;
+                }
+            } catch (err) {
+                console.error("Error checking fasting status from DB:", err);
+            }
+
             setTargetDate(targetStr);
             setTargetDisplay(target.toLocaleDateString('en-US', {
                 weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
             }));
+
+            // Calculate default answer based on settings and date
+            setDefaultAnswer(getDefaultIntention(target, userProfile));
         };
 
-        determineTargetDate();
-    }, []);
+        if (currentUser) {
+            determineTarget();
+        }
+    }, [currentUser, userProfile]);
 
     const handleYes = async () => {
         setLoading(true);
@@ -62,16 +75,14 @@ export default function FastingPrompt() {
             const sahurTime = fastingInfo.time.sahur;
 
             if (Capacitor.isNativePlatform()) {
-                let scheduleDate = new Date(targetDate);
+                let scheduleDate = new Date(targetDate + 'T00:00:00');
                 const [hours, minutes] = sahurTime.split(':').map(Number);
 
                 // Determine Alarm Time
                 if (userProfile?.customWakeUpTime) {
-                    // Use User's Custom Preference
                     const [customH, customM] = userProfile.customWakeUpTime.split(':').map(Number);
                     scheduleDate.setHours(customH, customM, 0, 0);
                 } else {
-                    // Default: 30 minutes BEFORE Sahur ends
                     scheduleDate.setHours(hours, minutes, 0, 0);
                     scheduleDate.setMinutes(scheduleDate.getMinutes() - 30);
                 }
@@ -112,6 +123,7 @@ export default function FastingPrompt() {
     };
 
     const handleNo = async () => {
+        setLoading(true);
         try {
             const statusRef = doc(db, 'daily_fasting_status', `${currentUser.uid}_${targetDate}`);
             await setDoc(statusRef, {
@@ -125,125 +137,135 @@ export default function FastingPrompt() {
         } catch (error) {
             console.error("Error dismissing fasting:", error);
             setStatus('hidden');
+        } finally {
+            setLoading(false);
         }
     };
 
     if (status === 'hidden') return null;
 
+    const dateObj = new Date(targetDate + 'T00:00:00');
+    const isSpecial = isMondayOrThursday(dateObj) || isWhiteDay(dateObj) || isRamadan(dateObj);
+    const hijri = getHijriDate(dateObj);
+
     return (
-        <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-            <div className="bg-primary/90 rounded-xl p-4 text-white shadow-sm border-1 border-blue-600 shadow-blue-200 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-xl"></div>
+        <div className="mb-0 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="bg-primary/95 rounded-2xl p-6 text-white shadow-xl border-1 border-white/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-accent/20 rounded-full -ml-16 -mb-16 blur-2xl"></div>
 
                 <div className="relative z-10">
                     {status === 'idle' && (
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
-                                    <Calendar className="h-4 w-4" />
+                        <div className="space-y-6">
+                            <div className="flex items-start gap-4">
+                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 text-yellow-300">
+                                    <Moon className="h-6 w-6" />
                                 </div>
                                 <div className="flex-1">
-                                    {(() => {
-                                        const dateObj = new Date(targetDate + 'T00:00:00');
-                                        const dayOfWeek = dateObj.getDay();
-                                        const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+                                    <h3 className="text-xl font-black tracking-tight">Suhoor for Tomorrow?</h3>
+                                    <p className="text-blue-100/80 text-sm mt-1">
+                                        Planning to fast on <span className="text-white font-bold">{targetDisplay}</span>?
+                                    </p>
 
-                                        const todayStr = new Date().toLocaleDateString('en-CA');
-                                        const isToday = targetDate === todayStr;
-                                        const timeLabel = isToday ? "today" : "tomorrow";
-                                        const TitleLabel = isToday ? "Today" : "Tomorrow";
-
-                                        const isSunnahDay = dayOfWeek === 1 || dayOfWeek === 4;
-
-                                        return (
-                                            <>
-                                                <p className="text-blue-100 text-lg">
-                                                    Are you planning to fast {timeLabel}, <span className="font-semibold">{targetDisplay}</span>?
-                                                </p>
-
-                                                {isSunnahDay && (
-                                                    <div className="mt-3 bg-green-500/20 border border-green-300/30 rounded-lg p-3 backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-500">
-                                                        <div className="flex items-start gap-2">
-                                                            <div>
-                                                                <p className="text-sm font-bold text-green-100">
-                                                                    {TitleLabel} is {dayName}, a blessed Sunnah day!
-                                                                </p>
-                                                                <p className="text-xs text-green-200 mt-1">
-                                                                    The Prophet ﷺ used to fast on Mondays and Thursdays
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </>
-                                        );
-                                    })()}
+                                    {isSpecial && (
+                                        <div className="mt-4 flex flex-col gap-2">
+                                            {isMondayOrThursday(dateObj) && (
+                                                <span className="w-fit px-3 py-1 bg-green-400/20 text-green-200 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-400/30">
+                                                    Sunnah Day
+                                                </span>
+                                            )}
+                                            {isWhiteDay(dateObj) && (
+                                                <span className="w-fit px-3 py-1 bg-blue-400/20 text-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-full border border-blue-400/30">
+                                                    White Day ({hijri.day}th)
+                                                </span>
+                                            )}
+                                            {isRamadan(dateObj) && (
+                                                <span className="w-fit px-3 py-1 bg-yellow-400/20 text-yellow-100 text-[10px] font-bold uppercase tracking-wider rounded-full border border-yellow-400/30">
+                                                    Ramadan
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
+
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setStatus('confirming_no')}
-                                    className="flex-1 md:flex-none px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-lg font-bold transition-all border border-white/20 cursor-pointer"
+                                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black transition-all border-2 border-white/10 cursor-pointer ${!defaultAnswer ? 'bg-white text-primary' : 'bg-white/5 hover:bg-white/10'}`}
                                 >
+                                    <X className="h-5 w-5" />
                                     No
                                 </button>
                                 <button
                                     onClick={() => setStatus('confirming_yes')}
-                                    className="flex-1 md:flex-none px-4 py-2.5 bg-white text-primary rounded-lg font-bold transition-all shadow-lg cursor-pointer"
+                                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black transition-all border-2 cursor-pointer ${defaultAnswer ? 'bg-white text-primary border-white' : 'bg-primary border-white/20 hover:bg-white/5'}`}
                                 >
+                                    <Check className="h-5 w-5" />
                                     Yes
                                 </button>
                             </div>
+
+                            <p className="text-center text-[10px] text-blue-200/50 uppercase font-bold tracking-widest">
+                                Defaulting to {defaultAnswer ? 'YES' : 'NO'} based on your settings
+                            </p>
                         </div>
                     )}
 
                     {status === 'confirming_yes' && (
-                        <div className="flex flex-col items-center text-center py-2 space-y-4 animate-in zoom-in-95 duration-200">
-                            <div className="p-3 bg-yellow-400/20 rounded-full">
-                                <AlertCircle className="h-8 w-8 text-yellow-300" />
+                        <div className="flex flex-col items-center text-center py-4 space-y-6 animate-in zoom-in-95 duration-200">
+                            <div className="p-4 bg-yellow-400/20 rounded-3xl border border-yellow-400/30">
+                                <Bell className="h-10 w-10 text-yellow-300 animate-pulse" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold">Confirm Fasting Intention?</h3>
-                                <p className="text-blue-100 text-sm max-w-sm">
-                                    We'll schedule an alarm for {targetDate} and your group members will be aware.
+                                <h3 className="text-2xl font-black italic">Set Intent?</h3>
+                                <p className="text-blue-100 text-sm mt-2 max-w-xs leading-relaxed">
+                                    We'll schedule your alarm and your group will be notified to wake you.
                                 </p>
                             </div>
-                            <div className="flex gap-3 w-full max-w-xs">
+                            <div className="flex gap-3 w-full">
                                 <button
                                     onClick={() => setStatus('idle')}
-                                    className="flex-1 px-4 py-2.5 bg-white/10 rounded-xl font-bold border border-white/20 cursor-pointer"
+                                    className="flex-1 px-6 py-4 bg-white/10 rounded-2xl font-black uppercase text-xs tracking-widest border border-white/10 cursor-pointer"
                                 >
-                                    Go Back
+                                    Cancel
                                 </button>
                                 <button
                                     onClick={handleYes}
                                     disabled={loading}
-                                    className="flex-1 px-4 py-2.5 bg-white text-primary rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                                    className="flex-1 px-6 py-4 bg-white text-primary rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                                    {loading ? 'Confirming...' : 'Confirm'}
+                                    Confirm
                                 </button>
                             </div>
                         </div>
                     )}
 
                     {status === 'confirming_no' && (
-                        <div className="flex flex-col items-center text-center py-2 space-y-4 animate-in zoom-in-95 duration-200">
-                            <div>
-                                <h3 className="text-lg font-bold">Dismiss for today?</h3>
-                                <p className="text-blue-100 text-sm">Your group members will not wake you for suhoor.</p>
+                        <div className="flex flex-col items-center text-center py-4 space-y-6 animate-in zoom-in-95 duration-200">
+                            <div className="p-4 bg-red-400/20 rounded-3xl border border-red-400/30">
+                                <AlertCircle className="h-10 w-10 text-red-300" />
                             </div>
-                            <div className="flex gap-3 w-full max-w-xs">
+                            <div>
+                                <h3 className="text-2xl font-black italic">Skip Suhoor?</h3>
+                                <p className="text-blue-100 text-sm mt-2 max-w-xs leading-relaxed">
+                                    Your team will be aware and won't be able to buzz you for suhoor.
+                                </p>
+                            </div>
+                            <div className="flex gap-3 w-full">
                                 <button
                                     onClick={() => setStatus('idle')}
-                                    className="flex-1 px-4 py-2.5 bg-white/10 rounded-xl font-bold border border-white/20 cursor-pointer"
+                                    className="flex-1 px-6 py-4 bg-white/10 rounded-2xl font-black uppercase text-xs tracking-widest border border-white/10 cursor-pointer"
                                 >
-                                    Go Back
+                                    Wait
                                 </button>
                                 <button
                                     onClick={handleNo}
-                                    className="flex-1 px-4 py-2.5 bg-red-400 text-white rounded-xl font-bold shadow-lg cursor-pointer"
+                                    disabled={loading}
+                                    className="flex-1 px-6 py-4 bg-red-500/80 text-white rounded-2xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
+                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
                                     Dismiss
                                 </button>
                             </div>
@@ -251,12 +273,12 @@ export default function FastingPrompt() {
                     )}
 
                     {status === 'success' && (
-                        <div className="flex flex-col items-center text-center py-4 animate-in bounce-in duration-500">
-                            <div className="h-16 w-16 bg-white text-primary rounded-full flex items-center justify-center mb-4 shadow-xl">
-                                <Bell className="h-8 w-8 animate-bounce" />
+                        <div className="flex flex-col items-center text-center py-8 animate-in bounce-in duration-500">
+                            <div className="h-20 w-20 bg-white text-primary rounded-full flex items-center justify-center mb-6 shadow-2xl">
+                                <Sun className="h-10 w-10 animate-spin-slow" />
                             </div>
-                            <h3 className="text-2xl font-black">Alhamdulillah!</h3>
-                            <p className="text-blue-50 text-sm">Alarms scheduled. We'll wake you for suhoor.</p>
+                            <h3 className="text-3xl font-black">Success!</h3>
+                            <p className="text-blue-100 font-medium mt-2">Intent recorded. We'll find you at Suhoor.</p>
                         </div>
                     )}
                 </div>

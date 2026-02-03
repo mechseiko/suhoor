@@ -1,6 +1,9 @@
-import { Bell, Shield, ChevronRight, Mail, Globe } from 'lucide-react'
+import { Bell, Shield, ChevronRight, Mail, Globe, Clock, CheckCircle2, Circle } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
+import { db } from '../config/firebase'
+import { doc, updateDoc } from 'firebase/firestore'
+import { useState } from 'react'
 
 export default function Settings() {
     const { currentUser, userProfile } = useAuth()
@@ -33,9 +36,80 @@ export default function Settings() {
         </div>
     )
 
+    const [updating, setUpdating] = useState(false)
+
+    const updateFastingDefault = async (key, value) => {
+        if (!currentUser) return
+        setUpdating(true)
+        try {
+            const userRef = doc(db, 'profiles', currentUser.uid)
+            await updateDoc(userRef, {
+                [`fastingDefaults.${key}`]: value
+            })
+        } catch (err) {
+            console.error("Error updating fasting default:", err)
+        } finally {
+            setUpdating(false)
+        }
+    }
+
+    const Toggle = ({ value, onToggle, disabled }) => (
+        <button
+            onClick={onToggle}
+            disabled={disabled}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer ${value ? 'bg-primary' : 'bg-gray-200'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+            <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${value ? 'translate-x-6' : 'translate-x-1'}`}
+            />
+        </button>
+    )
+
     return (
         <DashboardLayout pageTitle="Settings">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto pb-12">
+                <Section title="Fasting Defaults">
+                    <p className="px-6 py-2 text-xs text-gray-500 italic">
+                        Choose if prompt should default to "Yes" or "No" for these specific days.
+                    </p>
+                    <SettingItem
+                        icon={Clock}
+                        label="Mondays & Thursdays"
+                        description="Default to fasting on sunnah days"
+                        action={
+                            <Toggle
+                                value={userProfile?.fastingDefaults?.sunnah ?? true}
+                                onToggle={() => updateFastingDefault('sunnah', !(userProfile?.fastingDefaults?.sunnah ?? true))}
+                                disabled={updating}
+                            />
+                        }
+                    />
+                    <SettingItem
+                        icon={Clock}
+                        label="White Days"
+                        description="13th, 14th, 15th of Hijri month"
+                        action={
+                            <Toggle
+                                value={userProfile?.fastingDefaults?.whiteDays ?? true}
+                                onToggle={() => updateFastingDefault('whiteDays', !(userProfile?.fastingDefaults?.whiteDays ?? true))}
+                                disabled={updating}
+                            />
+                        }
+                    />
+                    <SettingItem
+                        icon={Clock}
+                        label="Ramadan"
+                        description="Default to fasting all days of Ramadan"
+                        action={
+                            <Toggle
+                                value={userProfile?.fastingDefaults?.ramadan ?? true}
+                                onToggle={() => updateFastingDefault('ramadan', !(userProfile?.fastingDefaults?.ramadan ?? true))}
+                                disabled={updating}
+                            />
+                        }
+                    />
+                </Section>
+
                 <Section title="Preferences">
                     <SettingItem
                         icon={Bell}
