@@ -25,7 +25,7 @@ const faqs = [
     },
     {
         question: "Can I use Suhoor for voluntary fasts?",
-        answer: "Of course! Suhoor is designed to be used year round for Sunnah fasts (like Mondays and Thursdays) or any other voluntary fasting you do with friends."
+        answer: "Of course! Suhoor is designed to be used year round for Sunnah fasts (like Mondays and Thursdays) or any other voluntary fasting."
     }
 ]
 
