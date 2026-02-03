@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { Users, TrendingUp, Award, X, Smile } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
-import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer } from 'firebase/firestore'
+import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer, serverTimestamp } from 'firebase/firestore'
 import StatsCard from '../components/StatsCard'
 import FastingPrompt from '../components/FastingPrompt'
 import DashboardLayout from '../layouts/DashboardLayout'
@@ -83,7 +83,7 @@ const chartOptions = {
 
 
 export default function Dashboard() {
-    const { currentUser } = useAuth();
+    const { currentUser, userProfile } = useAuth();
     const [searchParams] = useSearchParams()
     const isNewUser = searchParams.get('m') === 'n'
     const [showWelcomeBanner, setShowWelcomeBanner] = useState(isNewUser)
@@ -369,6 +369,7 @@ export default function Dashboard() {
                 }
             })
 
+            const totalFasts = fastingLogs.filter(log => log.wantsToFast).length
             const milestones = []
             if (totalFasts >= 10) milestones.push({ id: 'fasts_10', label: 'Getting Started', icon: '🌱' })
             if (totalFasts >= 30) milestones.push({ id: 'fasts_30', label: 'Ramadan Spirit', icon: '🌙' })
