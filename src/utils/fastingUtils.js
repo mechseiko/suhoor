@@ -1,10 +1,3 @@
-/**
- * Fasting Utilities
- * Handles logic for identifying specific fasting days:
- * - Mondays & Thursdays (Sunnah)
- * - 13th, 14th, 15th of Hijri month (White Days)
- * - Ramadan (Month 9 of Hijri calendar)
- */
 
 /**
  * Get Hijri date information for a given Gregorian date

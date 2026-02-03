@@ -55,48 +55,49 @@ export default function Duas() {
           return (
             <div
               key={idx}
-              className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+              className="group flex flex-col justify-between bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
-              <div className={`bg-primary p-6 text-white relative overflow-hidden`}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
-                      <Icon className="h-6 w-6" />
+              <section>
+                <div className={`bg-primary p-6 text-white relative overflow-hidden`}>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                  <div className="relative z-10 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <h2 className="text-xl font-bold">
+                        {dua.title}
+                      </h2>
                     </div>
-                    <h2 className="text-xl font-bold">
-                      {dua.title}
-                    </h2>
                   </div>
                 </div>
-              </div>
 
-              <div className="md:p-6 p-4 space-y-4">
-                <div className="text-center">
-                  <p
-                    className="text-3xl leading-relaxed font-serif text-gray-800 mb-4"
-                    dir="rtl"
-                  >
-                    {dua.arabic}
-                  </p>
-                </div>
+                <div className="md:p-6 p-4 space-y-4">
+                  <div className="text-center">
+                    <p
+                      className="text-3xl leading-relaxed font-serif text-gray-800 mb-4"
+                      dir="rtl"
+                    >
+                      {dua.arabic}
+                    </p>
+                  </div>
 
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl md:p-4 p-2 border border-gray-200">
-                  <div className="flex items-start gap-2">
-                    <BookOpen className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
-                    <p className="text-sm font-medium text-gray-700 italic">
-                      {dua.transliteration}
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl md:p-4 p-2 border border-gray-200">
+                    <div className="flex items-start gap-2">
+                      <BookOpen className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                      <p className="text-sm font-medium text-gray-700 italic">
+                        {dua.transliteration}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 text-center">
+                    <p className="text-gray-600 leading-relaxed italic">
+                      "{dua.translation}"
                     </p>
                   </div>
                 </div>
-
-                <div className="pt-2 text-center">
-                  <p className="text-gray-600 leading-relaxed italic">
-                    "{dua.translation}"
-                  </p>
-                </div>
-              </div>
-
+              </section>
               <div className={`h-1 bg-primary`}></div>
             </div>
           )

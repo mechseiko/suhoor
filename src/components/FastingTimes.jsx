@@ -120,7 +120,7 @@ export default function FastingTimes() {
         }))
       }
     } catch (err) {
-      setError("Failed to load fasting times.");
+      setError("Failed to load fasting times. Make sure you're connected to the internet.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -131,7 +131,6 @@ export default function FastingTimes() {
     if (!location.loaded) return;
     if (!location.coordinates.lat || !location.coordinates.lng) return;
 
-    // Fetch custom wake up time from profile
     const fetchProfileData = async () => {
       if (!currentUser) return
       try {
