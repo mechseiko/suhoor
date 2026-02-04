@@ -142,7 +142,7 @@ export default function FastingPrompt() {
         }
     };
 
-    if (status === 'hidden') return null;
+    if (status === 'hidden' || !targetDate) return null;
 
     const dateObj = new Date(targetDate + 'T00:00:00');
     const isSpecial = isMondayOrThursday(dateObj) || isWhiteDay(dateObj) || isRamadan(dateObj);
