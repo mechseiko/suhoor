@@ -5,12 +5,14 @@ import { db } from '../config/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
+import { useNavigate } from 'react-router-dom'
 
 export default function CreateGroupModal({ onClose, onSuccess }) {
     const { currentUser } = useAuth()
     const [groupName, setGroupName] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const navigate = useNavigate()
 
     const generateGroupKey = () => {
         return Math.random().toString(36).substring(2, 10).toUpperCase()
@@ -39,13 +41,14 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
                 role: 'admin',
                 joined_at: serverTimestamp(),
             })
+            navigate(`/groups/${groupRef.id}`)
 
             // Notification for success
             if (Capacitor.isNativePlatform()) {
                 await LocalNotifications.schedule({
                     notifications: [{
                         title: 'Group Created! 🚀',
-                        body: `Successfully created "${groupName}". Time to invite your friends!`,
+                        body: `Successfully created "${groupName}". Share the invite link to invite your friends!`,
                         id: new Date().getTime(),
                         schedule: { at: new Date(Date.now() + 500) }
                     }]

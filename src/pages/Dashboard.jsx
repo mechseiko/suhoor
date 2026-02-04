@@ -427,7 +427,10 @@ export default function Dashboard() {
                     const membersSnap = await getDocs(membersQuery)
 
                     membersSnap.forEach(doc => {
-                        uniqueMemberIds.add(doc.data().user_id)
+                        const uid = doc.data().user_id
+                        if (uid) {
+                            uniqueMemberIds.add(uid)
+                        }
                     })
 
                     groupsData.push({
@@ -440,6 +443,7 @@ export default function Dashboard() {
             setGroups(groupsData)
             localStorage.setItem(`suhoor_groups_${currentUser.uid}`, JSON.stringify(groupsData))
 
+            // Calculate total unique members across all groups
             const totalMembers = uniqueMemberIds.size
 
             // Integrate Fasting Stats
@@ -482,8 +486,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <FastingPrompt />
-
                 {showWelcomeBanner && (
                     <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
                         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-xl p-6 flex items-center justify-between gap-6 relative overflow-hidden group">
@@ -507,7 +509,9 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                <div className='flex-col-reverse md:flex-col flex'>
+                <FastingPrompt />
+
+                <div className='flex-col-reverse md:flex-col flex mt-10'>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
                         <StatsCard
                             icon={Users}

@@ -91,7 +91,7 @@ export default function FastingPrompt() {
                     notifications: [
                         {
                             title: "Suhoor Time! 🌅",
-                            body: "It's time for suhoor. May Allah accept your fast.",
+                            body: "It's time to wake up for sahoor. May Allah accept your fast.",
                             id: 1001,
                             schedule: { at: scheduleDate },
                             sound: 'alarm.wav',
@@ -158,30 +158,28 @@ export default function FastingPrompt() {
                     {status === 'idle' && (
                         <div className="space-y-6">
                             <div className="flex items-start gap-4">
-                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 text-yellow-300">
-                                    <Moon className="h-6 w-6" />
-                                </div>
+                                <img className="md:size-12 size-10 rounded-lg"  src="/logo.png" />
                                 <div className="flex-1">
                                     <h3 className="text-xl font-black tracking-tight">Suhoor for Tomorrow?</h3>
                                     <p className="text-blue-100/80 text-sm mt-1">
-                                        Planning to fast on <span className="text-white font-bold">{targetDisplay}</span>?
+                                        Are you planning to fast tomorrow, <span className="text-white font-bold">{targetDisplay}</span>?
                                     </p>
 
                                     {isSpecial && (
                                         <div className="mt-4 flex flex-col gap-2">
                                             {isMondayOrThursday(dateObj) && (
                                                 <span className="w-fit px-3 py-1 bg-green-400/20 text-green-200 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-400/30">
-                                                    Sunnah Day
+                                                    Sunnah Fast
                                                 </span>
                                             )}
                                             {isWhiteDay(dateObj) && (
                                                 <span className="w-fit px-3 py-1 bg-blue-400/20 text-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-full border border-blue-400/30">
-                                                    White Day ({hijri.day}th)
+                                                    White Day - {hijri.day}th
                                                 </span>
                                             )}
                                             {isRamadan(dateObj) && (
                                                 <span className="w-fit px-3 py-1 bg-yellow-400/20 text-yellow-100 text-[10px] font-bold uppercase tracking-wider rounded-full border border-yellow-400/30">
-                                                    Ramadan
+                                                    Ramadan day {hijri.day}
                                                 </span>
                                             )}
                                         </div>
@@ -192,14 +190,14 @@ export default function FastingPrompt() {
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setStatus('confirming_no')}
-                                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black transition-all border-2 border-white/10 cursor-pointer ${!defaultAnswer ? 'bg-white text-primary' : 'bg-white/5 hover:bg-white/10'}`}
+                                    className={`flex-1 flex items-center justify-center gap-2 md:px-6 md:py-3 px-4 py-2 rounded-xl font-black transition-all border-2 border-white/10 cursor-pointer ${!defaultAnswer ? 'bg-white text-primary' : 'bg-white/5 hover:bg-white/10'}`}
                                 >
                                     <X className="h-5 w-5" />
                                     No
                                 </button>
                                 <button
                                     onClick={() => setStatus('confirming_yes')}
-                                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black transition-all border-2 cursor-pointer ${defaultAnswer ? 'bg-white text-primary border-white' : 'bg-primary border-white/20 hover:bg-white/5'}`}
+                                    className={`flex-1 flex items-center justify-center gap-2 md:px-6 md:py-3 px-4 py-2 rounded-xl font-black transition-all border-2 cursor-pointer ${defaultAnswer ? 'bg-white text-primary border-white' : 'bg-primary border-white/20 hover:bg-white/5'}`}
                                 >
                                     <Check className="h-5 w-5" />
                                     Yes
@@ -207,7 +205,7 @@ export default function FastingPrompt() {
                             </div>
 
                             <p className="text-center text-[10px] text-blue-200/50 uppercase font-bold tracking-widest">
-                                Defaulting to {defaultAnswer ? 'YES' : 'NO'} based on your settings
+                                This defaults to <span className='text-green-500'>{defaultAnswer ? 'YES' : 'NO'}</span> based on your settings
                             </p>
                         </div>
                     )}
@@ -215,10 +213,10 @@ export default function FastingPrompt() {
                     {status === 'confirming_yes' && (
                         <div className="flex flex-col items-center text-center py-4 space-y-6 animate-in zoom-in-95 duration-200">
                             <div className="p-4 bg-yellow-400/20 rounded-3xl border border-yellow-400/30">
-                                <Bell className="h-10 w-10 text-yellow-300 animate-pulse" />
+                                <Bell className="h-8 w-8 text-yellow-300 animate-pulse" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black italic">Set Intent?</h3>
+                                <h3 className="text-2xl font-black italic">Confirm Intention</h3>
                                 <p className="text-blue-100 text-sm mt-2 max-w-xs leading-relaxed">
                                     We'll schedule your alarm and your group will be notified to wake you.
                                 </p>
@@ -226,14 +224,14 @@ export default function FastingPrompt() {
                             <div className="flex gap-3 w-full">
                                 <button
                                     onClick={() => setStatus('idle')}
-                                    className="flex-1 px-6 py-4 bg-white/10 rounded-2xl font-black uppercase text-xs tracking-widest border border-white/10 cursor-pointer"
+                                    className="flex-1 px-6 py-4 bg-white/10 rounded-lg font-black uppercase text-xs tracking-widest border border-white/10 cursor-pointer"
                                 >
-                                    Cancel
+                                    Back
                                 </button>
                                 <button
                                     onClick={handleYes}
                                     disabled={loading}
-                                    className="flex-1 px-6 py-4 bg-white text-primary rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                                    className="flex-1 px-6 py-4 bg-white text-primary rounded-lg font-black uppercase text-xs tracking-widest shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                     Confirm
@@ -245,28 +243,28 @@ export default function FastingPrompt() {
                     {status === 'confirming_no' && (
                         <div className="flex flex-col items-center text-center py-4 space-y-6 animate-in zoom-in-95 duration-200">
                             <div className="p-4 bg-red-400/20 rounded-3xl border border-red-400/30">
-                                <AlertCircle className="h-10 w-10 text-red-300" />
+                                <AlertCircle className="h-8 w-8 text-red-300" />
                             </div>
                             <div>
                                 <h3 className="text-2xl font-black italic">Skip Suhoor?</h3>
                                 <p className="text-blue-100 text-sm mt-2 max-w-xs leading-relaxed">
-                                    Your team will be aware and won't be able to buzz you for suhoor.
+                                    Your team will be aware and won't be able to wake you for suhoor.
                                 </p>
                             </div>
                             <div className="flex gap-3 w-full">
                                 <button
                                     onClick={() => setStatus('idle')}
-                                    className="flex-1 px-6 py-4 bg-white/10 rounded-2xl font-black uppercase text-xs tracking-widest border border-white/10 cursor-pointer"
+                                    className="flex-1 px-6 py-4 bg-white/10 rounded-lg font-black uppercase text-xs tracking-widest border border-white/10 cursor-pointer"
                                 >
-                                    Wait
+                                    Back
                                 </button>
                                 <button
                                     onClick={handleNo}
                                     disabled={loading}
-                                    className="flex-1 px-6 py-4 bg-red-500/80 text-white rounded-2xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                                    className="flex-1 px-6 py-4 bg-red-500/80 text-white rounded-lg font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
-                                    Dismiss
+                                    Skip Suhoor
                                 </button>
                             </div>
                         </div>
@@ -278,7 +276,7 @@ export default function FastingPrompt() {
                                 <Sun className="h-10 w-10 animate-spin-slow" />
                             </div>
                             <h3 className="text-3xl font-black">Success!</h3>
-                            <p className="text-blue-100 font-medium mt-2">Intent recorded. We'll find you at Suhoor.</p>
+                            <p className="text-blue-100 font-medium mt-2">Intent recorded. We'll wake you for suhoor.</p>
                         </div>
                     )}
                 </div>

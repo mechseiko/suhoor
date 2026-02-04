@@ -13,7 +13,7 @@ import {
 import { Bar } from 'react-chartjs-2'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
-import { TrendingUp, Calendar } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 
 ChartJS.register(
     CategoryScale,
@@ -38,7 +38,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                 for (let i = 6; i >= 0; i--) {
                     const d = new Date()
                     d.setDate(today.getDate() - i)
-                    last7Days.push(d.toLocaleDateString('en-CA')) // YYYY-MM-DD
+                    last7Days.push(d.toLocaleDateString('en-CA'))
                 }
 
                 const logsRef = collection(db, 'wake_up_logs')
@@ -106,7 +106,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                 beginAtZero: true,
                 max: memberCount || 10,
                 ticks: {
-                    stepSize: 1
+                    stepSize: 10
                 },
                 grid: {
                     display: false
@@ -136,7 +136,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                     <h3 className="text-lg font-bold text-gray-900">
                         Wake Up Stats
                     </h3>
-                    <p className="text-sm text-gray-500">Last 7 days activity</p>
+                    <p className="text-sm text-gray-500">Activity for the last seven days</p>
                 </div>
                 <div className="p-2 bg-gray-50 rounded-lg">
                     <Calendar className="h-5 w-5 text-gray-400" />

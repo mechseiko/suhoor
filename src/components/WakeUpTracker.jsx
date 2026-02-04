@@ -8,8 +8,7 @@ import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useLocationTracking } from '../hooks/useLocationTracking'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } from 'firebase/firestore'
-// GroupAnalytics removed
-import { Users, Crown } from 'lucide-react'
+import { Users } from 'lucide-react'
 
 export default function WakeUpTracker({ groupId, members, onMemberRemoved, groupName }) {
     // Create a map to store unique members, prioritizing admins

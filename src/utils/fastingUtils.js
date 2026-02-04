@@ -5,7 +5,7 @@
  * @returns {{ day: number, month: number, year: number }}
  */
 export const getHijriDate = (date) => {
-    const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-uma-nu-latn', {
+    const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
         day: 'numeric',
         month: 'numeric',
         year: 'numeric'
