@@ -41,7 +41,7 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
                 name: '',
                 company_name: 'Suhoor',
                 title: 'You\'ve been invited!',
-                body_intro: `${currentUser.displayName || currentUser.email} has invited you to join their Suhoor group: "${groupName}".`,
+                body_intro: `${currentUser?.displayName || currentUser?.email} has invited you to join their Suhoor group: "${groupName}".`,
                 button_text: 'Join Group',
                 action_link: inviteLink,
                 accent_note: `Group Key: ${groupKey}`,

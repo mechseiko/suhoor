@@ -40,7 +40,7 @@ export default function ForgotPassword() {
             const resetLink = `${window.location.origin}/reset-password?token=${token}`
             const templateParams = {
                 subject: 'Suhoor - Reset Your Password',
-                name: `${currentUser.displayName}, `,
+                name: ` `,
                 company_name: 'Suhoor',
                 title: 'Reset Your Password',
                 body_intro: `We received a request to reset the password for your account associated with ${email}.`,
