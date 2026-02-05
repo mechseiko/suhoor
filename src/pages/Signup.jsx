@@ -49,7 +49,7 @@ export default function Signup() {
                 createdAt: serverTimestamp()
             })
 
-            navigate('/verify-email')
+            navigate('/dashboard?m=n')
 
         } catch (err) {
             console.error('Signup Error:', err)

@@ -178,14 +178,6 @@ export default function GroupDetail() {
         }
     }
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <Loader />
-            </div>
-        )
-    }
-
     const GroupActions = () => {
         return (
             <div className="flex gap-3 justify-between *:cursor-pointer">
@@ -229,7 +221,7 @@ export default function GroupDetail() {
         try {
             setSavingName(true)
             const groupRef = doc(db, 'groups', groupId)
-            await updateDoc(groupRef, { name: newGroupName.trim() }) // [web:29]
+            await updateDoc(groupRef, { name: newGroupName.trim() })
 
             const updated = { ...group, name: newGroupName.trim() }
             setGroup(updated)

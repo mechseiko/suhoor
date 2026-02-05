@@ -255,7 +255,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
     // Handle persistent buzzing sound
     useEffect(() => {
         let interval;
-        if (!isBuzzing) {
+        if (isBuzzing) {
             // Play sound immediately
             playNotificationSound()
 
@@ -440,8 +440,8 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                             <Users className="h-4 w-4 text-primary" />
                             Group Members
                         </h3>
-                        {members.length > 1 && <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Action' : 'Show Action'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                            {showActions ? 'Hide' : 'Actions'}
+                        {members.length > 1 && <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Actions' : 'Show Actions'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                            {members.map(member => member.role === 'admin' && (showActions ? 'Hide' : 'Actions'))}
                         </button>}
                     </div>
                     <div className="divide-y divide-gray-50">

@@ -61,7 +61,7 @@ export default function Footer({currentNavItem}) {
 
         <div className="border-t border-gray-200 md:pt-6 pt-4 flex flex-col md:flex-row justify-between items-center gap-3">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} Suhoor by <Link to="https://devseiko.vercel.app" target="_blank" rel="noreferrer" className="text-primary text-[12px]">MECHSEIKO</Link>. All rights reserved.
+            © {new Date().getFullYear()} Suhoor by <Link to="https://devseiko.vercel.app" target="_blank" rel="noreferrer" className="text-primary text-[12px]">MECHSEIKO</Link>
           </p>
           <div className="flex items-center gap-1 text-sm text-gray-400">
             <span>Built with</span>

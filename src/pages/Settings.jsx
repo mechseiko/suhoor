@@ -1,4 +1,4 @@
-import { Bell, Shield, ChevronRight, Mail, Clock, Terminal} from 'lucide-react'
+import { Bell, Shield, ChevronRight, Mail, Clock, Terminal } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
@@ -125,7 +125,7 @@ export default function Settings() {
 
                 <Section title="Account">
                     <SettingItem
-                        icon={Shield}
+                        icon={Mail}
                         label="Email Address"
                         description={currentUser?.email}
                         action={
