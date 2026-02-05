@@ -38,7 +38,7 @@ export default function DownloadApp() {
         setCanInstall(false)
     }
 
-    // if (isNative || !isMobile) return null
+    if (isNative || !isMobile) return null
 
     return (
         <section className="bg-gradient-to-r from-primary to-primary/90 rounded-lg md:py-14 py-10 relative overflow-hidden">

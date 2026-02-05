@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import {
-    Download, AlertTriangle, Check, Shield, Layout, Users,
-    Clock, Bell, Info, ArrowRight, Smartphone, Globe,
-    Menu, X, ChevronRight, BarChart3, Star, Ghost, Terminal, LayoutDashboard,
+    Download, AlertTriangle, Layout, Users,
+    Clock, ArrowRight, Smartphone, Globe,
+    Menu, X, Terminal, LayoutDashboard,
     BookOpen,
     Settings2
 } from 'lucide-react'

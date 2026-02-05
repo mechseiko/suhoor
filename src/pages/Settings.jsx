@@ -1,4 +1,4 @@
-import { Bell, Shield, ChevronRight, Mail, Globe, Clock, CheckCircle2, Circle } from 'lucide-react'
+import { Bell, Shield, ChevronRight, Mail, Clock, Terminal} from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
@@ -161,7 +161,7 @@ export default function Settings() {
                     </a>
                     <a href="https://devseiko.vercel.app" target="_blank" rel="noopener noreferrer" className="block">
                         <SettingItem
-                            icon={Globe}
+                            icon={Terminal}
                             label="Developer"
                             description="mechseiko"
                             action={<ChevronRight className="h-5 w-5 text-gray-400" />}

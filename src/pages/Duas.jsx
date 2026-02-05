@@ -4,40 +4,40 @@ import SectionHeader from '../components/SectionHeader'
 import { useAuth } from '../context/AuthContext'
 import DashboardLayout from '../layouts/DashboardLayout'
 
-export const duas = [
-  {
-    title: "Dua for Breaking Fast",
-    arabic: "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ",
-    transliteration: "Dhahaba adh-dhama'u wabtallatil 'urooqu wa thabatal ajru in sha Allah",
-    translation: "The thirst is gone, the veins are moistened, and the reward is confirmed, if Allah wills.",
-    icon: Sun,
-  },
-  {
-    title: "Dua for Lailatul Qadr",
-    arabic: "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
-    transliteration: "Allahumma innaka 'afuwwun tuhibbul 'afwa fa'fu 'anni",
-    translation: "O Allah, You are Forgiving and love forgiveness, so forgive me.",
-    icon: Heart,
-  },
-  {
-    title: "Dua for Goodness",
-    arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
-    transliteration: "Rabbana atina fid-dunya hasanatan wa fil 'akhirati hasanatan waqina 'adhaban-nar",
-    translation: "Our Lord! Give us in this world that which is good and in the Hereafter that which is good, and save us from the torment of the Fire.",
-    icon: Sparkles,
-  },
-  {
-    title: "Dua for Parents",
-    arabic: "رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
-    transliteration: "Rabbi irhamhuma kama rabbayani saghira",
-    translation: "My Lord, have mercy upon them as they brought me up [when I was] small.",
-    icon: Users,
-  }
-]
-
 export default function Duas() {
-  const { currentUser } = useAuth()
 
+  const duas = [
+    {
+      title: "Dua for Breaking Fast",
+      arabic: "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ",
+      transliteration: "Dhahaba adh-dhama'u wabtallatil 'urooqu wa thabatal ajru in sha Allah",
+      translation: "The thirst is gone, the veins are moistened, and the reward is confirmed, if Allah wills.",
+      icon: Sun,
+    },
+    {
+      title: "Dua for Lailatul Qadr",
+      arabic: "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
+      transliteration: "Allahumma innaka 'afuwwun tuhibbul 'afwa fa'fu 'anni",
+      translation: "O Allah, You are Forgiving and love forgiveness, so forgive me.",
+      icon: Heart,
+    },
+    {
+      title: "Dua for Goodness",
+      arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      transliteration: "Rabbana atina fid-dunya hasanatan wa fil 'akhirati hasanatan waqina 'adhaban-nar",
+      translation: "Our Lord! Give us in this world that which is good and in the Hereafter that which is good, and save us from the torment of the Fire.",
+      icon: Sparkles,
+    },
+    {
+      title: "Dua for Parents",
+      arabic: "رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
+      transliteration: "Rabbi irhamhuma kama rabbayani saghira",
+      translation: "My Lord, have mercy upon them as they brought me up [when I was] small.",
+      icon: Users,
+    }
+  ]
+  
+  const { currentUser } = useAuth()
   const content = (
     <div className={`${currentUser ? '' : 'md:pt-15 pt-12 pb-8 px-4 mt-5'}`}>
       <div className="text-center mb-12">

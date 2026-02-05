@@ -4,52 +4,52 @@ import SectionHeader from '../components/SectionHeader';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../layouts/DashboardLayout';
 
-export const baseBooks = [
-  {
-    title: 'Book of Fasting',
-    file: '/books/book-of-fasting.pdf',
-    description: "A translation of a small pocket-size booklet written by Shaikh Usaamah Al-Qoosee, which was given the title 'As-Siyaam wa Ahkaamuhu' (Fasting and Its Rulings).",
-    pages: 32
-  },
-  {
-    title: "Ramadhan: Let's avoid the losses",
-    file: "/books/ramadhan-avoid-losses.pdf",
-    description: 'A book on the avoidance of loosing the Blessings of Ramadan.',
-    pages: 40
-  },
-  {
-    title: 'A Guide For Ramadhan',
-    file: '/books/a-guide-for-ramadhan.pdf',
-    description: "A mini guide to help those who may be confused about what to do to make their Ramadhan productive.",
-    pages: 21
-  },
-  {
-    title: 'Kitab Us-Sawm',
-    file: '/books/kitaabus-sawm.pdf',
-    description: "Kitab Us-Sawm (The book of fasting) is a book Compiled by Mujlisul Ulama (PE)",
-    pages: 47
-  },
-  {
-    title: 'Causes Behind The Increase and Decrease of Eemaan',
-    file: '/books/causes-of-eemaan.pdf',
-    description: "An explanation and clarification of the most important causes for the increase and decrease of eemaan.",
-    pages: 164
-  },
-  {
-    title: 'Islamic Fundamentals (Zakat and Sawm)',
-    file: '/books/islamic-fundamentals-zakat-and-sawm-hints-the-principles-economic-system-in-islam.pdf',
-    description: "An indispensable handbook for students of Islamic Studies at various level of learning.",
-    pages: 66
-  },
-  {
-    title: "Bulugh Al Maram Fee Adilatil Ahkaam",
-    file: "/books/bulugh-al-maram.pdf",
-    description: "Bulugh Al-Maram is a book which was written by Imam Ibn Hajar(773H - 852H) with the objective of compiling many of the Ahadith particularly related to the Ahkam(Judgements) of the islamic Shari'ah.",
-    pages: 576
-  },
-];
-
 export default function Books() {
+  const baseBooks = [
+    {
+      title: 'Book of Fasting',
+      file: '/books/book-of-fasting.pdf',
+      description: "A translation of a small pocket-size booklet written by Shaikh Usaamah Al-Qoosee, which was given the title 'As-Siyaam wa Ahkaamuhu' (Fasting and Its Rulings).",
+      pages: 32
+    },
+    {
+      title: "Ramadhan: Let's avoid the losses",
+      file: "/books/ramadhan-avoid-losses.pdf",
+      description: 'A book on the avoidance of loosing the Blessings of Ramadan.',
+      pages: 40
+    },
+    {
+      title: 'A Guide For Ramadhan',
+      file: '/books/a-guide-for-ramadhan.pdf',
+      description: "A mini guide to help those who may be confused about what to do to make their Ramadhan productive.",
+      pages: 21
+    },
+    {
+      title: 'Kitab Us-Sawm',
+      file: '/books/kitaabus-sawm.pdf',
+      description: "Kitab Us-Sawm (The book of fasting) is a book Compiled by Mujlisul Ulama (PE)",
+      pages: 47
+    },
+    {
+      title: 'Causes Behind The Increase and Decrease of Eemaan',
+      file: '/books/causes-of-eemaan.pdf',
+      description: "An explanation and clarification of the most important causes for the increase and decrease of eemaan.",
+      pages: 164
+    },
+    {
+      title: 'Islamic Fundamentals (Zakat and Sawm)',
+      file: '/books/islamic-fundamentals-zakat-and-sawm-hints-the-principles-economic-system-in-islam.pdf',
+      description: "An indispensable handbook for students of Islamic Studies at various level of learning.",
+      pages: 66
+    },
+    {
+      title: "Bulugh Al Maram Fee Adilatil Ahkaam",
+      file: "/books/bulugh-al-maram.pdf",
+      description: "Bulugh Al-Maram is a book which was written by Imam Ibn Hajar(773H - 852H) with the objective of compiling many of the Ahadith particularly related to the Ahkam(Judgements) of the islamic Shari'ah.",
+      pages: 576
+    },
+  ];
+
   const [searchTerm, setSearchTerm] = useState('');
   const filteredBooks = baseBooks.filter((book) =>
     book.title.toLowerCase().includes(searchTerm.toLowerCase()

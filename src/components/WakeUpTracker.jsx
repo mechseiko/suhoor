@@ -255,7 +255,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
     // Handle persistent buzzing sound
     useEffect(() => {
         let interval;
-        if (isBuzzing) {
+        if (!isBuzzing) {
             // Play sound immediately
             playNotificationSound()
 

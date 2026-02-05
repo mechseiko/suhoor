@@ -20,7 +20,7 @@ export default function LanderCta({className1, className2}) {
                 onClick={() => navigate(currentUser ? '/books' : '/docs')}
                 className={className2}
             >
-                {currentUser ? 'Explore Resources' : 'Documentation'}
+                {currentUser ? 'Explore Resources' : 'Read Documentation'}
             </button>
         </div>
     )

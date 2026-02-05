@@ -158,7 +158,7 @@ export default function FastingPrompt() {
                     {status === 'idle' && (
                         <div className="space-y-6">
                             <div className="flex items-start gap-4">
-                                <img className="md:size-12 size-10 rounded-lg"  src="/logo.png" />
+                                <img className="md:size-12 size-10 rounded-lg" src="/logo.png" />
                                 <div className="flex-1">
                                     <h3 className="text-xl font-black tracking-tight">Suhoor for Tomorrow?</h3>
                                     <p className="text-blue-100/80 text-sm mt-1">
@@ -166,7 +166,7 @@ export default function FastingPrompt() {
                                     </p>
 
                                     {isSpecial && (
-                                        <div className="mt-4 flex flex-col gap-2">
+                                        <div className="mt-3 flex flex-col gap-2">
                                             {isMondayOrThursday(dateObj) && (
                                                 <span className="w-fit px-3 py-1 bg-green-400/20 text-green-200 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-400/30">
                                                     Sunnah Fast
@@ -190,22 +190,20 @@ export default function FastingPrompt() {
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setStatus('confirming_no')}
-                                    className={`flex-1 flex items-center justify-center gap-2 md:px-6 md:py-3 px-4 py-2 rounded-xl font-black transition-all border-2 border-white/10 cursor-pointer ${!defaultAnswer ? 'bg-white text-primary' : 'bg-white/5 hover:bg-white/10'}`}
+                                    className={`flex-1 flex items-center justify-center gap-2 md:px-6 md:py-3 px-4 py-2 rounded-lg font-black transition-all border-2 border-white/10 cursor-pointer ${!defaultAnswer ? 'bg-white text-primary' : 'bg-white/5 hover:bg-white/10'}`}
                                 >
-                                    <X className="h-5 w-5" />
                                     No
                                 </button>
                                 <button
                                     onClick={() => setStatus('confirming_yes')}
-                                    className={`flex-1 flex items-center justify-center gap-2 md:px-6 md:py-3 px-4 py-2 rounded-xl font-black transition-all border-2 cursor-pointer ${defaultAnswer ? 'bg-white text-primary border-white' : 'bg-primary border-white/20 hover:bg-white/5'}`}
+                                    className={`flex-1 flex items-center justify-center gap-2 md:px-6 md:py-3 px-4 py-2 rounded-lg font-black transition-all border-2 cursor-pointer ${defaultAnswer ? 'bg-white text-primary border-white' : 'bg-primary border-white/20 hover:bg-white/5'}`}
                                 >
-                                    <Check className="h-5 w-5" />
                                     Yes
                                 </button>
                             </div>
 
                             <p className="text-center text-[10px] text-blue-200/50 uppercase font-bold tracking-widest">
-                                This defaults to <span className='text-green-500'>{defaultAnswer ? 'YES' : 'NO'}</span> based on your settings
+                                This defaults to <span className='text-green-500'>{defaultAnswer ? 'YES' : 'NO'}</span> based on your <a href='/settings' className='underline'>settings</a>
                             </p>
                         </div>
                     )}
@@ -224,14 +222,14 @@ export default function FastingPrompt() {
                             <div className="flex gap-3 w-full">
                                 <button
                                     onClick={() => setStatus('idle')}
-                                    className="flex-1 px-6 py-4 bg-white/10 rounded-lg font-black uppercase text-xs tracking-widest border border-white/10 cursor-pointer"
+                                    className="flex-1 md:px-6 md:py-3 px-4 py-2 bg-white/10 rounded-lg font-black uppercase text-xs tracking-widest border border-white/10 cursor-pointer"
                                 >
                                     Back
                                 </button>
                                 <button
                                     onClick={handleYes}
                                     disabled={loading}
-                                    className="flex-1 px-6 py-4 bg-white text-primary rounded-lg font-black uppercase text-xs tracking-widest shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                                    className="flex-1 md:px-6 md:py-3 px-4 py-2 bg-white text-primary rounded-lg font-black uppercase text-xs tracking-widest shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
                                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                     Confirm
@@ -263,7 +261,6 @@ export default function FastingPrompt() {
                                     disabled={loading}
                                     className="flex-1 px-6 py-4 bg-red-500/80 text-white rounded-lg font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                                 >
-                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
                                     Skip Suhoor
                                 </button>
                             </div>
@@ -276,7 +273,7 @@ export default function FastingPrompt() {
                                 <Sun className="h-10 w-10 animate-spin-slow" />
                             </div>
                             <h3 className="text-3xl font-black">Success!</h3>
-                            <p className="text-blue-100 font-medium mt-2">Intent recorded. We'll wake you for suhoor.</p>
+                            <p className="text-blue-100 font-medium mt-2">Intention recorded. We'll wake you for suhoor.</p>
                         </div>
                     )}
                 </div>
