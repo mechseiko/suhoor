@@ -260,7 +260,6 @@ export default function Dashboard() {
                 const oneHourAfterSahur = new Date(sahurTime.getTime() + 60 * 60 * 1000);
 
                 if (today > oneHourAfterSahur) {
-                    // Use getDefaultIntention to see what it SHOULD have been
                     const intention = getDefaultIntention(today, userProfile);
 
                     await setDoc(statusRef, {
