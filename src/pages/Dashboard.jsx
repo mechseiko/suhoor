@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Users, TrendingUp, Award, X, Smile } from 'lucide-react'
+import { Users, Award, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
-import { doc, getDoc, setDoc, collection, query, where, getDocs, getCountFromServer, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore'
 import StatsCard from '../components/StatsCard'
 import FastingPrompt from '../components/FastingPrompt'
 import DashboardLayout from '../layouts/DashboardLayout'
-import { getTargetFastingDate, getDefaultIntention } from '../utils/fastingUtils'
 import {
     Chart as ChartJS,
     LineElement,
@@ -105,7 +104,7 @@ export default function Dashboard() {
         datasets: [{
             label: 'Fasting Days',
             data: new Array(12).fill(0),
-            borderColor: '#10B981', // Green
+            borderColor: '#10B981',
             backgroundColor: 'transparent',
             borderWidth: 2,
             tension: 0.4,
@@ -116,7 +115,7 @@ export default function Dashboard() {
         }, {
             label: 'My Activity',
             data: new Array(12).fill(0),
-            borderColor: '#8B5CF6', // Purple
+            borderColor: '#8B5CF6',
             backgroundColor: 'transparent',
             borderWidth: 2,
             tension: 0.4,
@@ -124,11 +123,10 @@ export default function Dashboard() {
             pointHoverRadius: 6,
             pointBackgroundColor: '#8B5CF6',
             pointBorderColor: '#fff',
-            hidden: true
         }, {
             label: 'Groups Created',
             data: new Array(12).fill(0),
-            borderColor: '#3B82F6', // Blue
+            borderColor: '#3B82F6',
             backgroundColor: 'transparent',
             borderWidth: 2,
             tension: 0.4,
@@ -170,7 +168,7 @@ export default function Dashboard() {
                     date = new Date(group.created_at);
                 }
 
-                if (!isNaN(date.getTime())) {
+                if (!isNaN(date.getTime()) && date.getFullYear() === selectedYear) {
                     const monthIndex = date.getMonth();
                     creationCounts[monthIndex]++;
                 }
@@ -181,7 +179,7 @@ export default function Dashboard() {
         logs.forEach(log => {
             if (log.date) {
                 const date = new Date(log.date)
-                if (!isNaN(date.getTime())) {
+                if (!isNaN(date.getTime()) && date.getFullYear() === selectedYear) {
                     const monthIndex = date.getMonth()
                     activityCounts[monthIndex]++
                 }
@@ -241,12 +239,10 @@ export default function Dashboard() {
 
             if (!statusSnap.exists()) {
                 // If not exists, check if it's 1 hour past suhoor
-                // 1. Get coords (or use userProfile if available)
                 const pos = await new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject);
                 });
 
-                // 2. Fetch today's fasting times
                 const response = await fetch(
                     `https://islamicapi.com/api/v1/fasting/?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&api_key=A3A2CmTNN6m2l7pZhjCr2og3iscpW6AoFCGvOdzaiXpT3hKs`
                 );
@@ -260,7 +256,9 @@ export default function Dashboard() {
                 const oneHourAfterSahur = new Date(sahurTime.getTime() + 60 * 60 * 1000);
 
                 if (today > oneHourAfterSahur) {
-                    const intention = getDefaultIntention(today, userProfile);
+                    // Default to FALSE (Not Fasting) if they missed the prompt
+                    // They can manually update it if they did fast (future feature)
+                    const intention = false;
 
                     await setDoc(statusRef, {
                         userId: currentUser.uid,
@@ -308,54 +306,7 @@ export default function Dashboard() {
             })
 
             // Calculate active streak
-            // Sort by date descending
             fastingLogs.sort((a, b) => new Date(b.date) - new Date(a.date))
-
-            let streak = 0
-            const today = new Date().toLocaleDateString('en-CA')
-            const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('en-CA')
-
-            // Check if fasted today or yesterday to start streak
-            // Simple logic: consecutive days where wantsToFast is true
-            // If they haven't answered for today yet, streak continues from yesterday?
-            // Let's count consecutive "true" entries from top.
-
-            // Re-sort ascending to build calendar or descending for streak?
-            // Descending is easier for "current" streak.
-
-            // Filter only true values? No, a 'false' breaks streak.
-
-            // This is complex because dates might be missing.
-            // Simplified: Count most recent consecutive block of dates.
-
-            let currentCheckDate = new Date()
-            let streakCount = 0;
-            let keepChecking = true
-
-            // Map dates to status
-            const dateMap = {}
-            fastingLogs.forEach(log => {
-                dateMap[log.date] = log.wantsToFast
-            })
-
-            while (keepChecking) {
-                const dateStr = currentCheckDate.toLocaleDateString('en-CA')
-                if (dateMap[dateStr] === true) {
-                    streakCount++
-                    currentCheckDate.setDate(currentCheckDate.getDate() - 1)
-                } else if (dateMap[dateStr] === false) {
-                    keepChecking = false
-                } else {
-                    // Entry missing.
-                    // If it's TODAY and missing, we check YESTERDAY.
-                    // If it's older than today and missing, streak breaks.
-                    if (dateStr === today) {
-                        currentCheckDate.setDate(currentCheckDate.getDate() - 1)
-                    } else {
-                        keepChecking = false
-                    }
-                }
-            }
 
             // Update Graph Data (Monthly Fasting Count)
             const fastingCounts = new Array(12).fill(0)
@@ -369,11 +320,6 @@ export default function Dashboard() {
             })
 
             const totalFasts = fastingLogs.filter(log => log.wantsToFast).length
-            const milestones = []
-            if (totalFasts >= 10) milestones.push({ id: 'fasts_10', label: 'Getting Started', icon: '🌱' })
-            if (totalFasts >= 30) milestones.push({ id: 'fasts_30', label: 'Ramadan Spirit', icon: '🌙' })
-            if (totalFasts >= 50) milestones.push({ id: 'fasts_50', label: 'Dedicated Faster', icon: '🏆' })
-            if (totalFasts >= 100) milestones.push({ id: 'fasts_100', label: 'Elite Devotion', icon: '⭐' })
 
             setChartData(prev => ({
                 ...prev,
@@ -394,11 +340,11 @@ export default function Dashboard() {
                 ]
             }))
 
-            return { fastingCounts, milestones }
+            return { fastingCounts }
 
         } catch (err) {
             console.error("Error fetching fasting stats:", err)
-            return { fastingCounts: new Array(12).fill(0), milestones: [] }
+            return { fastingCounts: new Array(12).fill(0) }
         }
     }
 
@@ -446,13 +392,12 @@ export default function Dashboard() {
             const totalMembers = uniqueMemberIds.size
 
             // Integrate Fasting Stats
-            const { fastingCounts, milestones } = await fetchFastingStats()
+            const { fastingCounts } = await fetchFastingStats()
 
             const newStats = {
                 totalGroups: groupsData.length,
                 totalMembers: totalMembers,
-                totalFastingDays: fastingCounts.reduce((a, b) => a + b, 0),
-                milestones
+                totalFastingDays: fastingCounts.reduce((a, b) => a + b, 0)
             }
             setStats(newStats)
             localStorage.setItem(`suhoor_stats_${currentUser.uid}`, JSON.stringify(newStats))
@@ -575,26 +520,6 @@ export default function Dashboard() {
                             <Line data={chartData} options={chartOptions} />
                         </div>
                     </div>
-
-                    {stats.milestones?.length > 0 && (
-                        <div className="mb-6">
-                            <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                <Award className="h-4 w-4 text-primary" />
-                                Spiritual Milestones
-                            </h4>
-                            <div className="flex flex-wrap gap-3">
-                                {stats.milestones.map(m => (
-                                    <div
-                                        key={m.id}
-                                        className="bg-white border border-gray-100 shadow-sm px-4 py-2.5 rounded-2xl flex items-center gap-3 animate-in zoom-in duration-300"
-                                    >
-                                        <span className="text-xl">{m.icon}</span>
-                                        <span className="text-sm font-bold text-gray-700">{m.label}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </DashboardLayout>
