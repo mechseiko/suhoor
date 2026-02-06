@@ -2,12 +2,15 @@ import { Download } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useNative } from '../hooks/useNative'
 import { useState, useEffect } from 'react'
+import Toast from './Toast'
 
 export default function DownloadApp() {
     const isNative = useNative()
     const [isMobile, setIsMobile] = useState(false)
     const [deferredPrompt, setDeferredPrompt] = useState(null)
     const [canInstall, setCanInstall] = useState(false)
+    const [toast, setToast] = useState(null)
+
 
     useEffect(() => {
         setIsMobile(window.innerWidth < 768)
@@ -58,7 +61,8 @@ export default function DownloadApp() {
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <a
-                            href="https://github.com/mechseiko/suhoor/releases/latest/download/Suhoor.apk"
+                            // href="https://github.com/mechseiko/suhoor/releases/latest/download/Suhoor.apk"
+                            onClick={() => setToast({ message: 'Mobile App is still being developed', type: 'info' })}
                             className="w-fit sm:w-auto px-6 py-2 bg-white text-primary rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3 group cursor-pointer hover:shadow-xl hover:bg-gray-50"
                         >
                             <Download className="md:h-5 md:w-5 h-4 w-4 group-hover:-translate-y-1 transition-transform" />
@@ -78,6 +82,13 @@ export default function DownloadApp() {
                     </div>
                 </motion.div>
             </div>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </section>
     )
 }

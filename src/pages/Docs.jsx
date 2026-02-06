@@ -57,7 +57,7 @@ export default function Docs() {
                     <p className="text-gray-600">The best experience is on Android. Follow these steps to install the native app:</p>
                     <div className="space-y-4">
                         {[
-                            { step: 1, title: 'Download App', alert: false },
+                            { step: 1, title: 'Download the App', alert: false },
                             { step: 2, title: 'Install APK', desc: 'Open the downloaded file. If your browser asks for permission, tap "Settings" and enable "Allow from this source".', alert: true },
                             { step: 3, title: 'Permissions', desc: 'When you first open the app, allow Location and Notification permissions for full features.', alert: false },
                         ].map((s) => (
@@ -66,8 +66,9 @@ export default function Docs() {
                                 <div>
                                     <h4 className="font-bold text-gray-900">{s.title}</h4>
                                     <p className="text-sm text-gray-500">{s.desc}</p>
-                                    {s.step === 1 && (
-                                        <p className="text-sm text-gray-500">If you haven't already, <a
+                                    {/* {s.step === 1 && (
+                                        <p className="text-sm text-gray-500">If you haven't already,
+                                        <a
                                             href="https://github.com/mechseiko/suhoor/releases/latest/download/Suhoor.apk"
                                             onClick={handleDownload}
                                             className="mt-2 flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100"
@@ -75,7 +76,7 @@ export default function Docs() {
                                             <Download size={12} /> {isDownloading ? 'Downloading...' : 'Download the App'}
                                         </a>
                                         </p>
-                                    )}
+                                    )} */}
                                     {s.alert && s.step === 2 && (
                                         <div className="mt-2 w-fit flex items-center gap-2 text-[11px] font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
                                             <AlertTriangle size={12} /> Enable "Unknown Sources" if prompted.
