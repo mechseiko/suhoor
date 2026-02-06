@@ -38,7 +38,6 @@ export default function ForgotPassword() {
             const templateParams = {
                 subject: 'Suhoor - Reset Your Password',
                 name: 'Suhoor',
-                company_name: 'Suhoor',
                 title: 'Reset Your Password',
                 body_intro: `We received a request to reset the password for your account associated with ${email}.`,
                 button_text: 'Reset My Password',

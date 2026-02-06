@@ -68,9 +68,8 @@ export default function Signup() {
             const templateParams = {
                 subject: 'Suhoor - Verify Your Email',
                 name: 'Suhoor',
-                company_name: 'Suhoor',
                 title: 'Verify Your Email Address',
-                body_intro: `Welcome to Suhoor! Please verify your email address to complete your registration.`,
+                body_intro: `Welcome to Suhoor! Kindly verify your email address to complete your registration.`,
                 button_text: 'Verify My Email',
                 action_link: verificationLink,
                 accent_note: 'If you did not create this account, please ignore this email.',

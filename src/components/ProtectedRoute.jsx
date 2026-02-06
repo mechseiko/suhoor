@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }) {
 
   useEffect(() => {
     if (userProfile && !userProfile.isVerified) {
-      setToast({ message: 'Please Verify your email to continue', type: 'info' });
+      setToast({ message: 'Please verify your email to continue', type: 'info' });
 
       const t = setTimeout(() => {
         navigate('/verify-email', { replace: true });

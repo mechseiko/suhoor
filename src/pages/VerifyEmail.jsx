@@ -137,7 +137,6 @@ export default function VerifyEmail() {
                 {
                     subject: 'Suhoor - Verify Your Email',
                     name: 'Suhoor',
-                    company_name: 'Suhoor',
                     title: 'Verify Your Email Address',
                     body_intro: 'We received a request to resend your verification email.',
                     button_text: 'Verify My Email',
@@ -159,6 +158,31 @@ export default function VerifyEmail() {
         } finally {
             setResending(false)
         }
+    }
+
+    const ResendEmail = ({showPrompt = true}) => {
+        return (
+            <>
+                <div className="mt-5">
+                    <p className="text-center text-gray-600 mb-5">
+                        {showPrompt && <>{(!resending || !resendStatus === 'success') && <>Didn't get the email? {' '}</>}</>}
+                        <button
+                            className='text-primary font-medium inline-flex items-center'
+                        >
+                            {resending && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
+                            {resending ? 'Sending...' : resendStatus === 'success' ? 'Email Sent' : ''}
+                        </button>
+                    </p>
+                </div>
+
+                <button
+                    className="w-full bg-primary cursor-pointer text-white py-3 rounded-lg hover:opacity-90 font-medium"
+                    onClick={(!resending || !resendStatus === 'success') && handleResend}
+                >
+                    Resend Verification Email
+                </button>
+            </>
+        )
     }
 
     return (
@@ -187,26 +211,7 @@ export default function VerifyEmail() {
                             <Bell className="w-10 h-10 text-primary animate-bounce" />
                         </div>
 
-                        <div className="mt-5">
-                            <p className="text-center text-gray-600 mb-5">
-                                {(!resending || !resendStatus === 'success') && <>Didn't get the email?{' '}</>}
-                                <button
-                                    onClick={(!resending || !resendStatus === 'success') && handleResend}
-                                    disabled={resending || resendStatus === 'success'}
-                                    className={`text-primary ${(!resending || !resendStatus === 'success') && 'hover:underline cursor-pointer'} font-medium disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center`}
-                                >
-                                    {resending && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
-                                    {resending ? 'Sending...' : resendStatus === 'success' ? 'Email Sent' : 'Resend Verification Email'}
-                                </button>
-                            </p>
-                        </div>
-
-                        <button
-                            className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium"
-                            onClick={() => navigate('/login')}
-                        >
-                            Back to Login
-                        </button>
+                        <ResendEmail />
                     </div>
                 )}
 
@@ -221,13 +226,8 @@ export default function VerifyEmail() {
                 {status === 'error' && (
                     <div className="flex flex-col items-center">
                         <XCircle className="w-16 h-16 text-red-500 mb-4" />
-                        <p className="text-gray-600 mb-6">{message}</p>
-                        <button
-                            className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 font-medium"
-                            onClick={() => navigate('/login')}
-                        >
-                            Back to Login
-                        </button>
+                        <p className="text-gray-600 mb-4">{message}</p>
+                        <ResendEmail showPrompt={false}/>
                     </div>
                 )}
 
