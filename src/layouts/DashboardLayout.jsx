@@ -20,6 +20,7 @@ import Logo from '../components/Logo'
 import ProfileButton from '../components/ProfileButton'
 import VerificationBanner from '../components/VerificationBanner'
 import SearchModal from '../components/SearchModal'
+import Toast from '../components/Toast'
 
 export default function DashboardLayout({
     children,
@@ -34,6 +35,7 @@ export default function DashboardLayout({
     const location = useLocation()
     const [showMobileMenu, setShowMobileMenu] = useState(false)
     const [showSearchModal, setShowSearchModal] = useState(false)
+    const [toast, setToast] = useState(null)
 
     useEffect(() => {
         const handleCtrlK = (event) => {
@@ -61,10 +63,14 @@ export default function DashboardLayout({
 
     const handleLogout = async () => {
         try {
-            await logout()
-            navigate('/login')
+            setToast({ message: 'Logged out successfully', type: 'success' })
+            setTimeout(async () => {
+                await logout()
+                navigate('/login')
+            }, 1500)
         } catch (err) {
             console.error('Logout failed:', err)
+            setToast({ message: 'Failed to logout', type: 'error' })
         }
     }
 
@@ -253,6 +259,13 @@ export default function DashboardLayout({
             {showSearchModal && (
                 <SearchModal
                     onClose={() => setShowSearchModal(false)}
+                />
+            )}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
                 />
             )}
         </div>

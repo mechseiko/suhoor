@@ -15,6 +15,7 @@ import GroupAnalytics from '../components/GroupAnalytics'
 import InviteMemberModal from '../components/InviteMemberModal'
 import Loader from '../components/Loader'
 import DashboardLayout from '../layouts/DashboardLayout'
+import Toast from '../components/Toast'
 import { useSocket } from '../context/SocketContext'
 import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useAuth } from '../context/AuthContext'
@@ -185,7 +186,7 @@ export default function GroupDetail() {
                     onClick={
                         () => {
                             setCopyInvite(true)
-                            navigator.clipboard.writeText(`${window.location.origin}/groups?groupKey=${group.group_key}`)
+                            navigator.clipboard.writeText(`${window.location.origin}/groups?groupKey=${group?.group_key}`)
                             setTimeout(() => {
                                 setCopyInvite(false)
                             }, 2000)
@@ -238,6 +239,14 @@ export default function GroupDetail() {
         }
     }
 
+
+    if (loading && !group) return (
+        <DashboardLayout>
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <Loader />
+            </div>
+        </DashboardLayout>
+    )
 
     return (
         <DashboardLayout>
@@ -311,13 +320,13 @@ export default function GroupDetail() {
                                 <div className='flex items-center'>
                                     <Users className="h-4 w-4 mr-2 text-primary" />
                                     <div className='flex justify-between items-center gap-1'>
-                                        <span className="font-mono text-gray-700">{group.group_key}</span>
+                                        <span className="font-mono text-gray-700">{group?.group_key}</span>
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setCopied(true);
-                                                setClicked(group.id)
-                                                navigator.clipboard.writeText(`${group.group_key}`)
+                                                setClicked(group?.id)
+                                                navigator.clipboard.writeText(`${group?.group_key}`)
                                                 setTimeout(() => {
                                                     setCopied(false)
                                                 }, 2000)
@@ -333,8 +342,8 @@ export default function GroupDetail() {
                                     <span className="px-3 py-1 w-fit bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
                                         {members.length} {members.length === 1 ? 'Member' : 'Members'}
                                     </span>
-                                    <span title={`${showLeave ? 'Hide Actions' : 'Show Actions'}`}><Settings2 className={`h-4 w-4 cursor-pointer ${showLeave ? 'text-primary' : ''}`} onClick={() => setShowLeave(!showLeave)}/></span>
-                                </div>      
+                                    <span title={`${showLeave ? 'Hide Actions' : 'Show Actions'}`}><Settings2 className={`h-4 w-4 cursor-pointer ${showLeave ? 'text-primary' : ''}`} onClick={() => setShowLeave(!showLeave)} /></span>
+                                </div>
                             </div>
                             <GroupActions />
                         </div>
@@ -342,11 +351,9 @@ export default function GroupDetail() {
                 </div>
             </div>
 
-            <WakeUpTracker groupId={groupId} members={members} onMemberRemoved={fetchMembers} groupName={group?.name}/>
+            <WakeUpTracker groupId={groupId} members={members} onMemberRemoved={fetchMembers} groupName={group?.name} />
 
-            <div className="mt-8">
-                <GroupAnalytics groupId={groupId} memberCount={members.length} />
-            </div>
+            <GroupAnalytics groupId={groupId} memberCount={members.length} />
 
             {showInviteModal && (
                 <InviteMemberModal
@@ -358,13 +365,11 @@ export default function GroupDetail() {
             )}
 
             {toast && (
-                <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
-                    <div className={`px-4 py-3 rounded-xl shadow-lg border flex items-center gap-3 ${toast.type === 'success' ? 'bg-white border-green-100 text-green-800' : 'bg-white border-blue-100 text-blue-800'
-                        }`}>
-                        <div className={`w-2 h-2 rounded-full ${toast.type === 'success' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
-                        <span className="text-sm font-medium">{toast.message}</span>
-                    </div>
-                </div>
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </DashboardLayout>
     )

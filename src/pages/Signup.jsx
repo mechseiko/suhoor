@@ -18,7 +18,6 @@ export default function Signup() {
     const { signup } = useAuth()
     const navigate = useNavigate()
 
-    // EmailJS Credentials
     const SERVICE_ID = 'service_3flsb3n'
     const TEMPLATE_ID = 'template_vhylt41'
     const USER_ID = 'JKRA71R40HTU6vo6W'

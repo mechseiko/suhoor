@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2, X, Clock } from 'lucide-react'
+import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2, X, Clock, Users } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { useAuth } from '../context/AuthContext'
@@ -8,7 +8,8 @@ import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useLocationTracking } from '../hooks/useLocationTracking'
 import { db } from '../config/firebase'
 import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } from 'firebase/firestore'
-import { Users } from 'lucide-react'
+import Toast from './Toast'
+import BottomPrompt from './BottomPrompt'
 
 export default function WakeUpTracker({ groupId, members, onMemberRemoved, groupName }) {
     // Create a map to store unique members, prioritizing admins
@@ -41,6 +42,8 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
     const [showDateModal, setShowDateModal] = useState(false)
     const [dateInput, setDateInput] = useState('')
     const [dateError, setDateError] = useState('')
+    const [toast, setToast] = useState(null)
+    const [prompt, setPrompt] = useState(null)
     const audioRef = useRef(null)
 
     // Fetch fasting status for the target date
@@ -148,11 +151,10 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         try {
             const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
 
-            // 1. Fetch Wake Up Logs
+            // 1. Fetch Wake Up Logs (Global - not per group)
             const logsRef = collection(db, 'wake_up_logs')
             const q = query(
                 logsRef,
-                where('group_id', '==', groupId),
                 where('date', '==', today)
             )
             const querySnapshot = await getDocs(q)
@@ -356,7 +358,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         const inputDigits = dateInput.replace(/\D/g, '')
 
         if (inputDigits !== expected) {
-            setDateError('Incorrect date. Please type the full current date (MM DD YYYY).')
+            setDateError("Incorrect date. Please type today's date in this format: (MM DD YYYY).")
             return
         }
 
@@ -368,10 +370,9 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
 
             setIsBuzzing(false) // Stop current buzzing
 
-            // Save to Firestore
+            // Save to Firestore (Global wake-up status, not per group)
             await addDoc(collection(db, 'wake_up_logs'), {
                 user_id: currentUser.uid,
-                group_id: groupId,
                 date: todayStr,
                 woke_up_at: wakeUpTime,
             })
@@ -409,16 +410,28 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         }
     }
 
-    const handleRemoveMember = async (memberId, memberName) => {
-        if (!window.confirm(`Are you sure you want to remove ${memberName} from the group?`)) return
-
-        try {
-            await deleteDoc(doc(db, 'group_members', memberId))
-            onMemberRemoved?.()
-        } catch (err) {
-            console.error('Error removing member:', err)
-            alert('Failed to remove member')
-        }
+    const handleRemoveMember = (memberId, memberName) => {
+        setPrompt({
+            title: 'Remove Member?',
+            description: `Are you sure you want to remove ${memberName} from the group? This action cannot be undone.`,
+            confirmText: 'Remove',
+            type: 'danger',
+            icon: Trash2,
+            onConfirm: async () => {
+                setLoading(true)
+                try {
+                    await deleteDoc(doc(db, 'group_members', memberId))
+                    setToast({ message: `${memberName} removed from group`, type: 'success' })
+                    onMemberRemoved?.()
+                } catch (err) {
+                    console.error('Error removing member:', err)
+                    setToast({ message: 'Failed to remove member', type: 'error' })
+                } finally {
+                    setLoading(false)
+                    setPrompt(null)
+                }
+            }
+        })
     }
 
     const isCurrentUserAdmin = members.find(m => m.profiles.id === currentUser.uid)?.role === 'admin'
@@ -440,8 +453,8 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                             <Users className="h-4 w-4 text-primary" />
                             Group Members
                         </h3>
-                        {members.length > 1 && <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Actions' : 'Show Actions'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                            {members.map(member => member.role === 'admin' && (showActions ? 'Hide' : 'Actions'))}
+                        {members.length > 1 && <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Actions' : 'Show Actions'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-full border border-gray-100">
+                            {isCurrentUserAdmin && showActions ? 'Hide' : 'Actions'}
                         </button>}
                     </div>
                     <div className="divide-y divide-gray-50">
@@ -487,7 +500,11 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                 <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
                                                     {member.profiles.display_name || member.profiles.email.split('@')[0]}
                                                     {member.role === 'admin' && <span className='text-primary'>{' '} (Admin)</span>}
-                                                    {isAwake && <div className='bg-gray-100 px-1 py-0.5 rounded flex items-center gap-1'><CheckCircle className="h-3.5 w-3.5 text-accent" />Awake</div>}
+                                                    {isAwake && wakeUpTime && (
+                                                        <span className="text-accent font-medium text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
+                                                          Woke up at  • {new Date(wakeUpTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </span>
+                                                    )}
                                                     {!intendsToFast && <span className='text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded'>Not Fasting</span>}
                                                 </div>
                                                 <div className="text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
@@ -498,11 +515,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                             {member.profiles.customWakeUpTime}
                                                         </span>
                                                     )}
-                                                    {isAwake && wakeUpTime && (
-                                                        <span className="text-accent font-medium">
-                                                            • {new Date(wakeUpTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                        </span>
-                                                    )}
+                                                    {isAwake && <div className='bg-gray-100 px-1 py-0.5 rounded flex items-center gap-1'><CheckCircle className="h-3.5 w-3.5 text-accent" />Awake</div>}
                                                 </div>
                                                 {hasLocation && isInWindow && !isAwake && (
                                                     <a
@@ -525,7 +538,10 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                         if (targetMemberIntent) {
                                                             buzzUser(member.profiles.id, groupId, getCurrentUserName())
                                                         } else {
-                                                            alert(`${member.profiles.display_name || 'Member'} is not fasting today and cannot be buzzed.`)
+                                                            setToast({
+                                                                message: `${member.profiles.display_name || 'Member'} is not fasting today and cannot be buzzed.`,
+                                                                type: 'info'
+                                                            })
                                                         }
                                                     }}
                                                     className={`p-2 rounded-lg border transition-colors flex items-center gap-2 cursor-pointer ${memberIntentions[member.profiles.id] !== false ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-200' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-50 cursor-not-allowed'}`}
@@ -678,11 +694,34 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                 disabled={loading}
                                 className="w-full cursor-pointer hover:bg-pacity-90 py-4 bg-primary text-white rounded-lg font-bold text-lg hover:shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-2"
                             >
-                                {loading ? 'Logging...' : 'I am Awake'}
+                                {loading ? 'Verifying...' : 'I am Awake'}
                             </button>
                         </div>
                     </div>
                 </div>
+            )}
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
+
+            {prompt && (
+                <BottomPrompt
+                    isOpen={!!prompt}
+                    onClose={() => setPrompt(null)}
+                    title={prompt.title}
+                    description={prompt.description}
+                    onConfirm={prompt.onConfirm}
+                    onCancel={() => setPrompt(null)}
+                    confirmText={prompt.confirmText}
+                    type={prompt.type}
+                    icon={prompt.icon}
+                    isLoading={loading}
+                />
             )}
         </div>
     )

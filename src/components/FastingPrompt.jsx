@@ -6,6 +6,7 @@ import { db } from '../config/firebase';
 import { collection, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { getHijriDate, isMondayOrThursday, isWhiteDay, isRamadan, getTargetFastingDate, getDefaultIntention } from '../utils/fastingUtils';
+import Toast from './Toast';
 
 export default function FastingPrompt() {
     const { currentUser, userProfile } = useAuth();
@@ -14,6 +15,7 @@ export default function FastingPrompt() {
     const [targetDate, setTargetDate] = useState('');
     const [targetDisplay, setTargetDisplay] = useState('');
     const [defaultAnswer, setDefaultAnswer] = useState(false);
+    const [toast, setToast] = useState(null);
 
     useEffect(() => {
         const determineTarget = async () => {
@@ -116,7 +118,7 @@ export default function FastingPrompt() {
 
         } catch (error) {
             console.error("Error scheduling suhoor:", error);
-            alert("Could not schedule alarm. Please check permissions.");
+            setToast({ message: "Could not schedule alarm. Please check permissions.", type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -278,6 +280,13 @@ export default function FastingPrompt() {
                     )}
                 </div>
             </div>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 }
