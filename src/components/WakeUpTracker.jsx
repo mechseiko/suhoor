@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Bell, CheckCircle, Volume2, VolumeX, MapPin, Trash2, X, Clock, Users } from 'lucide-react'
+import { Bell, CheckCircle, MapPin, Trash2, X, Clock, Users } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { useAuth } from '../context/AuthContext'
@@ -24,7 +24,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
     // Override members with uniqueMembers for the rest of the component
     members = Array.from(uniqueMembersMap.values());
 
-    const { currentUser } = useAuth()
+    const { currentUser, userProfile } = useAuth()
     const { isConnected, joinGroup, leaveGroup, emitWakeUp, buzzUser, on, off } = useSocket()
     const { todayData } = useFastingTimes();
     const [wantsToFast, setWantsToFast] = useState(true) // Default to true
@@ -36,7 +36,6 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
     const [hasWokenUp, setHasWokenUp] = useState(false)
     const [isBuzzing, setIsBuzzing] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [soundEnabled, setSoundEnabled] = useState(true)
     const [onlineMembers, setOnlineMembers] = useState([])
     const [isInWindow, setIsInWindow] = useState(false)
     const [showDateModal, setShowDateModal] = useState(false)
@@ -232,7 +231,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
 
     // Play notification sound
     const playNotificationSound = useCallback(() => {
-        if (!soundEnabled) return
+        if (!(userProfile?.preferences?.soundEnabled ?? true)) return
 
         // Create a simple beep sound using Web Audio API
         const audioContext = new (window.AudioContext || window.webkitAudioContext)()
@@ -252,7 +251,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         oscillator.start(audioContext.currentTime)
         oscillator.stop(audioContext.currentTime + 2.0)
 
-    }, [soundEnabled])
+    }, [userProfile?.preferences?.soundEnabled])
 
     // Handle persistent buzzing sound
     useEffect(() => {
@@ -453,10 +452,16 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                             <Users className="h-4 w-4 text-primary" />
                             Group Members
                         </h3>
-                        {members.length > 1 && <button onClick={() => setShowActions(!showActions)} title={`${showActions ? 'Hide Actions' : 'Show Actions'}`} className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-full border border-gray-100">
-                            {isCurrentUserAdmin && showActions ? 'Hide' : 'Actions'}
-                        </button>}
+                        {(isCurrentUserAdmin && members.length > 1) &&
+                            <button
+                                onClick={() => setShowActions(!showActions)}
+                                title={`${showActions ? 'Hide Actions' : 'Show Actions'}`}
+                                className="text-[10px] cursor-pointer font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-full border border-gray-100">
+                                {showActions ? 'Hide' : 'Actions'}
+                            </button>
+                        }
                     </div>
+                    
                     <div className="divide-y divide-gray-50">
                         {loading && !members.length ? (
                             <div className="p-4 space-y-4">
@@ -479,12 +484,12 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                 )?.woke_up_at
                                 const location = userLocations[member.profiles.id]
                                 const hasLocation = !!location
-                                const intendsToFast = memberIntentions[member.profiles.id] !== false // Default true
+                                const intendsToFast = memberIntentions[member.profiles.id] !== false
 
                                 return (
                                     <div
                                         key={member.id}
-                                        className={`p-4 transition-colors flex items-center justify-between group ${isAwake ? 'bg-accent/5' : ''
+                                        className={`p-4 transition-colors flex sm:flex-row flex-col md:space-y-0 space-y-4 items-center justify-between group ${isAwake ? 'bg-accent/5' : ''
                                             } ${!intendsToFast ? 'opacity-60 bg-gray-50' : ''}`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -501,12 +506,13 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                     {member.profiles.display_name || member.profiles.email.split('@')[0]}
                                                     {member.role === 'admin' && <span className='text-primary'>{' '} (Admin)</span>}
                                                     {isAwake && wakeUpTime && (
-                                                        <span className="text-accent font-medium text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
-                                                          Woke up at  • {new Date(wakeUpTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        <span className="text-accent font-medium md:text-xs text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
+                                                            Woke up at {new Date(wakeUpTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                         </span>
                                                     )}
                                                     {!intendsToFast && <span className='text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded'>Not Fasting</span>}
                                                 </div>
+                                                
                                                 <div className="text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
                                                     {member.profiles.email}
                                                     {member.profiles.customWakeUpTime && (
@@ -515,62 +521,54 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                             {member.profiles.customWakeUpTime}
                                                         </span>
                                                     )}
-                                                    {isAwake && <div className='bg-gray-100 px-1 py-0.5 rounded flex items-center gap-1'><CheckCircle className="h-3.5 w-3.5 text-accent" />Awake</div>}
+                                                    {isAwake && <div className='bg-green-100 px-1 py-0.5 rounded flex items-center gap-1'>Awake</div>}
+                                                    {!isAwake && <div className='bg-red-100 px-1 py-0.5 rounded flex items-center gap-1'>Sleeping</div>}
                                                 </div>
-                                                {hasLocation && isInWindow && !isAwake && (
-                                                    <a
-                                                        href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="mt-1 flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-800 font-medium"
-                                                    >
-                                                        <MapPin className="h-3 w-3" />
-                                                        <span>Live Location Path</span>
-                                                    </a>
-                                                )}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
+
+                                        <div className="flex items-center md:gap-2 gap-3 md:ml-0 ml-10">
                                             {!isAwake && memberOnline && member.profiles.id !== currentUser.uid && (
-                                                <button
-                                                    onClick={() => {
-                                                        const targetMemberIntent = memberIntentions[member.profiles.id] !== false
-                                                        if (targetMemberIntent) {
-                                                            buzzUser(member.profiles.id, groupId, getCurrentUserName())
-                                                        } else {
-                                                            setToast({
-                                                                message: `${member.profiles.display_name || 'Member'} is not fasting today and cannot be buzzed.`,
-                                                                type: 'info'
-                                                            })
-                                                        }
-                                                    }}
-                                                    className={`p-2 rounded-lg border transition-colors flex items-center gap-2 cursor-pointer ${memberIntentions[member.profiles.id] !== false ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-200' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-50 cursor-not-allowed'}`}
-                                                    title={`Buzz ${member.profiles.display_name || member.profiles.email}`}
-                                                >
-                                                    <Bell className={`h-3.5 w-3.5 ${memberIntentions[member.profiles.id] !== false ? 'animate-bounce' : ''}`} />
-                                                    <span className="text-[10px] font-bold uppercase">Buzz</span>
-                                                </button>
+                                            <button
+                                                onClick={() => {
+                                                    const targetMemberIntent = memberIntentions[member.profiles.id] !== false
+                                                    if (targetMemberIntent) {
+                                                        buzzUser(member.profiles.id, groupId, getCurrentUserName())
+                                                    } else {
+                                                        setToast({
+                                                            message: `${member.profiles.display_name || 'Member'} is not fasting today and cannot be buzzed.`,
+                                                            type: 'info'
+                                                        })
+                                                    }
+                                                }}
+                                                className={`p-2 rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${memberIntentions[member.profiles.id] !== false ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' : 'bg-gray-100 text-gray-400 opacity-50 cursor-not-allowed'}`}
+                                                title={`Buzz ${member.profiles.display_name || member.profiles.email}`}
+                                            >
+                                                <Bell className={`h-3.5 w-3.5 ${memberIntentions[member.profiles.id] !== false ? 'animate-bounce' : ''}`} />
+                                                <span className="text-xs md:font-bold">Buzz</span>
+                                            </button>
                                             )}
                                             {hasLocation && isInWindow && !isAwake && (
-                                                <a
-                                                    href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                                                    title="Navigate to member"
-                                                >
-                                                    <MapPin className="h-4 w-4" />
-                                                </a>
+                                            <a
+                                                href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="p-2 text-xs md:font-bold flex items-center gap-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                                title={`Find ${member.profiles.display_name || member.profiles.email}`}
+                                            >
+                                                <MapPin className="h-4 w-4" />
+                                                Find
+                                            </a>
                                             )}
                                             {isCurrentUserAdmin && member.profiles.id !== currentUser.uid && showActions && (
-                                                <button
-                                                    onClick={() => handleRemoveMember(member.id, member.profiles.display_name || member.profiles.email)}
-                                                    className="p-2 text-xs flex items-center gap-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                                                    title="Remove Member"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                    Remove
-                                                </button>
+                                            <button
+                                                onClick={() => handleRemoveMember(member.id, member.profiles.display_name || member.profiles.email)}
+                                                className="p-2 text-xs md:font-bold flex items-center gap-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                                title={`Remove ${member.profiles.display_name || member.profiles.email}`}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                                Remove
+                                            </button>
                                             )}
                                         </div>
                                     </div>
@@ -605,17 +603,6 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                     )}
                 </div>
                 <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => setSoundEnabled(!soundEnabled)}
-                        className="p-2 cursor-pointer hover:bg-gray-100 rounded-lg transition-colors"
-                        title={soundEnabled ? 'Mute notifications' : 'Enable notifications'}
-                    >
-                        {soundEnabled ? (
-                            <Volume2 className="h-5 w-5 text-gray-600" />
-                        ) : (
-                            <VolumeX className="h-5 w-5 text-gray-400" />
-                        )}
-                    </button>
                     {!hasWokenUp ? (
                         <button
                             onClick={handleWakeUpClick}
@@ -627,8 +614,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                         </button>
                     ) : (
                         <div className="flex items-center space-x-2 text-accent">
-                            <CheckCircle className="h-5 w-5" />
-                            <span className="font-medium">You're awake!</span>
+                            <span className="font-medium">You're awake</span>
                         </div>
                     )}
                 </div>

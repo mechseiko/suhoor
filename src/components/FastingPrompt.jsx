@@ -53,7 +53,6 @@ export default function FastingPrompt() {
                 weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
             }));
 
-            // Calculate default answer based on settings and date
             setDefaultAnswer(getDefaultIntention(target, userProfile));
         };
 

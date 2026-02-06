@@ -42,7 +42,12 @@ jobs:
         run: chmod +x android/gradlew
 
       - name: Build APK
-        run: npm run build:apk
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Copy APK to public folder
+        run: |
+          mkdir -p public
+          cp android/app/build/outputs/apk/debug/app-debug.apk public/Suhoor.apk
 
       - name: Create GitHub Release
         id: create_release
@@ -54,7 +59,6 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-          allowUpdates: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

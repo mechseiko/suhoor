@@ -24,7 +24,6 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
 
         try {
 
-            // 1. Create DB record
             await addDoc(collection(db, 'group_invites'), {
                 group_id: groupId,
                 invited_by: currentUser.uid,
@@ -33,7 +32,6 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
                 created_at: serverTimestamp(),
             })
 
-            // 2. Send Email
             const inviteLink = `${window.location.origin}/groups?groupKey=${groupKey}`
 
             const templateParams = {

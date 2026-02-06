@@ -1,4 +1,4 @@
-import { Bell, Shield, ChevronRight, Mail, Clock, Terminal } from 'lucide-react'
+import { Bell, Shield, ChevronRight, Mail, Clock, Terminal, Volume2 } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../config/firebase'
@@ -43,11 +43,19 @@ export default function Settings() {
         setUpdating(true)
         try {
             const userRef = doc(db, 'profiles', currentUser.uid)
-            await updateDoc(userRef, {
-                [`fastingDefaults.${key}`]: value
-            })
+            // Handle nested keys like 'preferences.soundEnabled'
+            if (key.includes('.')) {
+                const [parent, child] = key.split('.')
+                await updateDoc(userRef, {
+                    [`${parent}.${child}`]: value
+                })
+            } else {
+                await updateDoc(userRef, {
+                    [`fastingDefaults.${key}`]: value
+                })
+            }
         } catch (err) {
-            console.error("Error updating fasting default:", err)
+            console.error("Error updating setting:", err)
         } finally {
             setUpdating(false)
         }
@@ -111,6 +119,18 @@ export default function Settings() {
                 </Section>
 
                 <Section title="Preferences">
+                    <SettingItem
+                        icon={Volume2}
+                        label="Notification Sounds"
+                        description="Play sound when anyone tries to wake you up (Recommended)"
+                        action={
+                            <Toggle
+                                value={userProfile?.preferences?.soundEnabled ?? true}
+                                onToggle={() => updateFastingDefault('preferences.soundEnabled', !(userProfile?.preferences?.soundEnabled ?? true))}
+                                disabled={updating}
+                            />
+                        }
+                    />
                     <SettingItem
                         icon={Bell}
                         label="Wake Up Time"

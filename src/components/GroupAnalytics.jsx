@@ -33,6 +33,32 @@ export default function GroupAnalytics({ groupId, memberCount }) {
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
+                // First, get all members of this group
+                const membersRef = collection(db, 'group_members')
+                const membersQuery = query(membersRef, where('group_id', '==', groupId))
+                const membersSnapshot = await getDocs(membersQuery)
+
+                const memberIds = []
+                membersSnapshot.forEach(doc => {
+                    memberIds.push(doc.data().user_id)
+                })
+
+                if (memberIds.length === 0) {
+                    setChartData({
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Members Awake',
+                            data: [0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgb(59, 130, 246)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                        }]
+                    })
+                    setLoading(false)
+                    return
+                }
+
                 const today = new Date()
                 const last7Days = []
                 for (let i = 6; i >= 0; i--) {
@@ -41,22 +67,30 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                     last7Days.push(d.toLocaleDateString('en-CA'))
                 }
 
+                // Fetch wake-up logs for the last 7 days
                 const logsRef = collection(db, 'wake_up_logs')
                 const q = query(
                     logsRef,
-                    where('group_id', '==', groupId),
                     where('date', 'in', last7Days)
                 )
                 const querySnapshot = await getDocs(q)
 
+                // Count unique members who woke up each day (only for THIS group's members)
                 const stats = {}
-                last7Days.forEach(date => stats[date] = 0)
+                last7Days.forEach(date => stats[date] = new Set())
 
                 querySnapshot.forEach(doc => {
                     const data = doc.data()
-                    if (stats[data.date] !== undefined) {
-                        stats[data.date]++
+                    // Only count if this user is a member of THIS group
+                    if (memberIds.includes(data.user_id) && stats[data.date] !== undefined) {
+                        stats[data.date].add(data.user_id)
                     }
+                })
+
+                // Convert Sets to counts
+                const counts = {}
+                last7Days.forEach(date => {
+                    counts[date] = stats[date].size
                 })
 
                 const labels = last7Days.map(date => {
@@ -69,7 +103,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                     datasets: [
                         {
                             label: 'Members Awake',
-                            data: last7Days.map(date => stats[date]),
+                            data: last7Days.map(date => counts[date]),
                             backgroundColor: 'rgba(59, 130, 246, 0.6)',
                             borderColor: 'rgb(59, 130, 246)',
                             borderWidth: 1,
@@ -136,7 +170,7 @@ export default function GroupAnalytics({ groupId, memberCount }) {
                     <h3 className="text-lg font-bold text-gray-900">
                         Wake Up Stats
                     </h3>
-                    <p className="text-sm text-gray-500">Activity for the last seven days</p>
+                    <p className="text-sm text-gray-500">The Groups's activity for the last seven days</p>
                 </div>
                 <div className="p-2 bg-gray-50 rounded-lg">
                     <Calendar className="h-5 w-5 text-gray-400" />
