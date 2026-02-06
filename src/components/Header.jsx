@@ -5,11 +5,13 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import ProfileButton from "../components/ProfileButton"
 import Container from "./Container";
+import Toast from "./Toast";
 
 
 export default function Header({ isScrolled, currentNavItem, navBar, navigate }) {
 
     const { currentUser, logout } = useAuth();
+    const [toast, setToast] = useState(null)
 
     const NavBar = ({ style }) => {
         return (
@@ -37,13 +39,13 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
         return (
             <div className="flex space-x-5 *:cursor-pointer justify-center items-center">
                 <button
-                    onClick={() => {setIsMenuOpen(false); navigate('/login')}}
+                    onClick={() => { setIsMenuOpen(false); navigate('/login') }}
                     className="w-fit sm:w-auto px-5 py-1.5 bg-primary text-white text-base rounded-lg hover:opacity-90 font-medium transition shadow-lg hover:shadow-xl"
                 >
                     Login
                 </button>
                 <button
-                    onClick={() => {setIsMenuOpen(false); navigate('/signup')}}
+                    onClick={() => { setIsMenuOpen(false); navigate('/signup') }}
                     className="w-fit sm:w-auto px-5 py-1.5 bg-white border-2 border-primary text-primary text-base rounded-lg hover:bg-primary/10 font-medium transition"
                 >
                     Sign Up
@@ -52,21 +54,27 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
         )
     }
 
+    const handleLogout = async () => {
+        try {
+            setToast({ message: 'Logged out successfully', type: 'success' })
+            setTimeout(async () => {
+                await logout()
+                navigate('/')
+            }, 1500)
+        } catch (err) {
+            console.error('Logout failed:', err)
+            setToast({ message: 'Failed to logout', type: 'error' })
+        }
+    }
+
     const UserCta = () => {
-        return(
+        return (
             <div className="flex md:flex-row flex-col items-center gap-4">
                 <div className="scale-110">
                     <ProfileButton currentUser={currentUser} />
                 </div>
                 <button
-                    onClick={async () => {
-                        try {
-                            await logout();
-                            navigate('/');
-                        } catch (error) {
-                            console.error("Logout failed", error);
-                        }
-                    }}
+                    onClick={handleLogout}
                     className="text-red-500 cursor-pointer font-medium py-2 px-3 hover:bg-red-50 rounded-lg w-full text-center"
                 >
                     Logout
@@ -88,7 +96,7 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                         </div>
                         {
                             !currentUser ? <Cta /> :
-                            <UserCta />
+                                <UserCta />
                         }
                     </div>
                 </header>
@@ -116,18 +124,25 @@ export default function Header({ isScrolled, currentNavItem, navBar, navigate })
                                     )
                                 })}
                                 <div className="mt-4">
-                                    <hr className="mb-6"/>
+                                    <hr className="mb-6" />
                                     {currentUser ? (
-                                    <UserCta />
-                                ) : (
-                                    <Cta />
-                                )}
+                                        <UserCta />
+                                    ) : (
+                                        <Cta />
+                                    )}
                                 </div>
                             </div> :
                             <></>
                     }
                 </header>
             </Container>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     )
 }

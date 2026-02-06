@@ -36,10 +36,10 @@ export default function InviteMemberModal({ groupId, groupName, groupKey, onClos
 
             const templateParams = {
                 subject: 'Join my group on Suhoor',
-                name: '',
+                name: 'Suhoor',
                 company_name: 'Suhoor',
                 title: 'You\'ve been invited!',
-                body_intro: `${currentUser?.displayName || currentUser?.email} has invited you to join their Suhoor group: "${groupName}".`,
+                body_intro: `${currentUser?.displayName || currentUser?.email} has invited you to join their Suhoor group: "${groupName}". \n\n You must be logged in with this email to join the group.`,
                 button_text: 'Join Group',
                 action_link: inviteLink,
                 accent_note: `Group Key: ${groupKey}`,

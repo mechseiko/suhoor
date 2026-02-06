@@ -47,6 +47,7 @@ export default function GroupDetail() {
     const [toast, setToast] = useState(null)
     const [userLocations, setUserLocations] = useState({})
     const [leavingGroup, setLeavingGroup] = useState(false)
+    const [leaveFlex, setLeaveFlex] = useState(true)
 
     const { socket, on, off, isConnected } = useSocket()
     const { isWakeUpWindow } = useFastingTimes()
@@ -181,7 +182,7 @@ export default function GroupDetail() {
 
     const GroupActions = () => {
         return (
-            <div className="flex gap-3 justify-between *:cursor-pointer">
+            <div className={`${leaveFlex === false && 'md:flex-row flex-col'} flex gap-3 justify-between *:cursor-pointer`}>
                 <button
                     onClick={
                         () => {
@@ -201,7 +202,7 @@ export default function GroupDetail() {
                     onClick={() => setShowInviteModal(true)}
                     className="flex items-center cursor-pointer justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 hover:shadow-md hover:shadow-blue-200 transition-all duration-200 font-medium text-[13px]"
                 >
-                    <UserPlus className="h-5 w-5" />
+                    <UserPlus className="h-4 w-4" />
                     <span>Invite Member</span>
                 </button>
                 {showLeave && <button
@@ -210,12 +211,20 @@ export default function GroupDetail() {
                     className="flex items-center cursor-pointer justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium text-[13px] border border-red-100"
                     title="Leave Group"
                 >
-                    <LogOut className="h-4 w-4 hidden sm:inline" />
-                    <span className="text-xs">Leave</span>
+                    <LogOut className="h-4 w-4" />
+                    <span className="text-xs">Leave Group</span>
                 </button>}
             </div>
         )
     }
+
+    const leaveButton = ( ) => {
+        setShowLeave(!showLeave)
+        setLeaveFlex(!leaveFlex)
+    }
+
+    const isCurrentUserAdmin = members.find(m => m.profiles.id === currentUser.uid)?.role === 'admin'
+
 
     const handleSaveGroupName = async () => {
         if (!groupId || !newGroupName.trim()) return
@@ -256,7 +265,7 @@ export default function GroupDetail() {
                     <div>
                         <div className="flex md:flex-row flex-col md:items-center gap-3 mb-2">
                             <h1 className="md:text-2xl text-xl flex items-center gap-2 font-bold text-gray-900">
-                                {isEditingName ? (
+                                {isEditingName && (
                                     <>
                                         <input
                                             autoFocus
@@ -289,22 +298,26 @@ export default function GroupDetail() {
                                             Cancel
                                         </button>
                                     </>
-                                ) : (
-                                    <>
-                                        <span>{group?.name}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setIsEditingName(true)
-                                                setNewGroupName(group?.name || '')
-                                            }}
-                                            className="text-primary cursor-pointer mb-3"
-                                            title="Edit Group Name"
-                                        >
-                                            <Edit size={12} />
-                                        </button>
-                                    </>
                                 )}
+                                <>
+                                    {!isEditingName && <span>{group?.name}</span>}
+                                    {isCurrentUserAdmin && !isEditingName &&
+                                        (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setIsEditingName(true)
+                                                    setNewGroupName(group?.name || '')
+                                                }}
+                                                className="text-primary cursor-pointer mb-3"
+                                                title="Edit Group Name"
+                                            >
+                                                <Edit size={12} />
+                                            </button>
+                                        )
+                                    }
+                                </>
+
                             </h1>
 
                             {isConnected && (
@@ -342,7 +355,7 @@ export default function GroupDetail() {
                                     <span className="px-3 py-1 w-fit bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
                                         {members.length} {members.length === 1 ? 'Member' : 'Members'}
                                     </span>
-                                    <span title={`${showLeave ? 'Hide Actions' : 'Show Actions'}`}><Settings2 className={`h-4 w-4 cursor-pointer ${showLeave ? 'text-primary' : ''}`} onClick={() => setShowLeave(!showLeave)} /></span>
+                                    {!isCurrentUserAdmin && (<span title={`${leaveButton ? 'Hide Actions' : 'Show Actions'}`}><Settings2 className={`h-4 w-4 cursor-pointer ${showLeave ? 'text-primary' : ''}`} onClick={leaveButton} /></span>)}
                                 </div>
                             </div>
                             <GroupActions />

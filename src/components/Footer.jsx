@@ -65,7 +65,7 @@ export default function Footer({currentNavItem}) {
           </p>
           <div className="flex items-center gap-1 text-sm text-gray-400">
             <span>Built with</span>
-            <Heart className="h-4 w-4 text-primary fill-primary" />
+            <Heart className="h-4 w-4 text-primary/50 fill-primary/80" />
             <span>for the Ummah</span>
           </div>
         </div>

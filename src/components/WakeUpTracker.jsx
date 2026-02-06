@@ -494,7 +494,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="relative">
-                                                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                                                <div className={`${member.role === 'admin' ? 'bg-yellow-100' : 'bg-primary/10'} h-10 w-10 rounded-full flex items-center justify-center text-primary font-bold text-sm`}>
                                                     {member.profiles.display_name?.charAt(0).toUpperCase() || member.profiles.email?.charAt(0).toUpperCase()}
                                                 </div>
                                                 {memberOnline && (
@@ -504,7 +504,6 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                             <div className='space-y-1'>
                                                 <div className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
                                                     {member.profiles.display_name || member.profiles.email.split('@')[0]}
-                                                    {member.role === 'admin' && <span className='text-primary'>{' '} (Admin)</span>}
                                                     {isAwake && wakeUpTime && (
                                                         <span className="text-accent font-medium md:text-xs text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
                                                             Woke up at {new Date(wakeUpTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

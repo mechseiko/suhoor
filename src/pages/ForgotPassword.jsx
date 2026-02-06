@@ -24,23 +24,20 @@ export default function ForgotPassword() {
         setLoading(true)
 
         try {
-            // 1. Generate a unique token
             const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 
-            // 2. Store token in Firestore with expiry (e.g., 1 hour)
             await addDoc(collection(db, 'password_resets'), {
                 email: email,
                 token: token,
                 createdAt: serverTimestamp(),
-                expiresAt: new Date(Date.now() + 3600000), // 1 hour from now
+                expiresAt: new Date(Date.now() + 3600000),
                 used: false
             })
 
-            // 3. Send email via EmailJS
             const resetLink = `${window.location.origin}/reset-password?token=${token}`
             const templateParams = {
                 subject: 'Suhoor - Reset Your Password',
-                name: ` `,
+                name: 'Suhoor',
                 company_name: 'Suhoor',
                 title: 'Reset Your Password',
                 body_intro: `We received a request to reset the password for your account associated with ${email}.`,

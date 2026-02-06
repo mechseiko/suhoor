@@ -13,10 +13,10 @@ export default function CtaSection() {
 
                     <div className="relative z-10">
                         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                            {currentUser?.displayName ? 'Jump right Back In!' : 'Ready to Get Started?'}
+                            {currentUser ? 'Jump right Back In!' : 'Ready to Get Started?'}
                         </h2>
                         <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-                            {currentUser?.displayName ? `${currentUser.displayName}, Pick up right where you left off` : 'Join Muslims already using Suhoor'}
+                            {currentUser ? `Pick up right where you left off` : 'Join Muslims already using Suhoor'}
                         </p>
                         <LanderCta
                             className1="group md:px-6 px-4 py-2 bg-white text-primary rounded-lg font-semibold hover:bg-white/90 transition-all flex items-center justify-center gap-2"

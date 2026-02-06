@@ -15,7 +15,7 @@ export default function Signup() {
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const { signup } = useAuth()
+    const { currentUser, signup } = useAuth()
     const navigate = useNavigate()
 
     const SERVICE_ID = 'service_3flsb3n'
@@ -67,7 +67,7 @@ export default function Signup() {
             const verificationLink = `${window.location.origin}/verify-email?token=${token}`
             const templateParams = {
                 subject: 'Suhoor - Verify Your Email',
-                name: email.split('@')[0],
+                name: 'Suhoor',
                 company_name: 'Suhoor',
                 title: 'Verify Your Email Address',
                 body_intro: `Welcome to Suhoor! Please verify your email address to complete your registration.`,
@@ -94,6 +94,10 @@ export default function Signup() {
                 setError('Email is already in use by another account.')
             } else {
                 setError('Failed to create account. Please try again.')
+            }
+            if (err.code === 'auth/network-request-failed') {
+                navigate('/verify-email') 
+                    return 
             }
         } finally {
             setLoading(false)

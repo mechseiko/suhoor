@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { SocketProvider } from './context/SocketContext'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -25,9 +25,16 @@ const About = lazy(() => import('./pages/About'))
 const Groups = lazy(() => import('./pages/Groups'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Docs = lazy(() => import('./pages/Docs'))
+
+const AuthRedirectRoute = () => {
+  const { currentUser } = useAuth();
+  return currentUser ? <Navigate to="/dashboard" replace /> : <Outlet />;
+};
+
+
 function AppRoutes() {
-  const { currentUser, loading } = useAuth()
-  const isNative = useNative()
+  const { currentUser, loading } = useAuth();
+  const isNative = useNative();
 
   useEffect(() => {
     if (!loading) {
@@ -44,10 +51,14 @@ function AppRoutes() {
           <Route path="/about" element={<About />} />
           <Route path="/books" element={<Books />} />
           <Route path="/duas" element={<Duas />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+
+          <Route element={<AuthRedirectRoute />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+          </Route>
+          
           <Route path="/verify-email" element={<VerifyEmail />} />
         </Route>
 
@@ -100,11 +111,15 @@ function AppRoutes() {
           }
         />
 
-        <Route path="/*" element={<Navigate to={currentUser ? '/dashboard' : '/'} />} />
+        <Route
+          path="/*"
+          element={<Navigate to={currentUser ? '/dashboard' : '/'} replace />}
+        />
       </Routes>
     </Suspense>
-  )
+  );
 }
+
 
 function App() {
   return (

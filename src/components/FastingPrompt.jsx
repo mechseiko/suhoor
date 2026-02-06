@@ -112,7 +112,6 @@ export default function FastingPrompt() {
 
             localStorage.setItem(`suhoor_intent_${targetDate}`, 'yes');
             setStatus('success');
-
             setTimeout(() => setStatus('hidden'), 3000);
 
         } catch (error) {
