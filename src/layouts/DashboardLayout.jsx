@@ -18,7 +18,6 @@ import {
 import { useAuth } from '../context/AuthContext'
 import Logo from '../components/Logo'
 import ProfileButton from '../components/ProfileButton'
-import VerificationBanner from '../components/VerificationBanner'
 import SearchModal from '../components/SearchModal'
 import Toast from '../components/Toast'
 
@@ -28,9 +27,7 @@ export default function DashboardLayout({
     setShowCreateModal,
     pageTitle
 }) {
-    const { currentUser, logout, userProfile } = useAuth()
-    const isVerified = userProfile?.isVerified || false;
-
+    const { currentUser, logout } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
     const [showMobileMenu, setShowMobileMenu] = useState(false)
@@ -193,7 +190,7 @@ export default function DashboardLayout({
                         <div className='cursor-pointer text-primary' title="Search" onClick={() => setShowSearchModal(true)}>
                             <Search size="18" />
                         </div>
-                        <ProfileButton currentUser={currentUser} navigate={() => { }} />
+                        <ProfileButton currentUser={currentUser} navigate={() => {}} />
                         <button
                             onClick={() => setShowMobileMenu(!showMobileMenu)}
                             className="md:p-2 md:hover:bg-gray-100 rounded-lg transition-colors"
@@ -242,9 +239,6 @@ export default function DashboardLayout({
                                     <ProfileButton currentUser={currentUser} />
                                 </div>
                             </div>
-                            {!isVerified && location.pathname === '/dashboard' && (
-                                <VerificationBanner />
-                            )}
                         </div>
                     }
 

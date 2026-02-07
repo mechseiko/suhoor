@@ -214,7 +214,6 @@ export default function VerifyEmail() {
                         <div className="bg-primary/10 p-4 rounded-full mb-6">
                             <Bell className="w-10 h-10 text-primary animate-bounce" />
                         </div>
-
                         <ResendEmail />
                     </div>
                 )}
@@ -222,7 +221,6 @@ export default function VerifyEmail() {
                 {status === 'success' && (
                     <div className="flex flex-col items-center">
                         <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-                        <p className="text-gray-600 mb-6">{message}</p>
                         <p className="text-sm text-gray-500 mb-4">You will be redirected shortly…</p>
                     </div>
                 )}

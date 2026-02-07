@@ -13,7 +13,7 @@ export default function ProfileButton({ currentUser, navigate }) {
             <div className="md:h-6 md:w-6 h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                 {initial}
             </div>
-            <span className="text-sm font-medium text-gray-700 pr-1">{displayName.slice(0, 30)}{displayName.length > 30 && '...'}</span>
+            <span className="text-sm font-medium text-gray-700 pr-1">{displayName.slice(0, 15)}</span>
         </button>
     )
 }

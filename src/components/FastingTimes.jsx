@@ -61,7 +61,6 @@ export default function FastingTimes() {
     });
   };
 
-  // Calculate allowed time range (15 min before, 5 min after Suhoor)
   const calculateTimeRange = (suhoorTime) => {
     if (!suhoorTime) return { min: '', max: '' };
 
