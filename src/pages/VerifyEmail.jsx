@@ -165,7 +165,11 @@ export default function VerifyEmail() {
             <>
                 <div className="mt-5">
                     <p className="text-center text-gray-600 mb-5">
-                        {showPrompt && <>{(!resending || !resendStatus === 'success') && <>Didn't get the email? {' '}</>}</>}
+                        {showPrompt && 
+                            <>
+                            {resending ? '' : resendStatus === 'success' ? '' : "Didn't get the email?"}
+                            </>
+                        }
                         <button
                             className='text-primary font-medium inline-flex items-center'
                         >
