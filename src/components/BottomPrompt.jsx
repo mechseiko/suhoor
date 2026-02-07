@@ -43,7 +43,7 @@ export default function BottomPrompt({
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="relative w-full max-w-md bg-white rounded-t-3xl overflow-hidden shadow-2xl"
+                        className="relative w-full max-w-lg bg-white rounded-t-3xl overflow-hidden shadow-2xl"
                     >
                         <div className={`${typeStyles[type] || typeStyles.default} p-6 pb-12 text-white relative`}>
                             {/* Decorative blurs */}

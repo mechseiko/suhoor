@@ -10,9 +10,10 @@ import { db } from '../config/firebase'
 import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } from 'firebase/firestore'
 import Toast from './Toast'
 import BottomPrompt from './BottomPrompt'
+import { useNavigate } from 'react-router-dom'
 
 export default function WakeUpTracker({ groupId, members, onMemberRemoved, groupName }) {
-    // Create a map to store unique members, prioritizing admins
+    const navigate = useNavigate();
     const uniqueMembersMap = new Map();
     members.forEach(member => {
         const existing = uniqueMembersMap.get(member.profiles.id);
@@ -21,7 +22,6 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         }
     });
 
-    // Override members with uniqueMembers for the rest of the component
     members = Array.from(uniqueMembersMap.values());
 
     const { currentUser, userProfile } = useAuth()
@@ -29,6 +29,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
     const { todayData } = useFastingTimes();
     const [wantsToFast, setWantsToFast] = useState(true) // Default to true
     const [showActions, setShowActions] = useState(false)
+    const [showSleepStatus, setShowSleepStatus] = useState(false)
 
     // State declarations moved to top to prevent ReferenceError
     const [userLocations, setUserLocations] = useState({})
@@ -336,7 +337,14 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         }
     }, [isConnected, on, off, groupId, currentUser.uid, playNotificationSound, isBuzzing])
 
-    // Handle wake-up button click
+    useEffect(() => {
+        const hour = new Date().getHours();
+        if ((hour >= 20 && hour <= 23) || (hour >= 0 && hour < 8)) {
+            setShowSleepStatus(true);
+        }
+        return;
+    }, [showSleepStatus])
+
     const handleWakeUpClick = () => {
         setShowDateModal(true)
         setDateInput('')
@@ -344,9 +352,6 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
     }
 
     const validateAndWakeUp = async () => {
-        // Expected format: MM-DD-YYYY or MM DD YYYY etc. 
-        // User said: "01-13-2026 will type 0 1 1 3 20 2 5"
-        // Let's normalize both to digits only for comparison
         const today = new Date()
         const expected = today.toLocaleDateString('en-US', {
             month: '2-digit',
@@ -409,6 +414,18 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
         }
     }
 
+    useEffect(() => {
+        let memberUids = [];
+        members.forEach(member => {
+            memberUids.push(member.profiles.id)
+        });
+        if(!memberUids.includes(currentUser.uid)){
+            setToast({ message: 'You are no longer a member of this group', type: 'error' })
+            navigate('/groups')
+        }
+        return;
+    }, [])
+
     const handleRemoveMember = (memberId, memberName) => {
         setPrompt({
             title: 'Remove Member?',
@@ -461,7 +478,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                             </button>
                         }
                     </div>
-                    
+
                     <div className="divide-y divide-gray-50">
                         {loading && !members.length ? (
                             <div className="p-4 space-y-4">
@@ -489,7 +506,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                 return (
                                     <div
                                         key={member.id}
-                                        className={`p-4 transition-colors flex sm:flex-row flex-col md:space-y-0 space-y-4 items-center justify-between group ${isAwake ? 'bg-accent/5' : ''
+                                        className={`p-4 transition-colors flex sm:flex-row flex-col md:space-y-0 space-y-4 md:items-center justify-between group ${isAwake ? 'bg-accent/5' : ''
                                             } ${!intendsToFast ? 'opacity-60 bg-gray-50' : ''}`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -511,7 +528,7 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                     )}
                                                     {!intendsToFast && <span className='text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded'>Not Fasting</span>}
                                                 </div>
-                                                
+
                                                 <div className="text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
                                                     {member.profiles.email}
                                                     {member.profiles.customWakeUpTime && (
@@ -520,54 +537,58 @@ export default function WakeUpTracker({ groupId, members, onMemberRemoved, group
                                                             {member.profiles.customWakeUpTime}
                                                         </span>
                                                     )}
-                                                    {isAwake && <div className='bg-green-100 px-1 py-0.5 rounded flex items-center gap-1'>Awake</div>}
-                                                    {!isAwake && <div className='bg-red-100 px-1 py-0.5 rounded flex items-center gap-1'>Sleeping</div>}
+                                                    {showSleepStatus &&
+                                                        <>
+                                                            {isAwake && <div className='bg-green-100 px-1 py-0.5 rounded flex items-center gap-1'>Awake</div>}
+                                                            {!isAwake && <div className='bg-red-100 px-1 py-0.5 rounded flex items-center gap-1'>Sleeping</div>}
+                                                        </>}
+
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="flex items-center md:gap-2 gap-3 md:ml-0 ml-10">
                                             {!isAwake && memberOnline && member.profiles.id !== currentUser.uid && (
-                                            <button
-                                                onClick={() => {
-                                                    const targetMemberIntent = memberIntentions[member.profiles.id] !== false
-                                                    if (targetMemberIntent) {
-                                                        buzzUser(member.profiles.id, groupId, getCurrentUserName())
-                                                    } else {
-                                                        setToast({
-                                                            message: `${member.profiles.display_name || 'Member'} is not fasting today and cannot be buzzed.`,
-                                                            type: 'info'
-                                                        })
-                                                    }
-                                                }}
-                                                className={`p-2 rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${memberIntentions[member.profiles.id] !== false ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' : 'bg-gray-100 text-gray-400 opacity-50 cursor-not-allowed'}`}
-                                                title={`Buzz ${member.profiles.display_name || member.profiles.email}`}
-                                            >
-                                                <Bell className={`h-3.5 w-3.5 ${memberIntentions[member.profiles.id] !== false ? 'animate-bounce' : ''}`} />
-                                                <span className="text-xs md:font-bold">Buzz</span>
-                                            </button>
+                                                <button
+                                                    onClick={() => {
+                                                        const targetMemberIntent = memberIntentions[member.profiles.id] !== false
+                                                        if (targetMemberIntent) {
+                                                            buzzUser(member.profiles.id, groupId, getCurrentUserName())
+                                                        } else {
+                                                            setToast({
+                                                                message: `${member.profiles.display_name || 'Member'} is not fasting today and cannot be buzzed.`,
+                                                                type: 'info'
+                                                            })
+                                                        }
+                                                    }}
+                                                    className={`p-2 rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${memberIntentions[member.profiles.id] !== false ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' : 'bg-gray-100 text-gray-400 opacity-50 cursor-not-allowed'}`}
+                                                    title={`Buzz ${member.profiles.display_name || member.profiles.email}`}
+                                                >
+                                                    <Bell className={`h-3.5 w-3.5 ${memberIntentions[member.profiles.id] !== false ? 'animate-bounce' : ''}`} />
+                                                    <span className="text-xs md:font-bold">Buzz</span>
+                                                </button>
                                             )}
                                             {hasLocation && isInWindow && !isAwake && (
-                                            <a
-                                                href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="p-2 text-xs md:font-bold flex items-center gap-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                                                title={`Find ${member.profiles.display_name || member.profiles.email}`}
-                                            >
-                                                <MapPin className="h-4 w-4" />
-                                                Find
-                                            </a>
+                                                <a
+                                                    href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="p-2 text-xs md:font-bold flex items-center gap-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                                    title={`Find ${member.profiles.display_name || member.profiles.email}`}
+                                                >
+                                                    <MapPin className="h-4 w-4" />
+                                                    Find
+                                                </a>
                                             )}
                                             {isCurrentUserAdmin && member.profiles.id !== currentUser.uid && showActions && (
-                                            <button
-                                                onClick={() => handleRemoveMember(member.id, member.profiles.display_name || member.profiles.email)}
-                                                className="p-2 text-xs md:font-bold flex items-center gap-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                                                title={`Remove ${member.profiles.display_name || member.profiles.email}`}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                                Remove
-                                            </button>
+                                                <button
+                                                    onClick={() => handleRemoveMember(member.id, member.profiles.display_name || member.profiles.email)}
+                                                    className="p-2 text-xs md:font-bold flex items-center gap-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                                    title={`Remove ${member.profiles.display_name || member.profiles.email}`}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                    Remove
+                                                </button>
                                             )}
                                         </div>
                                     </div>

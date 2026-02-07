@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import LanderCta from './LanderCta'
 
 export default function Hero({ navigate }) {
-    const [text, setText] = useState("In groups")
+    const [text, setText] = useState("with friends")
     const indexRef = useRef(0)
-    const keys = ["in groups", "with friends", "with family"]
+    const keys = ["with friends", "in groups", "with family"]
 
     useEffect(() => {
         const textInterval = setInterval(() => {

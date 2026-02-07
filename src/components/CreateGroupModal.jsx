@@ -26,7 +26,6 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
         try {
             const groupKey = generateGroupKey()
 
-            // Create group
             const groupRef = await addDoc(collection(db, 'groups'), {
                 name: groupName,
                 group_key: groupKey,
@@ -34,7 +33,6 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
                 created_at: serverTimestamp(),
             })
 
-            // Add user as admin member
             await addDoc(collection(db, 'group_members'), {
                 group_id: groupRef.id,
                 user_id: currentUser.uid,
@@ -43,7 +41,6 @@ export default function CreateGroupModal({ onClose, onSuccess }) {
             })
             navigate(`/groups/${groupRef.id}`)
 
-            // Notification for success
             if (Capacitor.isNativePlatform()) {
                 await LocalNotifications.schedule({
                     notifications: [{

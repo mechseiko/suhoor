@@ -21,7 +21,6 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
         setLoading(true)
 
         try {
-            // Find group by key
             const groupsRef = collection(db, 'groups')
             const q = query(groupsRef, where('group_key', '==', (groupKey || linkGroupKey).toUpperCase()))
             const querySnapshot = await getDocs(q)
@@ -35,7 +34,6 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
             const groupDoc = querySnapshot.docs[0]
             const groupId = groupDoc.id
 
-            // Check if already a member
             const membersRef = collection(db, 'group_members')
             const memberQ = query(
                 membersRef,
@@ -50,13 +48,13 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                 return
             }
 
-            // Add member
             await addDoc(collection(db, 'group_members'), {
                 group_id: groupId,
                 user_id: currentUser.uid,
                 role: 'member',
                 joined_at: serverTimestamp(),
             })
+            navigate(`/groups/${groupId}`)
 
             onSuccess()
         } catch (err) {
@@ -139,7 +137,7 @@ export default function JoinGroupModal({ onClose, onSuccess, linkGroupKey }) {
                     <div className="flex gap-3 pt-2 *:cursor-pointer">
                         <button
                             type="button"
-                            onClick={iWantToJoin ? () => {setStatus(false); navigate('/groups')} : onClose}
+                            onClick={iWantToJoin ? () => { setStatus(false); navigate('/groups') } : onClose}
                             className="flex-1 px-4 py-3.5 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-colors"
                         >
                             {iWantToJoin ? 'Reject' : 'Cancel'}

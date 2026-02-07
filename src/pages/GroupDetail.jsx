@@ -19,9 +19,7 @@ import Toast from '../components/Toast'
 import { useSocket } from '../context/SocketContext'
 import { useFastingTimes } from '../hooks/useFastingTimes'
 import { useAuth } from '../context/AuthContext'
-import { setDoc, serverTimestamp } from 'firebase/firestore'
-import Settings from './Settings'
-
+import BottomPrompt from '../components/BottomPrompt'
 
 export default function GroupDetail() {
     const { currentUser } = useAuth()
@@ -48,6 +46,7 @@ export default function GroupDetail() {
     const [userLocations, setUserLocations] = useState({})
     const [leavingGroup, setLeavingGroup] = useState(false)
     const [leaveFlex, setLeaveFlex] = useState(true)
+    const [prompt, setPrompt] = useState(null)
 
     const { socket, on, off, isConnected } = useSocket()
     const { isWakeUpWindow } = useFastingTimes()
@@ -158,26 +157,37 @@ export default function GroupDetail() {
     }, [groupId, isWakeUpWindow])
 
     const handleLeaveGroup = async () => {
-        if (!window.confirm('Are you sure you want to leave this group?')) return
+        setPrompt({
+            title: 'Leave Group?',
+            description: `Are you sure you want to leave this group? This action cannot be undone.`,
+            confirmText: 'Leave',
+            type: 'danger',
+            icon: LogOut,
+            onConfirm: async () => {
+                setLoading(true)
+                try {
+                    setLeavingGroup(true)
+                    const membersRef = collection(db, 'group_members')
+                    const q = query(membersRef, where('group_id', '==', groupId), where('user_id', '==', currentUser.uid))
+                    const querySnapshot = await getDocs(q)
 
-        try {
-            setLeavingGroup(true)
-            const membersRef = collection(db, 'group_members')
-            const q = query(membersRef, where('group_id', '==', groupId), where('user_id', '==', currentUser.uid))
-            const querySnapshot = await getDocs(q)
-
-            if (!querySnapshot.empty) {
-                await deleteDoc(doc(db, 'group_members', querySnapshot.docs[0].id))
-                localStorage.removeItem(`suhoor_group_${groupId}`)
-                localStorage.removeItem(`suhoor_members_${groupId}`)
-                navigate('/groups')
+                    if (!querySnapshot.empty) {
+                        await deleteDoc(doc(db, 'group_members', querySnapshot.docs[0].id))
+                        localStorage.removeItem(`suhoor_group_${groupId}`)
+                        localStorage.removeItem(`suhoor_members_${groupId}`)
+                        setToast({ message: `You left this group`, type: 'success' })
+                        navigate('/groups')
+                    }
+                } catch (err) {
+                    console.error('Error leaving group:', err)
+                    setToast({ type: 'error', message: 'Failed to leave group.' })
+                } finally {
+                    setLeavingGroup(false)
+                    setLoading(false)
+                    setPrompt(null)
+                }
             }
-        } catch (err) {
-            console.error('Error leaving group:', err)
-            setToast({ type: 'error', message: 'Failed to leave group.' })
-        } finally {
-            setLeavingGroup(false)
-        }
+        })
     }
 
     const GroupActions = () => {
@@ -218,7 +228,7 @@ export default function GroupDetail() {
         )
     }
 
-    const leaveButton = ( ) => {
+    const leaveButton = () => {
         setShowLeave(!showLeave)
         setLeaveFlex(!leaveFlex)
     }
@@ -352,7 +362,7 @@ export default function GroupDetail() {
                                     </div>
                                 </div>
                                 <div className='flex items-center gap-2'>
-                                    <span className="px-3 py-1 w-fit bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
+                                    <span className="px-3 py-1 w-fit bg-blue-50 text-blu e-700 text-xs font-medium rounded-full border border-blue-100">
                                         {members.length} {members.length === 1 ? 'Member' : 'Members'}
                                     </span>
                                     {!isCurrentUserAdmin && (<span title={`${leaveButton ? 'Hide Actions' : 'Show Actions'}`}><Settings2 className={`h-4 w-4 cursor-pointer ${showLeave ? 'text-primary' : ''}`} onClick={leaveButton} /></span>)}
@@ -382,6 +392,21 @@ export default function GroupDetail() {
                     message={toast.message}
                     type={toast.type}
                     onClose={() => setToast(null)}
+                />
+            )}
+
+            {prompt && (
+                <BottomPrompt
+                    isOpen={!!prompt}
+                    onClose={() => setPrompt(null)}
+                    title={prompt.title}
+                    description={prompt.description}
+                    onConfirm={prompt.onConfirm}
+                    onCancel={() => setPrompt(null)}
+                    confirmText={prompt.confirmText}
+                    type={prompt.type}
+                    icon={prompt.icon}
+                    isLoading={loading}
                 />
             )}
         </DashboardLayout>
