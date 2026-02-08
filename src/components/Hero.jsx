@@ -21,7 +21,7 @@ export default function Hero({ navigate }) {
                 Wake Up for <span className='text-primary'>Suhoor {text}</span>
             </h1>
             <p className="text-base md:text-lg text-gray-600 mb-6 leading-relaxed px-4 max-w-2xl mx-auto">
-              Create groups, connect with loved ones, ensure everyone wakes up on time, and start your fast with blessings and unity.
+              Create groups, connect with loved ones, ensure everyone wakes up on time for suhoor and start your fast with blessings and unity.
             </p>
             <LanderCta 
                 className1="w-full group flex items-center justify-center gap-2 sm:w-auto px-6 py-2.5 bg-primary text-white text-base rounded-lg hover:opacity-90 font-medium transition shadow-lg hover:shadow-xl"

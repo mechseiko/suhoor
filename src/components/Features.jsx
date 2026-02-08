@@ -1,4 +1,4 @@
-import { Users, Bell, Calendar, Moon } from 'lucide-react'
+import { Users, Bell, Calendar, BookOpen } from 'lucide-react'
 import FeatureCard from './FeatureCard'
 import SectionHeader from './SectionHeader'
 
@@ -25,13 +25,13 @@ export default function Features() {
                     />
                     <FeatureCard
                         icon={<Calendar className="h-10 w-10 text-primary" />}
-                        title="Prayer & Iftar"
+                        title="Fasting Times"
                         description="Accurate timings for Suhoor and Iftar, complete with Hijri dates and Sunnah fasting reminders."
                     />
                     <FeatureCard
-                        icon={<Moon className="h-10 w-10 text-primary" />}
-                        title="Collective Consistency"
-                        description="Motivate one another to maintain consistency in worship and fasting."
+                        icon={<BookOpen className="h-10 w-10 text-primary" />}
+                        title="Resources"
+                        description="Explore a curated collection of essential Islamic duas and books on fasting."
                     />
                 </div>
             </div>

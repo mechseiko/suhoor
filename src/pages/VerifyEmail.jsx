@@ -163,11 +163,11 @@ export default function VerifyEmail() {
     const ResendEmail = ({showPrompt = true}) => {
         return (
             <>
-                <div className="mt-5">
-                    <p className="text-center text-gray-600 mb-5">
+                <div className="mt-5 mb-3">
+                    <p className="text-center text-gray-600">
                         {showPrompt && 
                             <>
-                            {resending ? '' : resendStatus === 'success' ? '' : "Didn't get the email?"}
+                            {resending ? '' : "Didn't get the email? "}
                             </>
                         }
                         <button
@@ -180,8 +180,9 @@ export default function VerifyEmail() {
                 </div>
 
                 <button
-                    className="w-full bg-primary cursor-pointer text-white py-3 rounded-lg hover:opacity-90 font-medium"
-                    onClick={(!resending || !resendStatus === 'success') && handleResend}
+                    className="w-full bg-primary cursor-pointer text-white py-3 rounded-lg hover:opacity-90 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={resending}
+                    onClick={handleResend}
                 >
                     Resend Verification Email
                 </button>
@@ -227,8 +228,8 @@ export default function VerifyEmail() {
 
                 {status === 'error' && (
                     <div className="flex flex-col items-center">
-                        <XCircle className="w-16 h-16 text-red-500 mb-4" />
-                        <p className="text-gray-600 mb-4">{message}</p>
+                        <XCircle className="w-16 h-16 text-red-500 mb-6" />
+                        <p className="text-gray-600">{message}</p>
                         <ResendEmail showPrompt={false}/>
                     </div>
                 )}

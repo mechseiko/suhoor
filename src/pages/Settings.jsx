@@ -107,7 +107,7 @@ export default function Settings() {
                     <SettingItem
                         icon={Clock}
                         label="Ramadan"
-                        description="Default to fasting all days of Ramadan"
+                        description="Default to fasting all days of Ramadan (Recommended)"
                         action={
                             <Toggle
                                 value={userProfile?.fastingDefaults?.ramadan ?? true}

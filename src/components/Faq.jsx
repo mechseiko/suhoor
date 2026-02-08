@@ -9,19 +9,19 @@ const faqs = [
     },
     {
         question: "How do the groups work?",
-        answer: "You can join or create a group and invite friends or family using a unique code. Once they join, you can wake each other up for suhoor, see each other's progress and keep motivating everyone to keep up with their goals."
+        answer: "You can join or create a group and invite friends or family using a unique code. Once they join, you can wake each other up for suhoor."
     },
     {
         question: "Is there a mobile app?",
         answer: "Absolutely! There is a mobile app. This means you can install it directly to your home screen, and it works on both iOS and Android devices."
     },
     {
-        question: "How accurate are the prayer times?",
+        question: "How accurate are the fasting times?",
         answer: "We use high precision calculation methods based on your location. You can also adjust the calculation method in your settings to match your local mosque."
     },
     {
         question: "Is my location data private?",
-        answer: "Your location is ONLY shared within your selected group and ONLY during the 30 minute wake up window before Suhoor. We never track you outside of these times."
+        answer: "Your location is ONLY shared within your selected group and ONLY during the 30 minute wake up window. We never track you outside of these times."
     },
     {
         question: "Can I use Suhoor for voluntary fasts?",
